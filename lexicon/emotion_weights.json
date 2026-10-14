@@ -1,0 +1,959 @@
+{
+ "source": "jon2024_data",
+ "participants": 7387,
+ "records": 88716,
+ "countries": 25,
+ "rule": {
+  "lift": 1.25,
+  "countryShare": 0.5,
+  "minCountryN": 100,
+  "tierLine": 0.3
+ },
+ "emotions": {
+  "admiration": {
+   "baseline": 0.181,
+   "weights": {
+    "blue": 0.246
+   },
+   "tier": "low confidence",
+   "table": [
+    {
+     "colour": "blue",
+     "rate": 0.246,
+     "lift": 1.36,
+     "countriesTop3": "14/25",
+     "kept": true
+    },
+    {
+     "colour": "pink",
+     "rate": 0.242,
+     "lift": 1.34,
+     "countriesTop3": "9/25",
+     "kept": false
+    },
+    {
+     "colour": "turquoise",
+     "rate": 0.239,
+     "lift": 1.32,
+     "countriesTop3": "9/25",
+     "kept": false
+    },
+    {
+     "colour": "white",
+     "rate": 0.232,
+     "lift": 1.28,
+     "countriesTop3": "12/25",
+     "kept": false
+    },
+    {
+     "colour": "purple",
+     "rate": 0.227,
+     "lift": 1.26,
+     "countriesTop3": "10/25",
+     "kept": false
+    },
+    {
+     "colour": "yellow",
+     "rate": 0.213,
+     "lift": 1.18,
+     "countriesTop3": "6/25",
+     "kept": false
+    },
+    {
+     "colour": "red",
+     "rate": 0.205,
+     "lift": 1.13,
+     "countriesTop3": "9/25",
+     "kept": false
+    },
+    {
+     "colour": "green",
+     "rate": 0.19,
+     "lift": 1.05,
+     "countriesTop3": "2/25",
+     "kept": false
+    },
+    {
+     "colour": "orange",
+     "rate": 0.182,
+     "lift": 1.01,
+     "countriesTop3": "4/25",
+     "kept": false
+    },
+    {
+     "colour": "black",
+     "rate": 0.082,
+     "lift": 0.46,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "brown",
+     "rate": 0.056,
+     "lift": 0.31,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "grey",
+     "rate": 0.053,
+     "lift": 0.3,
+     "countriesTop3": "0/25",
+     "kept": false
+    }
+   ]
+  },
+  "amusement": {
+   "baseline": 0.195,
+   "weights": {
+    "orange": 0.41,
+    "yellow": 0.377,
+    "pink": 0.336
+   },
+   "tier": "supported but contested",
+   "table": [
+    {
+     "colour": "orange",
+     "rate": 0.41,
+     "lift": 2.11,
+     "countriesTop3": "24/25",
+     "kept": true
+    },
+    {
+     "colour": "yellow",
+     "rate": 0.377,
+     "lift": 1.94,
+     "countriesTop3": "21/25",
+     "kept": true
+    },
+    {
+     "colour": "pink",
+     "rate": 0.336,
+     "lift": 1.72,
+     "countriesTop3": "19/25",
+     "kept": true
+    },
+    {
+     "colour": "turquoise",
+     "rate": 0.252,
+     "lift": 1.29,
+     "countriesTop3": "3/25",
+     "kept": false
+    },
+    {
+     "colour": "green",
+     "rate": 0.223,
+     "lift": 1.14,
+     "countriesTop3": "4/25",
+     "kept": false
+    },
+    {
+     "colour": "red",
+     "rate": 0.19,
+     "lift": 0.97,
+     "countriesTop3": "3/25",
+     "kept": false
+    },
+    {
+     "colour": "purple",
+     "rate": 0.189,
+     "lift": 0.97,
+     "countriesTop3": "1/25",
+     "kept": false
+    },
+    {
+     "colour": "blue",
+     "rate": 0.157,
+     "lift": 0.81,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "white",
+     "rate": 0.079,
+     "lift": 0.41,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "brown",
+     "rate": 0.046,
+     "lift": 0.23,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "black",
+     "rate": 0.043,
+     "lift": 0.22,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "grey",
+     "rate": 0.035,
+     "lift": 0.18,
+     "countriesTop3": "0/25",
+     "kept": false
+    }
+   ]
+  },
+  "compassion": {
+   "baseline": 0.144,
+   "weights": {
+    "white": 0.247,
+    "blue": 0.198
+   },
+   "tier": "low confidence",
+   "table": [
+    {
+     "colour": "white",
+     "rate": 0.247,
+     "lift": 1.72,
+     "countriesTop3": "18/25",
+     "kept": true
+    },
+    {
+     "colour": "blue",
+     "rate": 0.198,
+     "lift": 1.38,
+     "countriesTop3": "15/25",
+     "kept": true
+    },
+    {
+     "colour": "pink",
+     "rate": 0.188,
+     "lift": 1.31,
+     "countriesTop3": "12/25",
+     "kept": false
+    },
+    {
+     "colour": "purple",
+     "rate": 0.172,
+     "lift": 1.2,
+     "countriesTop3": "8/25",
+     "kept": false
+    },
+    {
+     "colour": "green",
+     "rate": 0.156,
+     "lift": 1.08,
+     "countriesTop3": "5/25",
+     "kept": false
+    },
+    {
+     "colour": "turquoise",
+     "rate": 0.142,
+     "lift": 0.99,
+     "countriesTop3": "6/25",
+     "kept": false
+    },
+    {
+     "colour": "grey",
+     "rate": 0.112,
+     "lift": 0.78,
+     "countriesTop3": "5/25",
+     "kept": false
+    },
+    {
+     "colour": "yellow",
+     "rate": 0.11,
+     "lift": 0.76,
+     "countriesTop3": "1/25",
+     "kept": false
+    },
+    {
+     "colour": "brown",
+     "rate": 0.106,
+     "lift": 0.74,
+     "countriesTop3": "1/25",
+     "kept": false
+    },
+    {
+     "colour": "orange",
+     "rate": 0.102,
+     "lift": 0.71,
+     "countriesTop3": "1/25",
+     "kept": false
+    },
+    {
+     "colour": "black",
+     "rate": 0.098,
+     "lift": 0.68,
+     "countriesTop3": "3/25",
+     "kept": false
+    },
+    {
+     "colour": "red",
+     "rate": 0.091,
+     "lift": 0.63,
+     "countriesTop3": "0/25",
+     "kept": false
+    }
+   ]
+  },
+  "contentment": {
+   "baseline": 0.23,
+   "weights": {
+    "green": 0.391,
+    "blue": 0.35,
+    "turquoise": 0.32
+   },
+   "tier": "supported but contested",
+   "table": [
+    {
+     "colour": "green",
+     "rate": 0.391,
+     "lift": 1.7,
+     "countriesTop3": "20/25",
+     "kept": true
+    },
+    {
+     "colour": "blue",
+     "rate": 0.35,
+     "lift": 1.52,
+     "countriesTop3": "20/25",
+     "kept": true
+    },
+    {
+     "colour": "turquoise",
+     "rate": 0.32,
+     "lift": 1.39,
+     "countriesTop3": "16/25",
+     "kept": true
+    },
+    {
+     "colour": "white",
+     "rate": 0.299,
+     "lift": 1.3,
+     "countriesTop3": "9/25",
+     "kept": false
+    },
+    {
+     "colour": "yellow",
+     "rate": 0.262,
+     "lift": 1.14,
+     "countriesTop3": "4/25",
+     "kept": false
+    },
+    {
+     "colour": "orange",
+     "rate": 0.253,
+     "lift": 1.1,
+     "countriesTop3": "3/25",
+     "kept": false
+    },
+    {
+     "colour": "pink",
+     "rate": 0.249,
+     "lift": 1.08,
+     "countriesTop3": "3/25",
+     "kept": false
+    },
+    {
+     "colour": "purple",
+     "rate": 0.19,
+     "lift": 0.83,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "red",
+     "rate": 0.144,
+     "lift": 0.63,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "brown",
+     "rate": 0.131,
+     "lift": 0.57,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "grey",
+     "rate": 0.094,
+     "lift": 0.41,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "black",
+     "rate": 0.074,
+     "lift": 0.32,
+     "countriesTop3": "0/25",
+     "kept": false
+    }
+   ]
+  },
+  "interest": {
+   "baseline": 0.204,
+   "weights": {
+    "green": 0.309,
+    "blue": 0.28
+   },
+   "tier": "supported but contested",
+   "table": [
+    {
+     "colour": "green",
+     "rate": 0.309,
+     "lift": 1.52,
+     "countriesTop3": "22/25",
+     "kept": true
+    },
+    {
+     "colour": "blue",
+     "rate": 0.28,
+     "lift": 1.37,
+     "countriesTop3": "14/25",
+     "kept": true
+    },
+    {
+     "colour": "turquoise",
+     "rate": 0.276,
+     "lift": 1.35,
+     "countriesTop3": "11/25",
+     "kept": false
+    },
+    {
+     "colour": "orange",
+     "rate": 0.266,
+     "lift": 1.31,
+     "countriesTop3": "10/25",
+     "kept": false
+    },
+    {
+     "colour": "yellow",
+     "rate": 0.259,
+     "lift": 1.27,
+     "countriesTop3": "7/25",
+     "kept": false
+    },
+    {
+     "colour": "purple",
+     "rate": 0.237,
+     "lift": 1.16,
+     "countriesTop3": "4/25",
+     "kept": false
+    },
+    {
+     "colour": "pink",
+     "rate": 0.189,
+     "lift": 0.93,
+     "countriesTop3": "4/25",
+     "kept": false
+    },
+    {
+     "colour": "red",
+     "rate": 0.187,
+     "lift": 0.92,
+     "countriesTop3": "1/25",
+     "kept": false
+    },
+    {
+     "colour": "white",
+     "rate": 0.163,
+     "lift": 0.8,
+     "countriesTop3": "2/25",
+     "kept": false
+    },
+    {
+     "colour": "black",
+     "rate": 0.103,
+     "lift": 0.51,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "brown",
+     "rate": 0.092,
+     "lift": 0.45,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "grey",
+     "rate": 0.085,
+     "lift": 0.42,
+     "countriesTop3": "0/25",
+     "kept": false
+    }
+   ]
+  },
+  "joy": {
+   "baseline": 0.258,
+   "weights": {
+    "yellow": 0.557,
+    "orange": 0.446,
+    "pink": 0.418
+   },
+   "tier": "supported but contested",
+   "table": [
+    {
+     "colour": "yellow",
+     "rate": 0.557,
+     "lift": 2.16,
+     "countriesTop3": "20/25",
+     "kept": true
+    },
+    {
+     "colour": "orange",
+     "rate": 0.446,
+     "lift": 1.73,
+     "countriesTop3": "20/25",
+     "kept": true
+    },
+    {
+     "colour": "pink",
+     "rate": 0.418,
+     "lift": 1.62,
+     "countriesTop3": "17/25",
+     "kept": true
+    },
+    {
+     "colour": "turquoise",
+     "rate": 0.334,
+     "lift": 1.29,
+     "countriesTop3": "4/25",
+     "kept": false
+    },
+    {
+     "colour": "green",
+     "rate": 0.329,
+     "lift": 1.27,
+     "countriesTop3": "7/25",
+     "kept": false
+    },
+    {
+     "colour": "red",
+     "rate": 0.271,
+     "lift": 1.05,
+     "countriesTop3": "3/25",
+     "kept": false
+    },
+    {
+     "colour": "blue",
+     "rate": 0.225,
+     "lift": 0.87,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "white",
+     "rate": 0.22,
+     "lift": 0.85,
+     "countriesTop3": "3/25",
+     "kept": false
+    },
+    {
+     "colour": "purple",
+     "rate": 0.184,
+     "lift": 0.71,
+     "countriesTop3": "1/25",
+     "kept": false
+    },
+    {
+     "colour": "brown",
+     "rate": 0.043,
+     "lift": 0.17,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "black",
+     "rate": 0.038,
+     "lift": 0.15,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "grey",
+     "rate": 0.034,
+     "lift": 0.13,
+     "countriesTop3": "0/25",
+     "kept": false
+    }
+   ]
+  },
+  "love": {
+   "baseline": 0.188,
+   "weights": {
+    "red": 0.692,
+    "pink": 0.532
+   },
+   "tier": "supported but contested",
+   "table": [
+    {
+     "colour": "red",
+     "rate": 0.692,
+     "lift": 3.67,
+     "countriesTop3": "25/25",
+     "kept": true
+    },
+    {
+     "colour": "pink",
+     "rate": 0.532,
+     "lift": 2.82,
+     "countriesTop3": "24/25",
+     "kept": true
+    },
+    {
+     "colour": "white",
+     "rate": 0.189,
+     "lift": 1.0,
+     "countriesTop3": "15/25",
+     "kept": false
+    },
+    {
+     "colour": "purple",
+     "rate": 0.16,
+     "lift": 0.85,
+     "countriesTop3": "8/25",
+     "kept": false
+    },
+    {
+     "colour": "orange",
+     "rate": 0.12,
+     "lift": 0.64,
+     "countriesTop3": "2/25",
+     "kept": false
+    },
+    {
+     "colour": "turquoise",
+     "rate": 0.119,
+     "lift": 0.63,
+     "countriesTop3": "1/25",
+     "kept": false
+    },
+    {
+     "colour": "green",
+     "rate": 0.113,
+     "lift": 0.6,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "yellow",
+     "rate": 0.111,
+     "lift": 0.59,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "blue",
+     "rate": 0.108,
+     "lift": 0.57,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "black",
+     "rate": 0.042,
+     "lift": 0.22,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "brown",
+     "rate": 0.041,
+     "lift": 0.22,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "grey",
+     "rate": 0.034,
+     "lift": 0.18,
+     "countriesTop3": "0/25",
+     "kept": false
+    }
+   ]
+  },
+  "pleasure": {
+   "baseline": 0.242,
+   "weights": {
+    "pink": 0.418,
+    "turquoise": 0.352
+   },
+   "tier": "supported but contested",
+   "table": [
+    {
+     "colour": "pink",
+     "rate": 0.418,
+     "lift": 1.73,
+     "countriesTop3": "22/25",
+     "kept": true
+    },
+    {
+     "colour": "turquoise",
+     "rate": 0.352,
+     "lift": 1.45,
+     "countriesTop3": "15/25",
+     "kept": true
+    },
+    {
+     "colour": "orange",
+     "rate": 0.329,
+     "lift": 1.36,
+     "countriesTop3": "7/25",
+     "kept": false
+    },
+    {
+     "colour": "red",
+     "rate": 0.327,
+     "lift": 1.35,
+     "countriesTop3": "10/25",
+     "kept": false
+    },
+    {
+     "colour": "yellow",
+     "rate": 0.321,
+     "lift": 1.33,
+     "countriesTop3": "8/25",
+     "kept": false
+    },
+    {
+     "colour": "green",
+     "rate": 0.319,
+     "lift": 1.32,
+     "countriesTop3": "9/25",
+     "kept": false
+    },
+    {
+     "colour": "blue",
+     "rate": 0.249,
+     "lift": 1.03,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "purple",
+     "rate": 0.239,
+     "lift": 0.99,
+     "countriesTop3": "2/25",
+     "kept": false
+    },
+    {
+     "colour": "white",
+     "rate": 0.184,
+     "lift": 0.76,
+     "countriesTop3": "2/25",
+     "kept": false
+    },
+    {
+     "colour": "black",
+     "rate": 0.062,
+     "lift": 0.26,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "brown",
+     "rate": 0.061,
+     "lift": 0.25,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "grey",
+     "rate": 0.042,
+     "lift": 0.18,
+     "countriesTop3": "0/25",
+     "kept": false
+    }
+   ]
+  },
+  "pride": {
+   "baseline": 0.167,
+   "weights": {
+    "blue": 0.248,
+    "white": 0.231,
+    "purple": 0.228
+   },
+   "tier": "low confidence",
+   "table": [
+    {
+     "colour": "blue",
+     "rate": 0.248,
+     "lift": 1.48,
+     "countriesTop3": "19/25",
+     "kept": true
+    },
+    {
+     "colour": "white",
+     "rate": 0.231,
+     "lift": 1.38,
+     "countriesTop3": "13/25",
+     "kept": true
+    },
+    {
+     "colour": "purple",
+     "rate": 0.228,
+     "lift": 1.36,
+     "countriesTop3": "15/25",
+     "kept": true
+    },
+    {
+     "colour": "red",
+     "rate": 0.221,
+     "lift": 1.32,
+     "countriesTop3": "11/25",
+     "kept": false
+    },
+    {
+     "colour": "yellow",
+     "rate": 0.186,
+     "lift": 1.11,
+     "countriesTop3": "7/25",
+     "kept": false
+    },
+    {
+     "colour": "green",
+     "rate": 0.167,
+     "lift": 1.0,
+     "countriesTop3": "1/25",
+     "kept": false
+    },
+    {
+     "colour": "orange",
+     "rate": 0.167,
+     "lift": 1.0,
+     "countriesTop3": "2/25",
+     "kept": false
+    },
+    {
+     "colour": "turquoise",
+     "rate": 0.166,
+     "lift": 0.99,
+     "countriesTop3": "4/25",
+     "kept": false
+    },
+    {
+     "colour": "black",
+     "rate": 0.141,
+     "lift": 0.84,
+     "countriesTop3": "2/25",
+     "kept": false
+    },
+    {
+     "colour": "pink",
+     "rate": 0.121,
+     "lift": 0.73,
+     "countriesTop3": "1/25",
+     "kept": false
+    },
+    {
+     "colour": "brown",
+     "rate": 0.067,
+     "lift": 0.4,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "grey",
+     "rate": 0.066,
+     "lift": 0.39,
+     "countriesTop3": "0/25",
+     "kept": false
+    }
+   ]
+  },
+  "relief": {
+   "baseline": 0.198,
+   "weights": {
+    "white": 0.435,
+    "green": 0.347,
+    "blue": 0.344,
+    "turquoise": 0.337
+   },
+   "tier": "supported but contested",
+   "table": [
+    {
+     "colour": "white",
+     "rate": 0.435,
+     "lift": 2.2,
+     "countriesTop3": "25/25",
+     "kept": true
+    },
+    {
+     "colour": "green",
+     "rate": 0.347,
+     "lift": 1.75,
+     "countriesTop3": "19/25",
+     "kept": true
+    },
+    {
+     "colour": "blue",
+     "rate": 0.344,
+     "lift": 1.74,
+     "countriesTop3": "17/25",
+     "kept": true
+    },
+    {
+     "colour": "turquoise",
+     "rate": 0.337,
+     "lift": 1.7,
+     "countriesTop3": "14/25",
+     "kept": true
+    },
+    {
+     "colour": "yellow",
+     "rate": 0.179,
+     "lift": 0.9,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "pink",
+     "rate": 0.177,
+     "lift": 0.9,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "orange",
+     "rate": 0.125,
+     "lift": 0.63,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "purple",
+     "rate": 0.125,
+     "lift": 0.63,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "grey",
+     "rate": 0.098,
+     "lift": 0.49,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "brown",
+     "rate": 0.097,
+     "lift": 0.49,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "black",
+     "rate": 0.056,
+     "lift": 0.28,
+     "countriesTop3": "0/25",
+     "kept": false
+    },
+    {
+     "colour": "red",
+     "rate": 0.054,
+     "lift": 0.27,
+     "countriesTop3": "0/25",
+     "kept": false
+    }
+   ]
+  }
+ }
+}

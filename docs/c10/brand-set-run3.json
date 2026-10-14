@@ -1,0 +1,255 @@
+{
+  "purpose": "C10 run 3: brands chosen from the Digital Synopsis list by the criteria in docs/c10/README.md (run 3 plan). Verbatim words only; no synthesized mapping.",
+  "gathered": "2026-10-01",
+  "brands": [
+    {
+      "id": "ups",
+      "words_verbatim": [
+        "customer first",
+        "people led",
+        "innovation driven",
+        "leader",
+        "committed",
+        "resilient",
+        "sustainable"
+      ],
+      "words_source": "https://about.ups.com/us/en/our-company/our-strategy.html (official): 'Customer First. People Led. Innovation Driven.', 'logistics leader', 'committed', 'safer, stronger and more resilient communities', 'sustainable'",
+      "colors": [
+        {
+          "name": "UPS brown",
+          "hex": "#351c15",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "rolls-royce",
+      "words_verbatim": [
+        "perfection",
+        "exceptional",
+        "remarkable",
+        "persistence",
+        "aspirational",
+        "super-luxury"
+      ],
+      "words_source": "https://www.rolls-roycemotorcars.com/en_US/inspiring-greatness/values.html (official)",
+      "colors": [
+        {
+          "name": "Rolls-Royce burgundy",
+          "hex": "#680021",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "yahoo",
+      "words_verbatim": [
+        "impact",
+        "innovation",
+        "support",
+        "trusted",
+        "guide",
+        "original",
+        "pioneered",
+        "humanizing"
+      ],
+      "words_source": "https://www.yahooinc.com/about (official)",
+      "colors": [
+        {
+          "name": "Yahoo purple",
+          "hex": "#410093",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "american-express",
+      "words_verbatim": [
+        "right",
+        "customers",
+        "great",
+        "respect",
+        "diversity",
+        "equity",
+        "inclusion",
+        "team",
+        "communities"
+      ],
+      "words_source": "https://www.americanexpress.com/en-us/company/who-we-are/ (official): the eight Blue Box Values, key words taken from each",
+      "colors": [
+        {
+          "name": "Amex blue",
+          "hex": "#002663",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "tumblr",
+      "words_verbatim": [
+        "effortlessly",
+        "share"
+      ],
+      "words_source": "https://www.tumblr.com/about (official): 'Tumblr lets you effortlessly share anything.' (thin)",
+      "colors": [
+        {
+          "name": "Tumblr slate",
+          "hex": "#35465c",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "whatsapp",
+      "words_verbatim": [
+        "simple",
+        "secure",
+        "reliable",
+        "fast",
+        "free",
+        "personal"
+      ],
+      "words_source": "https://www.whatsapp.com/about (official)",
+      "colors": [
+        {
+          "name": "WhatsApp teal green",
+          "hex": "#075e54",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "home-depot",
+      "words_verbatim": [
+        "excellent",
+        "service",
+        "entrepreneurial",
+        "spirit",
+        "care",
+        "respect",
+        "right",
+        "strong",
+        "relationships",
+        "giving"
+      ],
+      "words_source": "https://corporate.homedepot.com/document/4400 (official, 2015 report): the eight values, key words taken from each",
+      "colors": [
+        {
+          "name": "Home Depot orange",
+          "hex": "#f96302",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "lamborghini",
+      "words_verbatim": [
+        "brave",
+        "unexpected",
+        "authentic",
+        "excellence",
+        "innovation",
+        "audacious"
+      ],
+      "words_source": "https://www.lamborghini.com/en-en/company (official)",
+      "colors": [
+        {
+          "name": "Lamborghini gold",
+          "hex": "#ddb321",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "heineken",
+      "words_verbatim": [
+        "joy",
+        "togetherness",
+        "pioneering",
+        "legendary",
+        "delight",
+        "better"
+      ],
+      "words_source": "https://www.theheinekencompany.com/about-us (official)",
+      "colors": [
+        {
+          "name": "Heineken green",
+          "hex": "#008200",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "t-mobile",
+      "words_verbatim": [
+        "love",
+        "together",
+        "dream",
+        "deliver",
+        "right",
+        "relentless",
+        "smart",
+        "risks",
+        "people-focused",
+        "purpose-driven"
+      ],
+      "words_source": "https://careers.t-mobile.com/culture-and-benefits (official): Un-carrier values and culture words",
+      "colors": [
+        {
+          "name": "T-Mobile magenta",
+          "hex": "#e20074",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "delta",
+      "words_verbatim": [
+        "honesty",
+        "integrity",
+        "respect",
+        "perseverance",
+        "servant leadership"
+      ],
+      "words_source": "https://www.delta.com/content/www/us/en/careers/overview.html (official)",
+      "colors": [
+        {
+          "name": "Delta red",
+          "hex": "#c8102e",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    },
+    {
+      "id": "tripadvisor",
+      "words_verbatim": [
+        "transformative",
+        "connect",
+        "unique",
+        "inclusive",
+        "belonging",
+        "together"
+      ],
+      "words_source": "https://www.purpose.tripadvisor.com/ (official)",
+      "colors": [
+        {
+          "name": "Tripadvisor green",
+          "hex": "#00af87",
+          "role": "primary",
+          "source": "secondary, possibly dated: Digital Synopsis, \"Colors Used By Famous Brands\" (first color listed); not checked against the brand's own guide"
+        }
+      ]
+    }
+  ]
+}

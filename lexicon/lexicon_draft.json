@@ -1,0 +1,1882 @@
+{
+ "version": "draft-2026-09-30",
+ "status": "draft for Kwade's review; decision = approve | edit | drop",
+ "schema": {
+  "L": "OKLCH L range [min,max], null = open",
+  "C": "OKLCH C range",
+  "hueWeights": "family -> weight (hue_families.json)",
+  "colorTerms": "colour word -> weight, expanded through hue_families.json colorTerms regions (negative = penalty)",
+  "nudges": "preferred direction on L or C with the source beta",
+  "models": "Ou (2004) equation, sign, min score, evaluated in CIELAB D65",
+  "studyWords": "words the source study itself used for this row (same tier as the row)",
+  "strongSynonyms": "near-identical words the studies did not use; matching one lowers the tier one step"
+ },
+ "sources": {
+  "ou2004": {
+   "cite": "Ou, Luo, Woodcock & Wright (2004). A study of colour emotion and colour preference. Part I: Colour emotions for single colours. Color Research & Application 29(3), 232-240.",
+   "doi": "10.1002/col.20010",
+   "url": "https://onlinelibrary.wiley.com/doi/abs/10.1002/col.20010",
+   "scope": "31 observers (14 British, 17 Chinese), 20 NCS patches on mid-grey under D65. Models in CIELAB: WC R2 .74, HL R2 .76, AP R2 .75, HS R2 .73. Equations checked against the printed paper, Eqs. 2-5 p. 238, 2026-10-04 (TO-CONFIRM X11). The paper has no models for its other six scales (C17, closed). Observers were all members of a color-science institute with color-science training (17 staff, 8 PhD students, 6 MSc students), not a general sample. Patches were 3 x 3 inch, viewed one at a time in a dark room; judgments were forced-choice word pairs scored as Thurstone Case V z-scores, so WC > 0 means most observers chose warm. The authors call the four modeled scales culture-independent across Britain, China, Japan, Thailand and Hong Kong only; tense-relaxed and like-dislike differed between British and Chinese observers and are not modeled. The paper does not state the white point of its CIELAB values (the engine's D65 frame is inferred from the D65 viewing cabinet). Limits recorded 2026-10-13."
+  },
+  "cie_ilv": {
+   "cite": "CIE S 017:2020 International Lighting Vocabulary, terms 17-22-063 (lightness) and 17-22-074 (chroma).",
+   "url": "https://cie.co.at/eilvterm/17-22-074",
+   "scope": "Definitions of the perceptual attributes; no thresholds."
+  },
+  "lm2012": {
+   "cite": "Labrecque & Milne (2012). Exciting red and competent blue: the importance of color in marketing. Journal of the Academy of Marketing Science 40, 711-727.",
+   "doi": "10.1007/s11747-010-0245-y",
+   "url": "https://link.springer.com/article/10.1007/s11747-010-0245-y",
+   "scope": "Study 1: n=255, fictitious logos, 10 colours vs grey (HSL S 220/240, L 120/240). Study 2: n=291, red/green/blue/purple x saturation (100%/42%) x value (100%/58%). US samples. Coefficients first read from an academia.edu copy by automated extraction; the kept values were checked against the printed Tables 1-2 on 2026-10-06 and match (TO-CONFIRM C14)."
+  },
+  "aaker1997": {
+   "cite": "Aaker (1997). Dimensions of Brand Personality. Journal of Marketing Research 34(3), 347-356.",
+   "doi": "10.1177/002224379703400304",
+   "url": "https://journals.sagepub.com/doi/10.1177/002224379703400304",
+   "scope": "Five dimensions, 15 facets. Facet names checked against secondary summaries; the article itself is paywalled."
+  },
+  "jon2024": {
+   "cite": "Jonauskaite et al. (2024). A comparative analysis of colour-emotion associations in 16-88-year-old adults from 31 countries. British Journal of Psychology 115, 275-305.",
+   "doi": "10.1111/bjop.12687",
+   "url": "https://nkonstantinou.com/publication/jonauskaite-bjp-2024/Jonauskaite-BJP-2024.pdf",
+   "scope": "n=7,393, 31 countries, 12 colour TERMS x 20 emotions (Geneva Emotion Wheel). Reports the 14 associations chosen by at least 40% of participants."
+  },
+  "jon2020ps": {
+   "cite": "Jonauskaite et al. (2020). Universal patterns in color-emotion associations are further shaped by linguistic and geographic proximity. Psychological Science 31(10).",
+   "doi": "10.1177/0956797620948810",
+   "url": "https://journals.sagepub.com/doi/10.1177/0956797620948810",
+   "scope": "n=4,598, 30 nations; average pattern similarity r = .88. Supports universality, not specific shades."
+  },
+  "jon2020ip": {
+   "cite": "Jonauskaite, Parraga, Quiblier & Mohr (2020). Feeling blue or seeing red? Similar patterns of emotion associations with colour patches and colour terms. i-Perception 11(1).",
+   "doi": "10.1177/2041669520902484",
+   "url": "https://journals.sagepub.com/doi/10.1177/2041669520902484",
+   "scope": "n=132, Switzerland. Patch vs term pattern r = .82 (purple .23). Table 1 gives Munsell + xyY for the 12 patches."
+  },
+  "jon2024_data": {
+   "cite": "Jonauskaite et al. (2024), raw data (DATA.csv) from the OSF project for the BJP article; 7,387 unique participants, 88,716 participant x colour records.",
+   "url": "https://osf.io/873df/",
+   "scope": "Reproduces all 14 published >= 40% figures exactly. Weights derived by build/emotion_weights.py: rate >= 1.25 x the emotion's mean across colours AND in the emotion's top 3 in >= 50% of the 25 countries with >= 100 participants."
+  },
+  "vikalpa2008": {
+   "cite": "Measurement and Validity of Jennifer Aaker's Brand Personality Scale for Colgate Brand (2008). Vikalpa 33(3). Reproduces Aaker's (1997) 42 trait items by dimension.",
+   "doi": "10.1177/0256090920080304",
+   "url": "https://journals.sagepub.com/doi/pdf/10.1177/0256090920080304",
+   "scope": "Secondary source for the wording of Aaker's 42 items (listed by dimension only, p. 52). The grouping of items into facets is not in this source; it was checked against Aaker (1997) Appendix A (TO-CONFIRM C16, closed 2026-10-03)."
+  }
+ },
+ "rows": [
+  {
+   "id": "warm",
+   "term": "warm",
+   "synonyms": [
+    "warmth"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": [
+     {
+      "eq": "ou2004.WC",
+      "sign": 1,
+      "min": 0.0
+     }
+    ]
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "ou2004"
+   ],
+   "rule": "Ou warm-cool WC > 0: reds through yellows with enough chroma",
+   "notes": "WC = -0.5 + 0.02 C*^1.07 cos(h - 50deg). About 32% of an sRGB grid scores warm.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28"
+  },
+  {
+   "id": "cool",
+   "term": "cool",
+   "synonyms": [
+    "cold",
+    "crisp"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {
+     "cyan": 0.83,
+     "blue": 0.8,
+     "neutral": 0.38,
+     "purple": 0.55,
+     "green": 0.35
+    },
+    "colorTerms": {},
+    "nudges": {},
+    "models": [
+     {
+      "eq": "ou2004.WC",
+      "sign": -1,
+      "min": 0.0
+     }
+    ]
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "ou2004"
+   ],
+   "rule": "Ou WC < 0, leaning toward cyan and blue; neutral greys allowed (D40)",
+   "notes": "WC alone scores every near-neutral as cool (WC = -0.5 at C* 0). In phase 3 a hue lean was added from the model's own cos(h - 50deg) term at each family's centre (converted to CIELAB D65 hue) so that greys would rank below blues and cyans. D40 (Kwade, 2026-10-13, after reading Gao & Xin 2006, Gao et al. 2007, Xin et al. 2004 and Ou et al. 2004, all of which rate grayish and low-chroma colours cool) lets greys rank as cool again: the neutral family now has a hue weight of 0.38, so a true grey is offered as a seed after cyan and blue. 0.38 is 0.80 x (0.50 / 1.05): Ou's mean cool score (-WC) over the matcher's sRGB grid for the neutral family, 0.50, against blue, 1.05, with the blue weight of 0.80 kept. It is an engineering choice (low confidence). D42 (Kwade, 2026-10-13, TO-CONFIRM C34) raises purple from 0.25 to 0.55 and green from 0.13 to 0.35, the same calculation scaled so that blue stays 0.80. Two grids gave purple 0.54 to 0.62 and green 0.35 to 0.42; the lower values, from a second check on the same day, were used (purple 0.81 to 0.84 and green 0.52 to 0.53 against blue 1.19 to 1.24 on Ou's scale). The cyan, blue and neutral weights were not re-derived: the two grids disagreed on cyan and blue by up to 0.2. Low confidence. A family weight is an average: inside a family the score varies with hue (a yellow-green is only weakly cool on Ou's scale), which one number cannot show.",
+   "decision": "edit",
+   "kwadeNote": "Approved 2026-09-28; hue lean added from Ou's WC term; greys allowed with neutral weight 0.38 (D40, 2026-10-13); purple 0.55 and green 0.35 (D42, 2026-10-13)"
+  },
+  {
+   "id": "heavy",
+   "term": "heavy",
+   "synonyms": [
+    "weighty",
+    "solid",
+    "dense"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": [
+     null,
+     0.64
+    ],
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": [
+     {
+      "eq": "ou2004.HL",
+      "sign": 1,
+      "min": 0.0
+     }
+    ]
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "ou2004"
+   ],
+   "rule": "Ou heavy-light HL > 0: CIELAB L* below 58 (about OKLCH L 0.64)",
+   "notes": "HL = -2.1 + 0.05(100 - L*); depends on lightness only.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28"
+  },
+  {
+   "id": "airy",
+   "term": "airy",
+   "synonyms": [
+    "lightweight",
+    "weightless"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": [
+     0.64,
+     null
+    ],
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": [
+     {
+      "eq": "ou2004.HL",
+      "sign": -1,
+      "min": 0.0
+     }
+    ]
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "ou2004"
+   ],
+   "rule": "Ou HL < 0: CIELAB L* above 58 (about OKLCH L 0.64)",
+   "notes": "Ou's pole is 'light'; renamed 'airy' so it doesn't collide with the lightness term 'light'. Same direction.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28"
+  },
+  {
+   "id": "energetic",
+   "term": "energetic",
+   "synonyms": [
+    "active",
+    "lively",
+    "dynamic"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": [
+     {
+      "eq": "ou2004.AP",
+      "sign": 1,
+      "min": 0.5
+     }
+    ]
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "ou2004"
+   ],
+   "rule": "Ou active-passive AP > 0.5: far from mid-grey in chroma or lightness",
+   "notes": "AP > 0 covers ~81% of an sRGB grid, so the 0.5 floor is an engineering choice to make the term selective.",
+   "decision": "approve",
+   "kwadeNote": "Thresholds accepted as a provisional metric (2026-09-28)"
+  },
+  {
+   "id": "calm",
+   "term": "calm",
+   "synonyms": [
+    "passive",
+    "quiet",
+    "restful",
+    "serene"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": [
+     {
+      "eq": "ou2004.AP",
+      "sign": -1,
+      "min": 0.0
+     }
+    ]
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "ou2004"
+   ],
+   "rule": "Ou AP < 0: close to mid-grey, low chroma",
+   "notes": "Ou's word is 'passive'; using it for 'calm' is a lexical choice for Kwade to confirm.",
+   "decision": "approve",
+   "kwadeNote": "Use Ou's passive pole for calm (2026-09-28)",
+   "strongSynonyms": [
+    "tranquil",
+    "peaceful",
+    "soothing"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "hard",
+   "term": "hard",
+   "synonyms": [
+    "firm",
+    "sturdy"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": [
+     {
+      "eq": "ou2004.HS",
+      "sign": 1,
+      "min": 0.0
+     }
+    ]
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "ou2004"
+   ],
+   "rule": "Ou hard-soft HS > 0: darker and lower-chroma colours",
+   "notes": "HS = 11.1 + 0.03(100 - L*) - 11.4 C*^0.02. Exact neutrals (C* 0) score very hard, an artifact of the C*^0.02 term.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28"
+  },
+  {
+   "id": "soft",
+   "term": "soft",
+   "synonyms": [
+    "gentle",
+    "delicate",
+    "tender"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": [
+     {
+      "eq": "ou2004.HS",
+      "sign": -1,
+      "min": 0.0
+     }
+    ]
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "ou2004"
+   ],
+   "rule": "Ou HS < 0: lighter colours with some chroma",
+   "notes": "Strongest soft scores in sRGB are light yellows.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28"
+  },
+  {
+   "id": "vivid",
+   "term": "vivid",
+   "synonyms": [
+    "saturated",
+    "intense",
+    "vibrant"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": [
+     0.15,
+     null
+    ],
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "well-established",
+   "sources": [
+    "cie_ilv"
+   ],
+   "rule": "OKLCH C >= 0.15",
+   "notes": "Definitional: chroma is the attribute. The 0.15 threshold is an engineering choice (low confidence).",
+   "decision": "approve",
+   "kwadeNote": "Thresholds accepted as a provisional metric (2026-09-28)"
+  },
+  {
+   "id": "muted",
+   "term": "muted",
+   "synonyms": [
+    "subdued",
+    "dusty",
+    "desaturated",
+    "understated"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": [
+     0.02,
+     0.08
+    ],
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "well-established",
+   "sources": [
+    "cie_ilv"
+   ],
+   "rule": "OKLCH C 0.02-0.08",
+   "notes": "Definitional; thresholds are engineering choices.",
+   "decision": "approve",
+   "kwadeNote": "Thresholds accepted as a provisional metric (2026-09-28)"
+  },
+  {
+   "id": "light",
+   "term": "light",
+   "synonyms": [
+    "pale"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": [
+     0.8,
+     null
+    ],
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "well-established",
+   "sources": [
+    "cie_ilv"
+   ],
+   "rule": "OKLCH L >= 0.80",
+   "notes": "Lightness term. Threshold is an engineering choice.",
+   "decision": "approve",
+   "kwadeNote": "Thresholds accepted as a provisional metric (2026-09-28)"
+  },
+  {
+   "id": "dark",
+   "term": "dark",
+   "synonyms": [
+    "dim"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": [
+     null,
+     0.4
+    ],
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "well-established",
+   "sources": [
+    "cie_ilv"
+   ],
+   "rule": "OKLCH L <= 0.40",
+   "notes": "Lightness term. Threshold is an engineering choice.",
+   "decision": "approve",
+   "kwadeNote": "Thresholds accepted as a provisional metric (2026-09-28)"
+  },
+  {
+   "id": "neutral",
+   "term": "neutral",
+   "synonyms": [
+    "achromatic",
+    "greyscale",
+    "monochrome"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": [
+     null,
+     0.03
+    ],
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "well-established",
+   "sources": [
+    "cie_ilv"
+   ],
+   "rule": "OKLCH C < 0.03 (the neutral family)",
+   "notes": "Achromatic by definition; matches the neutral family cut in hue_families.json.",
+   "decision": "approve",
+   "kwadeNote": "Thresholds accepted as a provisional metric (2026-09-28)"
+  },
+  {
+   "id": "pastel",
+   "term": "pastel",
+   "synonyms": [],
+   "synonymsBasis": null,
+   "class": "perceptual",
+   "targets": {
+    "L": [
+     0.82,
+     null
+    ],
+    "C": [
+     0.03,
+     0.1
+    ],
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "low confidence",
+   "sources": [
+    "cie_ilv"
+   ],
+   "rule": "OKLCH L >= 0.82 and C 0.03-0.10",
+   "notes": "Designer convention built from two defined attributes; no study sets these bounds.",
+   "decision": "approve",
+   "kwadeNote": "Thresholds accepted as a provisional metric (2026-09-28)"
+  },
+  {
+   "id": "bright",
+   "term": "bright",
+   "synonyms": [
+    "brilliant"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": [
+     0.7,
+     null
+    ],
+    "C": [
+     0.12,
+     null
+    ],
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "low confidence",
+   "sources": [
+    "cie_ilv"
+   ],
+   "rule": "OKLCH L >= 0.70 and C >= 0.12",
+   "notes": "Everyday 'bright' means light plus vivid; CIE 'brightness' is a different (absolute) attribute. Lexical choice.",
+   "decision": "approve",
+   "kwadeNote": "Thresholds accepted as a provisional metric (2026-09-28)"
+  },
+  {
+   "id": "rich",
+   "term": "rich",
+   "synonyms": [
+    "deep",
+    "jewel-toned"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": [
+     null,
+     0.5
+    ],
+    "C": [
+     0.1,
+     null
+    ],
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "low confidence",
+   "sources": [
+    "cie_ilv"
+   ],
+   "rule": "OKLCH L <= 0.50 and C >= 0.10",
+   "notes": "Designer convention (deep, saturated). Bounds are engineering choices.",
+   "decision": "approve",
+   "kwadeNote": "Thresholds accepted as a provisional metric (2026-09-28)"
+  },
+  {
+   "id": "bold",
+   "term": "bold",
+   "synonyms": [
+    "striking",
+    "strong"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": [
+     0.12,
+     null
+    ],
+    "hueWeights": {},
+    "colorTerms": {},
+    "nudges": {},
+    "models": [
+     {
+      "eq": "ou2004.AP",
+      "sign": 1,
+      "min": 1.0
+     }
+    ]
+   },
+   "inherits": null,
+   "tier": "low confidence",
+   "sources": [
+    "ou2004",
+    "cie_ilv"
+   ],
+   "rule": "Ou AP > 1.0 and OKLCH C >= 0.12",
+   "notes": "Lexical inference: 'bold' read as strongly active and colourful. Not a tested scale.",
+   "decision": "approve",
+   "kwadeNote": "Thresholds accepted as a provisional metric (2026-09-28)"
+  },
+  {
+   "id": "grounded",
+   "term": "grounded",
+   "synonyms": [
+    "earthy",
+    "natural",
+    "rooted"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "perceptual",
+   "targets": {
+    "L": null,
+    "C": [
+     null,
+     0.1
+    ],
+    "hueWeights": {
+     "orange": 0.5,
+     "yellow": 0.25,
+     "green": 0.25
+    },
+    "colorTerms": {},
+    "nudges": {},
+    "models": [
+     {
+      "eq": "ou2004.HL",
+      "sign": 1,
+      "min": 0.0
+     }
+    ]
+   },
+   "inherits": null,
+   "tier": "low confidence",
+   "sources": [
+    "ou2004",
+    "cie_ilv"
+   ],
+   "rule": "Ou HL > 0 (heavy), OKLCH C <= 0.10, earth hues",
+   "notes": "Heaviness is from Ou; the earth-hue weighting (orange/yellow/green) is designer convention.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 as a labelled convention, like pastel, bright and rich"
+  },
+  {
+   "id": "sincere",
+   "term": "sincere",
+   "synonyms": [
+    "sincerity",
+    "genuine"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "white": 0.435,
+     "pink": 0.379
+    },
+    "nudges": {
+     "L": {
+      "beta": 0.199,
+      "p": "<.05"
+     }
+    },
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "lm2012",
+    "aaker1997"
+   ],
+   "rule": "White and pink read as sincere; lighter adds sincerity",
+   "notes": "Only results significant at p < .05 and read identically in two extractions are kept; p < .10 results and the Study 2 betas the reads disagreed on were dropped (Kwade, 2026-09-28). HSV value is read as lightness, an approximation.",
+   "decision": "edit",
+   "kwadeNote": "Kept confirmed, p < .05 results only (2026-09-28)",
+   "strongSynonyms": [
+    "authentic",
+    "earnest"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "exciting",
+   "term": "exciting",
+   "synonyms": [
+    "excitement",
+    "exhilarating"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "red": 0.534
+    },
+    "nudges": {
+     "C": {
+      "beta": 0.204,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "lm2012",
+    "aaker1997"
+   ],
+   "rule": "Red reads as exciting; more saturation adds excitement",
+   "notes": "Only results significant at p < .05 and read identically in two extractions are kept; p < .10 results and the Study 2 betas the reads disagreed on were dropped (Kwade, 2026-09-28). HSV value is read as lightness, an approximation.",
+   "decision": "edit",
+   "kwadeNote": "Kept confirmed, p < .05 results only (2026-09-28)"
+  },
+  {
+   "id": "competent",
+   "term": "competent",
+   "synonyms": [
+    "competence",
+    "capable"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "royal blue": 0.522,
+     "yellow": -0.49
+    },
+    "nudges": {
+     "L": {
+      "beta": -0.363,
+      "p": "<.01"
+     },
+     "C": {
+      "beta": 0.275,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "lm2012",
+    "aaker1997"
+   ],
+   "rule": "Blue reads as competent, yellow works against it; darker and more saturated add competence",
+   "notes": "Only results significant at p < .05 and read identically in two extractions are kept; p < .10 results and the Study 2 betas the reads disagreed on were dropped (Kwade, 2026-09-28). Checked against the printed tables 2026-10-06: the Study 2 saturation effect on competence (+.275, p < .01) and value effect on sophistication (+.243, p < .01) were added (Kwade, 2026-10-06); Study 2 hue effects stay out because their reference color (low-saturation, low-value red) differs from Study 1's gray. HSV value is read as lightness, an approximation.",
+   "decision": "edit",
+   "kwadeNote": "Kept confirmed, p < .05 results only (2026-09-28); Study 2 nudge added 2026-10-06",
+   "strongSynonyms": [
+    "skilled",
+    "expert",
+    "proficient"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "sophisticated",
+   "term": "sophisticated",
+   "synonyms": [
+    "sophistication",
+    "refined"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "black": 0.697,
+     "purple": 0.475,
+     "pink": 0.432,
+     "orange": -0.474
+    },
+    "nudges": {
+     "L": {
+      "beta": 0.243,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "lm2012",
+    "aaker1997"
+   ],
+   "rule": "Black, purple and pink read as sophisticated, orange works against it; lighter adds a little",
+   "notes": "Only results significant at p < .05 and read identically in two extractions are kept; p < .10 results and the Study 2 betas the reads disagreed on were dropped (Kwade, 2026-09-28). Checked against the printed tables 2026-10-06: the Study 2 saturation effect on competence (+.275, p < .01) and value effect on sophistication (+.243, p < .01) were added (Kwade, 2026-10-06); Study 2 hue effects stay out because their reference color (low-saturation, low-value red) differs from Study 1's gray. HSV value is read as lightness, an approximation.",
+   "decision": "edit",
+   "kwadeNote": "Kept confirmed, p < .05 results only (2026-09-28); Study 2 nudge added 2026-10-06",
+   "strongSynonyms": [
+    "classy",
+    "polished"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "rugged",
+   "term": "rugged",
+   "synonyms": [
+    "ruggedness"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "brown": 0.708,
+     "purple": -0.546
+    },
+    "nudges": {
+     "L": {
+      "beta": -0.344,
+      "p": "<.01"
+     },
+     "C": {
+      "beta": 0.243,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "lm2012",
+    "aaker1997"
+   ],
+   "rule": "Brown reads as rugged, purple works against it; darker and more saturated add ruggedness",
+   "notes": "Only results significant at p < .05 and read identically in two extractions are kept; p < .10 results and the Study 2 betas the reads disagreed on were dropped (Kwade, 2026-09-28). HSV value is read as lightness, an approximation.",
+   "decision": "edit",
+   "kwadeNote": "Kept confirmed, p < .05 results only (2026-09-28)"
+  },
+  {
+   "id": "down-to-earth",
+   "term": "down-to-earth",
+   "synonyms": [
+    "approachable",
+    "unpretentious"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "white": 0.435,
+     "pink": 0.379
+    },
+    "nudges": {
+     "L": {
+      "beta": 0.199,
+      "p": "<.05"
+     }
+    },
+    "models": []
+   },
+   "inherits": "sincere",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'sincere' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "family-oriented",
+    "small-town"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)",
+   "strongSynonyms": [
+    "practical"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "honest",
+   "term": "honest",
+   "synonyms": [
+    "transparent",
+    "real"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "white": 0.435,
+     "pink": 0.379
+    },
+    "nudges": {
+     "L": {
+      "beta": 0.199,
+      "p": "<.05"
+     }
+    },
+    "models": []
+   },
+   "inherits": "sincere",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'sincere' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "realistic"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)",
+   "strongSynonyms": [
+    "truthful"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "wholesome",
+   "term": "wholesome",
+   "synonyms": [
+    "pure",
+    "original"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "white": 0.435,
+     "pink": 0.379
+    },
+    "nudges": {
+     "L": {
+      "beta": 0.199,
+      "p": "<.05"
+     }
+    },
+    "models": []
+   },
+   "inherits": "sincere",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012"
+   ],
+   "rule": "Inherits 'sincere' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28"
+  },
+  {
+   "id": "cheerful",
+   "term": "cheerful",
+   "synonyms": [
+    "friendly",
+    "upbeat"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "white": 0.435,
+     "pink": 0.379
+    },
+    "nudges": {
+     "L": {
+      "beta": 0.199,
+      "p": "<.05"
+     }
+    },
+    "models": []
+   },
+   "inherits": "sincere",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'sincere' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "sentimental"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)",
+   "strongSynonyms": [
+    "optimistic",
+    "cheery"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "daring",
+   "term": "daring",
+   "synonyms": [
+    "edgy",
+    "trendy"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "red": 0.534
+    },
+    "nudges": {
+     "C": {
+      "beta": 0.204,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "exciting",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012"
+   ],
+   "rule": "Inherits 'exciting' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "strongSynonyms": [
+    "brave",
+    "courageous",
+    "fearless"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "spirited",
+   "term": "spirited",
+   "synonyms": [
+    "youthful",
+    "vivacious"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "red": 0.534
+    },
+    "nudges": {
+     "C": {
+      "beta": 0.204,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "exciting",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'exciting' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "young"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)"
+  },
+  {
+   "id": "imaginative",
+   "term": "imaginative",
+   "synonyms": [
+    "innovative",
+    "creative",
+    "unique"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "red": 0.534
+    },
+    "nudges": {
+     "C": {
+      "beta": 0.204,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "exciting",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012"
+   ],
+   "rule": "Inherits 'exciting' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "strongSynonyms": [
+    "inventive",
+    "visionary"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "up-to-date",
+   "term": "up-to-date",
+   "synonyms": [
+    "modern",
+    "contemporary"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "red": 0.534
+    },
+    "nudges": {
+     "C": {
+      "beta": 0.204,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "exciting",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'exciting' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "independent"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)"
+  },
+  {
+   "id": "reliable",
+   "term": "reliable",
+   "synonyms": [
+    "trustworthy",
+    "dependable",
+    "secure"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "royal blue": 0.522,
+     "yellow": -0.49
+    },
+    "nudges": {
+     "L": {
+      "beta": -0.363,
+      "p": "<.01"
+     },
+     "C": {
+      "beta": 0.275,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "competent",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'competent' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "hard-working"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)",
+   "strongSynonyms": [
+    "responsible",
+    "safe"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "intelligent",
+   "term": "intelligent",
+   "synonyms": [
+    "smart",
+    "technical"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "royal blue": 0.522,
+     "yellow": -0.49
+    },
+    "nudges": {
+     "L": {
+      "beta": -0.363,
+      "p": "<.01"
+     },
+     "C": {
+      "beta": 0.275,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "competent",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'competent' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "corporate"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)",
+   "strongSynonyms": [
+    "clever",
+    "knowledgeable"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "successful",
+   "term": "successful",
+   "synonyms": [
+    "confident",
+    "leading"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "royal blue": 0.522,
+     "yellow": -0.49
+    },
+    "nudges": {
+     "L": {
+      "beta": -0.363,
+      "p": "<.01"
+     },
+     "C": {
+      "beta": 0.275,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "competent",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'competent' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "leader"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)",
+   "strongSynonyms": [
+    "accomplished"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "upper-class",
+   "term": "upper class",
+   "synonyms": [
+    "luxurious",
+    "premium",
+    "glamorous"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "black": 0.697,
+     "purple": 0.475,
+     "pink": 0.432,
+     "orange": -0.474
+    },
+    "nudges": {
+     "L": {
+      "beta": 0.243,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "sophisticated",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'sophisticated' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "good-looking"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)"
+  },
+  {
+   "id": "charming",
+   "term": "charming",
+   "synonyms": [
+    "elegant",
+    "graceful"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "black": 0.697,
+     "purple": 0.475,
+     "pink": 0.432,
+     "orange": -0.474
+    },
+    "nudges": {
+     "L": {
+      "beta": 0.243,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "sophisticated",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'sophisticated' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "feminine",
+    "smooth"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)"
+  },
+  {
+   "id": "outdoorsy",
+   "term": "outdoorsy",
+   "synonyms": [
+    "adventurous"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "brown": 0.708,
+     "purple": -0.546
+    },
+    "nudges": {
+     "L": {
+      "beta": -0.344,
+      "p": "<.01"
+     },
+     "C": {
+      "beta": 0.243,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "rugged",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012",
+    "vikalpa2008"
+   ],
+   "rule": "Inherits 'rugged' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "studyWords": [
+    "masculine",
+    "western"
+   ],
+   "studyWordsBasis": "Aaker (1997) trait items, wording from vikalpa2008; facet grouping checked 2026-10-03 against Aaker (1997) Appendix A, p. 354 (TO-CONFIRM C16, closed)"
+  },
+  {
+   "id": "tough",
+   "term": "tough",
+   "synonyms": [
+    "durable",
+    "hardy"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "personality",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "brown": 0.708,
+     "purple": -0.546
+    },
+    "nudges": {
+     "L": {
+      "beta": -0.344,
+      "p": "<.01"
+     },
+     "C": {
+      "beta": 0.243,
+      "p": "<.01"
+     }
+    },
+    "models": []
+   },
+   "inherits": "rugged",
+   "tier": "low confidence",
+   "sources": [
+    "aaker1997",
+    "lm2012"
+   ],
+   "rule": "Inherits 'rugged' (Aaker facet of that dimension)",
+   "notes": "Colour was tested only at dimension level; applying it to the facet is an inference. Facet membership per Aaker (1997).",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28",
+   "strongSynonyms": [
+    "robust"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "love",
+   "term": "love",
+   "synonyms": [
+    "romantic",
+    "affectionate"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "emotion",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "red": 0.692,
+     "pink": 0.532
+    },
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "jon2024",
+    "jon2024_data",
+    "jon2020ps"
+   ],
+   "rule": "red 69.2%, pink 53.2%",
+   "notes": "Share of participants choosing each colour word; baseline for love across all 12 colours is 18.8%. Kept colours are at least 1.25x baseline and in the top 3 in at least half of 25 countries. Tested colour words, not measured colours.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 (weights from raw OSF data)"
+  },
+  {
+   "id": "joy",
+   "term": "joy",
+   "synonyms": [
+    "happy",
+    "joyful"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "emotion",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "yellow": 0.557,
+     "orange": 0.446,
+     "pink": 0.418
+    },
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "jon2024",
+    "jon2024_data",
+    "jon2020ps"
+   ],
+   "rule": "yellow 55.7%, orange 44.6%, pink 41.8%",
+   "notes": "Share of participants choosing each colour word; baseline for joy across all 12 colours is 25.8%. Kept colours are at least 1.25x baseline and in the top 3 in at least half of 25 countries. Tested colour words, not measured colours.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 (weights from raw OSF data)"
+  },
+  {
+   "id": "pleasure",
+   "term": "pleasure",
+   "synonyms": [
+    "pleasant",
+    "enjoyment"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "emotion",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "pink": 0.418,
+     "turquoise": 0.352
+    },
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "jon2024",
+    "jon2024_data",
+    "jon2020ps"
+   ],
+   "rule": "pink 41.8%, turquoise 35.2%",
+   "notes": "Share of participants choosing each colour word; baseline for pleasure across all 12 colours is 24.2%. Kept colours are at least 1.25x baseline and in the top 3 in at least half of 25 countries. Tested colour words, not measured colours.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 (weights from raw OSF data)"
+  },
+  {
+   "id": "amusement",
+   "term": "amusement",
+   "synonyms": [
+    "fun",
+    "playful",
+    "humorous"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "emotion",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "orange": 0.41,
+     "yellow": 0.377,
+     "pink": 0.336
+    },
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "jon2024",
+    "jon2024_data",
+    "jon2020ps"
+   ],
+   "rule": "orange 41.0%, yellow 37.7%, pink 33.6%",
+   "notes": "Share of participants choosing each colour word; baseline for amusement across all 12 colours is 19.5%. Kept colours are at least 1.25x baseline and in the top 3 in at least half of 25 countries. Tested colour words, not measured colours.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 (weights from raw OSF data)",
+   "strongSynonyms": [
+    "funny"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "relief",
+   "term": "relief",
+   "synonyms": [
+    "reassuring",
+    "relieved"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "emotion",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "white": 0.435,
+     "green": 0.347,
+     "blue": 0.344,
+     "turquoise": 0.337
+    },
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "jon2024",
+    "jon2024_data",
+    "jon2020ps"
+   ],
+   "rule": "white 43.5%, green 34.7%, blue 34.4%, turquoise 33.7%",
+   "notes": "Share of participants choosing each colour word; baseline for relief across all 12 colours is 19.8%. Kept colours are at least 1.25x baseline and in the top 3 in at least half of 25 countries. Tested colour words, not measured colours.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 (weights from raw OSF data)"
+  },
+  {
+   "id": "contentment",
+   "term": "contentment",
+   "synonyms": [
+    "content",
+    "satisfied"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "emotion",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "green": 0.391,
+     "blue": 0.35,
+     "turquoise": 0.32
+    },
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "jon2024",
+    "jon2024_data",
+    "jon2020ps"
+   ],
+   "rule": "green 39.1%, blue 35.0%, turquoise 32.0%",
+   "notes": "Share of participants choosing each colour word; baseline for contentment across all 12 colours is 23.0%. Kept colours are at least 1.25x baseline and in the top 3 in at least half of 25 countries. Tested colour words, not measured colours.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 (weights from raw OSF data)"
+  },
+  {
+   "id": "pride",
+   "term": "pride",
+   "synonyms": [
+    "proud"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "emotion",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "blue": 0.248,
+     "white": 0.231,
+     "purple": 0.228
+    },
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "low confidence",
+   "sources": [
+    "jon2024",
+    "jon2024_data",
+    "jon2020ps"
+   ],
+   "rule": "blue 24.8%, white 23.1%, purple 22.8%",
+   "notes": "Share of participants choosing each colour word; baseline for pride across all 12 colours is 16.7%. Kept colours are at least 1.25x baseline and in the top 3 in at least half of 25 countries. Tested colour words, not measured colours.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 (weights from raw OSF data)"
+  },
+  {
+   "id": "interest",
+   "term": "interest",
+   "synonyms": [
+    "curious",
+    "intriguing"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "emotion",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "green": 0.309,
+     "blue": 0.28
+    },
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "supported but contested",
+   "sources": [
+    "jon2024",
+    "jon2024_data",
+    "jon2020ps"
+   ],
+   "rule": "green 30.9%, blue 28.0%",
+   "notes": "Share of participants choosing each colour word; baseline for interest across all 12 colours is 20.4%. Kept colours are at least 1.25x baseline and in the top 3 in at least half of 25 countries. Tested colour words, not measured colours.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 (weights from raw OSF data)",
+   "strongSynonyms": [
+    "inquisitive"
+   ],
+   "strongSynonymsBasis": "Claude's proposal, 2026-09-30, agreed by Kwade 2026-10-01: near-identical in meaning but not used by the source studies, so a match through one lowers the tier one step"
+  },
+  {
+   "id": "admiration",
+   "term": "admiration",
+   "synonyms": [
+    "admired",
+    "esteemed"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "emotion",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "blue": 0.246
+    },
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "low confidence",
+   "sources": [
+    "jon2024",
+    "jon2024_data",
+    "jon2020ps"
+   ],
+   "rule": "blue 24.6%",
+   "notes": "Share of participants choosing each colour word; baseline for admiration across all 12 colours is 18.1%. Kept colours are at least 1.25x baseline and in the top 3 in at least half of 25 countries. Tested colour words, not measured colours.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 (weights from raw OSF data)"
+  },
+  {
+   "id": "compassion",
+   "term": "compassion",
+   "synonyms": [
+    "caring",
+    "empathetic",
+    "kind"
+   ],
+   "synonymsBasis": "Claude's proposal",
+   "class": "emotion",
+   "targets": {
+    "L": null,
+    "C": null,
+    "hueWeights": {},
+    "colorTerms": {
+     "white": 0.247,
+     "blue": 0.198
+    },
+    "nudges": {},
+    "models": []
+   },
+   "inherits": null,
+   "tier": "low confidence",
+   "sources": [
+    "jon2024",
+    "jon2024_data",
+    "jon2020ps"
+   ],
+   "rule": "white 24.7%, blue 19.8%",
+   "notes": "Share of participants choosing each colour word; baseline for compassion across all 12 colours is 14.4%. Kept colours are at least 1.25x baseline and in the top 3 in at least half of 25 countries. Tested colour words, not measured colours.",
+   "decision": "approve",
+   "kwadeNote": "Approved 2026-09-28 (weights from raw OSF data)"
+  }
+ ]
+}

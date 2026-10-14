@@ -1,0 +1,57 @@
+{
+  "purpose": "C10 run 4: the National Park Service, added separately from run 3 as planned in docs/c10/README.md. Verbatim words only; no synthesized mapping. Words and colors were recorded before the matcher was run.",
+  "gathered": "2026-10-01",
+  "brands": [
+    {
+      "id": "national-park-service",
+      "words_verbatim": [
+        "preserves",
+        "unimpaired",
+        "natural",
+        "cultural",
+        "enjoyment",
+        "education",
+        "inspiration",
+        "excellent",
+        "service",
+        "productive",
+        "partnerships",
+        "citizen",
+        "involvement",
+        "heritage",
+        "outstanding",
+        "employees",
+        "development",
+        "wise",
+        "decisions",
+        "effective",
+        "management",
+        "research",
+        "technology",
+        "shared",
+        "capabilities"
+      ],
+      "words_source": "https://www.nps.gov/aboutus/mission.htm (official; read twice through a page-summarizing tool, both reads agreeing). Rule fixed before the run: every content word of the mission statement ('preserves unimpaired the natural and cultural resources and values of the national park system for the enjoyment, education, and inspiration of this and future generations'), plus every word of the ten core-value headings (Excellent Service, Productive Partnerships, Citizen Involvement, Heritage Education, Outstanding Employees, Employee Development, Wise Decisions, Effective Management, Research and Technology, Shared Capabilities), each distinct word once. Generic nouns such as 'resources', 'values', 'system', 'park', 'national' and 'generations' were left out as not describing the brand; the description sentences under each value were not used.",
+      "colors": [
+        {
+          "name": "Arrowhead foreground green (grass and trees)",
+          "hex": "#104334",
+          "role": "arrowhead",
+          "source": "eyedropped by Kwade (2026-10-01) from the Arrowhead image on nps.gov; no official digital asset could be downloaded. Approximate. Published reference: PMS 553C (https://www.nps.gov/subjects/hfc/faqs-about-arrowhead-artwork.htm). No Pantone-to-hex conversion was used."
+        },
+        {
+          "name": "Arrowhead mountain brown (outline)",
+          "hex": "#77390A",
+          "role": "arrowhead",
+          "source": "eyedropped by Kwade (2026-10-01) from the Arrowhead image on nps.gov. Approximate. The page names the mountain as 'dark rust', PMS 1615C; whether the outline is that color was not confirmed."
+        },
+        {
+          "name": "Arrowhead sky light brown",
+          "hex": "#B66611",
+          "role": "arrowhead",
+          "source": "eyedropped by Kwade (2026-10-01) from the Arrowhead image on nps.gov. Approximate. The page names the background as 'medium rust (sky)', PMS 1605C."
+        }
+      ]
+    }
+  ]
+}

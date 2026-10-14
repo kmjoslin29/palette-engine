@@ -1,0 +1,14 @@
+node_modules/
+dist/
+tmp/
+__pycache__/
+*.pyc
+.DS_Store
+# ICC profiles are downloaded by the person building the LUTs (see profiles/README.md), not stored here
+profiles/*.icc
+# The raw Jonauskaite et al. (2024) survey data stays on the maintainer's machine (see docs/08-data-and-licences.md)
+lexicon/data/
+# LittleCMS library used by build/lcms.py
+build/lcms2.dll
+# Correspondence with ECI and PRINTING United Alliance (replies and email drafts) stays on the maintainer's machine
+private/

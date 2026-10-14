@@ -1,0 +1,2576 @@
+{
+  "generated": "2026-10-06T13:37:14",
+  "lcms_version": 2140,
+  "grid": 33,
+  "interpolation": "tetrahedral",
+  "intent_cmyk": "relative colorimetric + BPC",
+  "intent_gamut": "relative colorimetric, no BPC",
+  "thresholds": {
+    "p95": 1.0,
+    "max": 2.0
+  },
+  "profiles": {
+    "gracol2013_crpc6": {
+      "label": "GRACoL 2013 coated (CRPC6)",
+      "file": "GRACoL2013_CRPC6.icc",
+      "sha256": "4ebbfad6bc9cfc033fdafdd8ac5df8159208932cb16d9a6596d349ae7ab50443",
+      "tac_limit": 320,
+      "grid_max_tac": 318.0,
+      "tests": {
+        "random": {
+          "n": 10000,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.02,
+            "p95": 0.138,
+            "max": 0.732
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.051,
+            "p95": 0.424,
+            "max": 2.445
+          },
+          "preview_lab_dE00": {
+            "median": 0.023,
+            "p95": 0.141,
+            "max": 0.733
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.026,
+            "p95": 0.179,
+            "max": 0.78
+          },
+          "gamut_flag_disagreements": 16,
+          "share_out_of_gamut": 0.548
+        },
+        "near_gray": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.026,
+            "p95": 0.123,
+            "max": 0.687
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.05,
+            "p95": 0.507,
+            "max": 1.191
+          },
+          "preview_lab_dE00": {
+            "median": 0.033,
+            "p95": 0.128,
+            "max": 0.672
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.039,
+            "p95": 0.261,
+            "max": 0.905
+          },
+          "gamut_flag_disagreements": 3,
+          "share_out_of_gamut": 0.108
+        },
+        "gamut_edge": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.018,
+            "p95": 0.133,
+            "max": 0.377
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.043,
+            "p95": 0.425,
+            "max": 1.384
+          },
+          "preview_lab_dE00": {
+            "median": 0.018,
+            "p95": 0.136,
+            "max": 0.378
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.018,
+            "p95": 0.135,
+            "max": 0.756
+          },
+          "gamut_flag_disagreements": 0,
+          "share_out_of_gamut": 0.862
+        }
+      },
+      "worst": [
+        {
+          "set": "random",
+          "hex": "#B60B82",
+          "dE00": 0.732,
+          "cmyk_direct": [
+            26.8,
+            100.0,
+            0.0,
+            0.3
+          ],
+          "cmyk_lut": [
+            26.8,
+            100.0,
+            0.0,
+            2.5
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F8FAF6",
+          "dE00": 0.687,
+          "cmyk_direct": [
+            2.9,
+            0.6,
+            3.7,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.9,
+            1.2,
+            3.7,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#B80D83",
+          "dE00": 0.676,
+          "cmyk_direct": [
+            26.2,
+            100.0,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            26.2,
+            100.0,
+            0.0,
+            2.1
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F7F4F9",
+          "dE00": 0.654,
+          "cmyk_direct": [
+            3.8,
+            3.4,
+            0.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            3.6,
+            3.6,
+            0.8,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FFF7F9",
+          "dE00": 0.627,
+          "cmyk_direct": [
+            0.0,
+            3.4,
+            0.6,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.0,
+            3.4,
+            1.3,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#E3EFF9",
+          "dE00": 0.616,
+          "cmyk_direct": [
+            11.6,
+            1.8,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            11.8,
+            1.8,
+            0.8,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F9F7F9",
+          "dE00": 0.615,
+          "cmyk_direct": [
+            2.7,
+            2.4,
+            1.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.6,
+            2.5,
+            1.7,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F3F4FA",
+          "dE00": 0.611,
+          "cmyk_direct": [
+            5.9,
+            2.6,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            5.6,
+            2.7,
+            0.6,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FAF4FA",
+          "dE00": 0.586,
+          "cmyk_direct": [
+            2.3,
+            3.9,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.1,
+            4.2,
+            0.6,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FAFBF3",
+          "dE00": 0.571,
+          "cmyk_direct": [
+            2.1,
+            0.2,
+            5.6,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.1,
+            0.7,
+            5.6,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#FFF9DB",
+          "dE00": 0.559,
+          "cmyk_direct": [
+            0.6,
+            0.5,
+            18.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.7,
+            1.1,
+            18.0,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#FCB2E1",
+          "dE00": 0.536,
+          "cmyk_direct": [
+            0.2,
+            39.1,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            1.5,
+            39.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#A9D8F3",
+          "dE00": 0.534,
+          "cmyk_direct": [
+            36.0,
+            2.6,
+            0.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            36.0,
+            2.6,
+            1.1,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#E8F3EE",
+          "dE00": 0.532,
+          "cmyk_direct": [
+            9.2,
+            0.6,
+            7.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            9.2,
+            1.2,
+            7.0,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#D7DC00",
+          "dE00": 0.377,
+          "cmyk_direct": [
+            20.2,
+            0.0,
+            94.6,
+            0.5
+          ],
+          "cmyk_lut": [
+            19.8,
+            0.6,
+            94.8,
+            0.9
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#4A6400",
+          "dE00": 0.368,
+          "cmyk_direct": [
+            43.2,
+            0.0,
+            100.0,
+            61.0
+          ],
+          "cmyk_lut": [
+            43.0,
+            1.2,
+            100.0,
+            61.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#DFF4FF",
+          "dE00": 0.365,
+          "cmyk_direct": [
+            12.9,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            12.9,
+            0.4,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFF2F5",
+          "dE00": 0.306,
+          "cmyk_direct": [
+            0.0,
+            5.6,
+            1.2,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.0,
+            5.8,
+            1.6,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#8F6E00",
+          "dE00": 0.304,
+          "cmyk_direct": [
+            5.5,
+            31.2,
+            97.2,
+            48.2
+          ],
+          "cmyk_lut": [
+            4.8,
+            31.2,
+            97.6,
+            48.2
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFEB4F",
+          "dE00": 0.302,
+          "cmyk_direct": [
+            3.0,
+            1.2,
+            76.8,
+            0.0
+          ],
+          "cmyk_lut": [
+            3.0,
+            1.8,
+            76.7,
+            0.0
+          ]
+        }
+      ],
+      "pass": true
+    },
+    "swop2013c3_crpc5": {
+      "label": "SWOP 2013 (CRPC5)",
+      "file": "SWOP2013C3_CRPC5.icc",
+      "sha256": "01123776855855378ed540228875458dfe88fca233a14d5b537800353c04faaf",
+      "tac_limit": 300,
+      "grid_max_tac": 299.9,
+      "tests": {
+        "random": {
+          "n": 10000,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.021,
+            "p95": 0.145,
+            "max": 0.684
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.055,
+            "p95": 0.453,
+            "max": 2.693
+          },
+          "preview_lab_dE00": {
+            "median": 0.024,
+            "p95": 0.148,
+            "max": 0.664
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.026,
+            "p95": 0.18,
+            "max": 0.799
+          },
+          "gamut_flag_disagreements": 13,
+          "share_out_of_gamut": 0.569
+        },
+        "near_gray": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.026,
+            "p95": 0.116,
+            "max": 0.706
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.053,
+            "p95": 0.394,
+            "max": 0.786
+          },
+          "preview_lab_dE00": {
+            "median": 0.036,
+            "p95": 0.133,
+            "max": 0.687
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.041,
+            "p95": 0.225,
+            "max": 0.701
+          },
+          "gamut_flag_disagreements": 0,
+          "share_out_of_gamut": 0.122
+        },
+        "gamut_edge": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.019,
+            "p95": 0.135,
+            "max": 0.557
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.044,
+            "p95": 0.469,
+            "max": 1.769
+          },
+          "preview_lab_dE00": {
+            "median": 0.018,
+            "p95": 0.151,
+            "max": 0.58
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.018,
+            "p95": 0.114,
+            "max": 0.58
+          },
+          "gamut_flag_disagreements": 1,
+          "share_out_of_gamut": 0.862
+        }
+      },
+      "worst": [
+        {
+          "set": "near_gray",
+          "hex": "#F8FAF6",
+          "dE00": 0.706,
+          "cmyk_direct": [
+            3.0,
+            0.6,
+            3.8,
+            0.0
+          ],
+          "cmyk_lut": [
+            3.0,
+            1.3,
+            3.8,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#9A078D",
+          "dE00": 0.684,
+          "cmyk_direct": [
+            47.8,
+            100.0,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            47.5,
+            100.0,
+            0.0,
+            2.6
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#E3EFF9",
+          "dE00": 0.646,
+          "cmyk_direct": [
+            11.6,
+            2.3,
+            0.2,
+            0.0
+          ],
+          "cmyk_lut": [
+            11.8,
+            2.3,
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FFF7F9",
+          "dE00": 0.636,
+          "cmyk_direct": [
+            0.0,
+            3.6,
+            0.5,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.1,
+            3.5,
+            1.3,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F3F4FA",
+          "dE00": 0.621,
+          "cmyk_direct": [
+            5.9,
+            2.8,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            5.6,
+            2.9,
+            0.7,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F7F4F9",
+          "dE00": 0.616,
+          "cmyk_direct": [
+            3.8,
+            3.6,
+            0.2,
+            0.0
+          ],
+          "cmyk_lut": [
+            3.7,
+            3.8,
+            0.9,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F9F7F9",
+          "dE00": 0.602,
+          "cmyk_direct": [
+            2.7,
+            2.6,
+            1.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.7,
+            2.6,
+            1.7,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#0160AC",
+          "dE00": 0.596,
+          "cmyk_direct": [
+            96.8,
+            64.3,
+            0.0,
+            0.5
+          ],
+          "cmyk_lut": [
+            96.7,
+            64.1,
+            0.0,
+            2.8
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FAFBF3",
+          "dE00": 0.589,
+          "cmyk_direct": [
+            2.3,
+            0.2,
+            5.8,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.3,
+            0.8,
+            5.8,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#5F6C07",
+          "dE00": 0.583,
+          "cmyk_direct": [
+            34.2,
+            0.0,
+            100.0,
+            60.4
+          ],
+          "cmyk_lut": [
+            34.1,
+            1.5,
+            100.0,
+            60.5
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#FCB2E1",
+          "dE00": 0.582,
+          "cmyk_direct": [
+            0.6,
+            39.7,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            1.9,
+            39.6,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#A3238D",
+          "dE00": 0.567,
+          "cmyk_direct": [
+            42.0,
+            100.0,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            42.0,
+            100.0,
+            0.0,
+            1.8
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#FFF9DB",
+          "dE00": 0.558,
+          "cmyk_direct": [
+            1.1,
+            0.5,
+            18.4,
+            0.0
+          ],
+          "cmyk_lut": [
+            1.1,
+            1.1,
+            18.3,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#DFF4FF",
+          "dE00": 0.557,
+          "cmyk_direct": [
+            12.8,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            12.9,
+            0.7,
+            0.3,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FAF4FA",
+          "dE00": 0.524,
+          "cmyk_direct": [
+            2.5,
+            4.2,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.4,
+            4.4,
+            0.6,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFF2F5",
+          "dE00": 0.447,
+          "cmyk_direct": [
+            0.0,
+            6.0,
+            1.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.0,
+            6.0,
+            1.5,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FF0E94",
+          "dE00": 0.366,
+          "cmyk_direct": [
+            0.0,
+            95.3,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.0,
+            95.3,
+            1.8,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#C4EEFF",
+          "dE00": 0.306,
+          "cmyk_direct": [
+            23.9,
+            0.0,
+            0.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            23.8,
+            0.0,
+            0.6,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#930048",
+          "dE00": 0.3,
+          "cmyk_direct": [
+            0.0,
+            100.0,
+            22.4,
+            45.8
+          ],
+          "cmyk_lut": [
+            1.2,
+            100.0,
+            22.4,
+            45.7
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFEB4F",
+          "dE00": 0.282,
+          "cmyk_direct": [
+            4.3,
+            1.2,
+            79.3,
+            0.1
+          ],
+          "cmyk_lut": [
+            4.4,
+            1.8,
+            79.3,
+            0.1
+          ]
+        }
+      ],
+      "pass": true
+    },
+    "gracol2013_unc_crpc3": {
+      "label": "GRACoL 2013 uncoated (CRPC3)",
+      "file": "GRACoL2013UNC_CRPC3.icc",
+      "sha256": "0c0d5b0893c6637244a1d47108e50046c7e570c296dcf639aaa04ce2f884265c",
+      "tac_limit": 280,
+      "grid_max_tac": 279.0,
+      "tests": {
+        "random": {
+          "n": 10000,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.021,
+            "p95": 0.139,
+            "max": 0.73
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.06,
+            "p95": 0.544,
+            "max": 3.332
+          },
+          "preview_lab_dE00": {
+            "median": 0.024,
+            "p95": 0.14,
+            "max": 0.769
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.027,
+            "p95": 0.162,
+            "max": 0.825
+          },
+          "gamut_flag_disagreements": 13,
+          "share_out_of_gamut": 0.792
+        },
+        "near_gray": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.027,
+            "p95": 0.103,
+            "max": 0.635
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.079,
+            "p95": 0.464,
+            "max": 0.902
+          },
+          "preview_lab_dE00": {
+            "median": 0.036,
+            "p95": 0.127,
+            "max": 0.625
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.053,
+            "p95": 0.399,
+            "max": 0.946
+          },
+          "gamut_flag_disagreements": 1,
+          "share_out_of_gamut": 0.29
+        },
+        "gamut_edge": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.016,
+            "p95": 0.125,
+            "max": 0.485
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.045,
+            "p95": 0.406,
+            "max": 1.954
+          },
+          "preview_lab_dE00": {
+            "median": 0.017,
+            "p95": 0.127,
+            "max": 0.458
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.017,
+            "p95": 0.11,
+            "max": 0.498
+          },
+          "gamut_flag_disagreements": 0,
+          "share_out_of_gamut": 0.942
+        }
+      },
+      "worst": [
+        {
+          "set": "random",
+          "hex": "#1660A4",
+          "dE00": 0.73,
+          "cmyk_direct": [
+            100.0,
+            59.2,
+            0.0,
+            0.4
+          ],
+          "cmyk_lut": [
+            99.8,
+            59.2,
+            0.0,
+            3.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#2768AB",
+          "dE00": 0.678,
+          "cmyk_direct": [
+            91.5,
+            54.5,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            91.3,
+            54.5,
+            0.0,
+            2.3
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#FFF9DB",
+          "dE00": 0.641,
+          "cmyk_direct": [
+            0.6,
+            0.6,
+            16.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.5,
+            1.1,
+            16.0,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F8FAF6",
+          "dE00": 0.635,
+          "cmyk_direct": [
+            2.6,
+            0.6,
+            3.2,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.6,
+            1.2,
+            3.2,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FFF7F9",
+          "dE00": 0.61,
+          "cmyk_direct": [
+            0.0,
+            3.1,
+            0.3,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.2,
+            3.1,
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F9F7F9",
+          "dE00": 0.602,
+          "cmyk_direct": [
+            2.5,
+            2.2,
+            0.7,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.5,
+            2.3,
+            1.4,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F7F4F9",
+          "dE00": 0.583,
+          "cmyk_direct": [
+            3.5,
+            3.1,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            3.5,
+            3.3,
+            0.7,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#345EA1",
+          "dE00": 0.581,
+          "cmyk_direct": [
+            92.0,
+            63.5,
+            0.0,
+            1.1
+          ],
+          "cmyk_lut": [
+            91.9,
+            63.3,
+            0.0,
+            3.4
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#43A525",
+          "dE00": 0.558,
+          "cmyk_direct": [
+            66.0,
+            0.0,
+            100.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            66.0,
+            0.0,
+            100.0,
+            1.4
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FAFBF3",
+          "dE00": 0.52,
+          "cmyk_direct": [
+            1.9,
+            0.3,
+            4.8,
+            0.0
+          ],
+          "cmyk_lut": [
+            1.9,
+            0.8,
+            4.8,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#EEFAFD",
+          "dE00": 0.485,
+          "cmyk_direct": [
+            6.4,
+            0.0,
+            0.3,
+            0.0
+          ],
+          "cmyk_lut": [
+            6.5,
+            0.2,
+            0.9,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFF2F5",
+          "dE00": 0.485,
+          "cmyk_direct": [
+            0.0,
+            5.2,
+            0.6,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.1,
+            5.3,
+            1.2,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#F5F8E2",
+          "dE00": 0.478,
+          "cmyk_direct": [
+            3.7,
+            0.0,
+            12.6,
+            0.0
+          ],
+          "cmyk_lut": [
+            3.7,
+            0.5,
+            12.7,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F3F4FA",
+          "dE00": 0.431,
+          "cmyk_direct": [
+            5.4,
+            2.5,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            5.3,
+            2.5,
+            0.5,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#DFF4FF",
+          "dE00": 0.43,
+          "cmyk_direct": [
+            12.2,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            12.2,
+            0.4,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F5EEF4",
+          "dE00": 0.395,
+          "cmyk_direct": [
+            4.2,
+            5.7,
+            0.6,
+            0.0
+          ],
+          "cmyk_lut": [
+            4.2,
+            5.7,
+            1.1,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFF3D2",
+          "dE00": 0.323,
+          "cmyk_direct": [
+            0.0,
+            3.3,
+            18.8,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.3,
+            3.2,
+            19.0,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#094C00",
+          "dE00": 0.276,
+          "cmyk_direct": [
+            78.5,
+            13.6,
+            100.0,
+            62.0
+          ],
+          "cmyk_lut": [
+            78.3,
+            12.6,
+            100.0,
+            61.8
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#8A0020",
+          "dE00": 0.269,
+          "cmyk_direct": [
+            0.0,
+            100.0,
+            64.4,
+            42.6
+          ],
+          "cmyk_lut": [
+            1.1,
+            100.0,
+            64.3,
+            42.6
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFEB4F",
+          "dE00": 0.253,
+          "cmyk_direct": [
+            1.4,
+            1.1,
+            78.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            1.5,
+            1.5,
+            78.1,
+            0.0
+          ]
+        }
+      ],
+      "pass": true
+    },
+    "pso_coated_v3": {
+      "label": "PSO Coated v3 (FOGRA51)",
+      "file": "PSOcoated_v3.icc",
+      "sha256": "c30ad2c01e8f93135ec7682c535e0a81bc2d177c301e196376c5f5838b5c8e86",
+      "tac_limit": 300,
+      "grid_max_tac": 295.8,
+      "tests": {
+        "random": {
+          "n": 10000,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.027,
+            "p95": 0.145,
+            "max": 0.715
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.073,
+            "p95": 0.444,
+            "max": 1.872
+          },
+          "preview_lab_dE00": {
+            "median": 0.03,
+            "p95": 0.145,
+            "max": 0.715
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.035,
+            "p95": 0.181,
+            "max": 1.643
+          },
+          "gamut_flag_disagreements": 10,
+          "share_out_of_gamut": 0.543
+        },
+        "near_gray": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.024,
+            "p95": 0.127,
+            "max": 0.699
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.07,
+            "p95": 0.314,
+            "max": 0.792
+          },
+          "preview_lab_dE00": {
+            "median": 0.031,
+            "p95": 0.147,
+            "max": 0.712
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.039,
+            "p95": 0.281,
+            "max": 0.731
+          },
+          "gamut_flag_disagreements": 1,
+          "share_out_of_gamut": 0.136
+        },
+        "gamut_edge": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.026,
+            "p95": 0.153,
+            "max": 0.992
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.063,
+            "p95": 0.43,
+            "max": 1.17
+          },
+          "preview_lab_dE00": {
+            "median": 0.028,
+            "p95": 0.156,
+            "max": 0.989
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.032,
+            "p95": 0.157,
+            "max": 0.995
+          },
+          "gamut_flag_disagreements": 2,
+          "share_out_of_gamut": 0.858
+        }
+      },
+      "worst": [
+        {
+          "set": "gamut_edge",
+          "hex": "#DFF4FF",
+          "dE00": 0.992,
+          "cmyk_direct": [
+            13.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            13.1,
+            1.1,
+            0.2,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#EEFAFD",
+          "dE00": 0.715,
+          "cmyk_direct": [
+            7.1,
+            0.0,
+            1.2,
+            0.0
+          ],
+          "cmyk_lut": [
+            7.0,
+            0.7,
+            1.2,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F3F4FA",
+          "dE00": 0.699,
+          "cmyk_direct": [
+            5.2,
+            3.8,
+            0.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            5.3,
+            3.7,
+            0.9,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#E6F5FB",
+          "dE00": 0.596,
+          "cmyk_direct": [
+            10.6,
+            0.1,
+            1.4,
+            0.0
+          ],
+          "cmyk_lut": [
+            10.5,
+            0.7,
+            1.3,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#0D56FB",
+          "dE00": 0.588,
+          "cmyk_direct": [
+            94.1,
+            68.1,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            94.1,
+            69.1,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#E3EFF9",
+          "dE00": 0.578,
+          "cmyk_direct": [
+            11.9,
+            3.1,
+            0.3,
+            0.0
+          ],
+          "cmyk_lut": [
+            11.9,
+            3.1,
+            1.1,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F9F7F9",
+          "dE00": 0.573,
+          "cmyk_direct": [
+            2.5,
+            3.1,
+            1.3,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.8,
+            3.0,
+            1.9,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#F12396",
+          "dE00": 0.558,
+          "cmyk_direct": [
+            0.7,
+            89.5,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.3,
+            89.5,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#FAC9DD",
+          "dE00": 0.554,
+          "cmyk_direct": [
+            0.0,
+            27.4,
+            0.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.8,
+            27.3,
+            1.3,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#4EC4F5",
+          "dE00": 0.55,
+          "cmyk_direct": [
+            60.8,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            60.8,
+            1.3,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F8FAF6",
+          "dE00": 0.529,
+          "cmyk_direct": [
+            3.0,
+            1.0,
+            3.8,
+            0.0
+          ],
+          "cmyk_lut": [
+            3.1,
+            1.5,
+            3.8,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FAF4FA",
+          "dE00": 0.517,
+          "cmyk_direct": [
+            2.4,
+            4.8,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.6,
+            4.8,
+            0.6,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F9F5FB",
+          "dE00": 0.506,
+          "cmyk_direct": [
+            2.9,
+            4.3,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            3.0,
+            4.2,
+            0.6,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FFF7F9",
+          "dE00": 0.501,
+          "cmyk_direct": [
+            0.0,
+            4.0,
+            0.8,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.3,
+            4.0,
+            1.5,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#D7DC00",
+          "dE00": 0.471,
+          "cmyk_direct": [
+            19.8,
+            0.0,
+            92.7,
+            0.0
+          ],
+          "cmyk_lut": [
+            19.3,
+            0.5,
+            92.8,
+            0.9
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FAFBF3",
+          "dE00": 0.4,
+          "cmyk_direct": [
+            2.2,
+            0.7,
+            5.6,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.2,
+            1.1,
+            5.5,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#4A6400",
+          "dE00": 0.372,
+          "cmyk_direct": [
+            52.5,
+            12.2,
+            99.2,
+            55.3
+          ],
+          "cmyk_lut": [
+            52.6,
+            12.9,
+            99.1,
+            54.3
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFED04",
+          "dE00": 0.317,
+          "cmyk_direct": [
+            2.6,
+            0.2,
+            88.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.5,
+            0.8,
+            88.0,
+            0.1
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#C3F2FF",
+          "dE00": 0.313,
+          "cmyk_direct": [
+            22.9,
+            0.0,
+            2.7,
+            0.0
+          ],
+          "cmyk_lut": [
+            23.0,
+            0.0,
+            2.3,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FF4FAB",
+          "dE00": 0.278,
+          "cmyk_direct": [
+            0.4,
+            78.7,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            1.1,
+            78.8,
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "pass": true
+    },
+    "pso_uncoated_v3": {
+      "label": "PSO Uncoated v3 (FOGRA52)",
+      "file": "PSOuncoated_v3_FOGRA52.icc",
+      "sha256": "7c39f74fbede1e8c85f8fbb9df7d359aea638b9b68dd0854fdd3ba386e3a02c0",
+      "tac_limit": 300,
+      "grid_max_tac": 292.6,
+      "tests": {
+        "random": {
+          "n": 10000,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.028,
+            "p95": 0.14,
+            "max": 0.686
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.095,
+            "p95": 0.585,
+            "max": 2.079
+          },
+          "preview_lab_dE00": {
+            "median": 0.034,
+            "p95": 0.139,
+            "max": 0.69
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.042,
+            "p95": 0.197,
+            "max": 0.758
+          },
+          "gamut_flag_disagreements": 12,
+          "share_out_of_gamut": 0.788
+        },
+        "near_gray": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.027,
+            "p95": 0.106,
+            "max": 0.668
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.076,
+            "p95": 0.339,
+            "max": 0.927
+          },
+          "preview_lab_dE00": {
+            "median": 0.039,
+            "p95": 0.122,
+            "max": 0.666
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.066,
+            "p95": 0.371,
+            "max": 0.7
+          },
+          "gamut_flag_disagreements": 0,
+          "share_out_of_gamut": 0.3
+        },
+        "gamut_edge": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.025,
+            "p95": 0.133,
+            "max": 0.698
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.071,
+            "p95": 0.508,
+            "max": 1.976
+          },
+          "preview_lab_dE00": {
+            "median": 0.026,
+            "p95": 0.132,
+            "max": 0.693
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.033,
+            "p95": 0.167,
+            "max": 0.764
+          },
+          "gamut_flag_disagreements": 0,
+          "share_out_of_gamut": 0.944
+        }
+      },
+      "worst": [
+        {
+          "set": "gamut_edge",
+          "hex": "#C0E1FF",
+          "dE00": 0.698,
+          "cmyk_direct": [
+            22.6,
+            2.1,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            22.5,
+            3.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#5ED3FD",
+          "dE00": 0.686,
+          "cmyk_direct": [
+            50.9,
+            0.0,
+            0.2,
+            0.0
+          ],
+          "cmyk_lut": [
+            50.9,
+            0.0,
+            1.5,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#E8F3EE",
+          "dE00": 0.685,
+          "cmyk_direct": [
+            7.7,
+            0.2,
+            5.2,
+            0.0
+          ],
+          "cmyk_lut": [
+            7.8,
+            0.9,
+            5.2,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F8FAF6",
+          "dE00": 0.668,
+          "cmyk_direct": [
+            2.4,
+            0.5,
+            2.8,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.4,
+            1.0,
+            2.7,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#5BD2FD",
+          "dE00": 0.643,
+          "cmyk_direct": [
+            51.7,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            51.8,
+            0.0,
+            1.2,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FFF7F9",
+          "dE00": 0.624,
+          "cmyk_direct": [
+            0.0,
+            3.2,
+            0.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.3,
+            3.1,
+            0.8,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#DEF0FF",
+          "dE00": 0.615,
+          "cmyk_direct": [
+            12.1,
+            0.2,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            12.0,
+            0.8,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#E3EFF9",
+          "dE00": 0.604,
+          "cmyk_direct": [
+            10.0,
+            1.4,
+            0.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            10.0,
+            1.6,
+            0.9,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F9F7F9",
+          "dE00": 0.586,
+          "cmyk_direct": [
+            2.1,
+            2.2,
+            0.7,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.3,
+            2.1,
+            1.2,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#DFF4FF",
+          "dE00": 0.557,
+          "cmyk_direct": [
+            11.4,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            10.9,
+            0.4,
+            0.2,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F3F4FA",
+          "dE00": 0.542,
+          "cmyk_direct": [
+            4.6,
+            2.6,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            4.5,
+            2.4,
+            0.5,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#A9D8F3",
+          "dE00": 0.528,
+          "cmyk_direct": [
+            31.5,
+            1.3,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            31.3,
+            1.5,
+            0.9,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#CBC1DC",
+          "dE00": 0.521,
+          "cmyk_direct": [
+            18.8,
+            19.1,
+            0.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            18.8,
+            19.1,
+            1.0,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F7F4F9",
+          "dE00": 0.478,
+          "cmyk_direct": [
+            3.2,
+            3.1,
+            0.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            3.2,
+            3.1,
+            0.6,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F9F5FB",
+          "dE00": 0.441,
+          "cmyk_direct": [
+            2.7,
+            3.1,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.7,
+            3.0,
+            0.4,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FAF4FA",
+          "dE00": 0.437,
+          "cmyk_direct": [
+            2.3,
+            3.6,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.3,
+            3.5,
+            0.4,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFF2F5",
+          "dE00": 0.401,
+          "cmyk_direct": [
+            0.0,
+            5.2,
+            0.6,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.2,
+            5.1,
+            0.9,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#D7DC00",
+          "dE00": 0.261,
+          "cmyk_direct": [
+            15.0,
+            0.0,
+            98.9,
+            0.0
+          ],
+          "cmyk_lut": [
+            14.6,
+            0.2,
+            99.1,
+            0.4
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#29007B",
+          "dE00": 0.256,
+          "cmyk_direct": [
+            93.6,
+            100.0,
+            0.0,
+            0.1
+          ],
+          "cmyk_lut": [
+            93.5,
+            100.0,
+            0.2,
+            1.1
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#002095",
+          "dE00": 0.244,
+          "cmyk_direct": [
+            99.8,
+            95.3,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            99.9,
+            94.2,
+            0.0,
+            0.1
+          ]
+        }
+      ],
+      "pass": true
+    },
+    "fogra39_vigc260": {
+      "label": "Coated FOGRA39L (VIGC 260)",
+      "file": "Coated_Fogra39L_VIGC_260.icc",
+      "sha256": "8decbce6c2efafdce11eca36571f5e22b5cb85418343a87d84c9289369e3519e",
+      "tac_limit": 260,
+      "grid_max_tac": 265.4,
+      "tests": {
+        "random": {
+          "n": 10000,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.021,
+            "p95": 0.139,
+            "max": 0.742
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.052,
+            "p95": 0.408,
+            "max": 2.797
+          },
+          "preview_lab_dE00": {
+            "median": 0.022,
+            "p95": 0.14,
+            "max": 0.745
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.023,
+            "p95": 0.168,
+            "max": 0.935
+          },
+          "gamut_flag_disagreements": 19,
+          "share_out_of_gamut": 0.526
+        },
+        "near_gray": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.033,
+            "p95": 0.098,
+            "max": 0.627
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.109,
+            "p95": 0.637,
+            "max": 1.153
+          },
+          "preview_lab_dE00": {
+            "median": 0.031,
+            "p95": 0.108,
+            "max": 0.651
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.032,
+            "p95": 0.188,
+            "max": 0.657
+          },
+          "gamut_flag_disagreements": 0,
+          "share_out_of_gamut": 0.116
+        },
+        "gamut_edge": {
+          "n": 500,
+          "printed_dE00_from_lut_cmyk": {
+            "median": 0.019,
+            "p95": 0.139,
+            "max": 0.576
+          },
+          "cmyk_abs_diff_points": {
+            "median": 0.04,
+            "p95": 0.367,
+            "max": 1.289
+          },
+          "preview_lab_dE00": {
+            "median": 0.019,
+            "p95": 0.134,
+            "max": 0.57
+          },
+          "roundtrip_lab_dE00": {
+            "median": 0.017,
+            "p95": 0.143,
+            "max": 0.466
+          },
+          "gamut_flag_disagreements": 1,
+          "share_out_of_gamut": 0.844
+        }
+      },
+      "worst": [
+        {
+          "set": "random",
+          "hex": "#FFF9DB",
+          "dE00": 0.742,
+          "cmyk_direct": [
+            0.8,
+            0.4,
+            20.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.5,
+            1.3,
+            20.0,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#8F6FB1",
+          "dE00": 0.674,
+          "cmyk_direct": [
+            50.8,
+            60.7,
+            0.0,
+            0.4
+          ],
+          "cmyk_lut": [
+            50.7,
+            60.7,
+            0.2,
+            2.5
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F8FAF6",
+          "dE00": 0.627,
+          "cmyk_direct": [
+            3.1,
+            0.8,
+            4.6,
+            0.0
+          ],
+          "cmyk_lut": [
+            3.1,
+            1.5,
+            4.6,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#0160AC",
+          "dE00": 0.616,
+          "cmyk_direct": [
+            89.8,
+            57.8,
+            0.0,
+            0.3
+          ],
+          "cmyk_lut": [
+            89.8,
+            57.6,
+            0.0,
+            3.1
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#E8F3EE",
+          "dE00": 0.6,
+          "cmyk_direct": [
+            10.0,
+            0.6,
+            8.3,
+            0.0
+          ],
+          "cmyk_lut": [
+            10.0,
+            1.4,
+            8.4,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#154200",
+          "dE00": 0.576,
+          "cmyk_direct": [
+            68.2,
+            2.0,
+            100.0,
+            76.9
+          ],
+          "cmyk_lut": [
+            67.4,
+            1.4,
+            100.0,
+            76.2
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#0C4398",
+          "dE00": 0.562,
+          "cmyk_direct": [
+            100.0,
+            76.6,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            98.9,
+            76.6,
+            0.0,
+            1.2
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F9F5FB",
+          "dE00": 0.561,
+          "cmyk_direct": [
+            2.7,
+            4.3,
+            0.0,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.7,
+            4.4,
+            0.8,
+            0.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#202280",
+          "dE00": 0.545,
+          "cmyk_direct": [
+            100.0,
+            100.0,
+            0.0,
+            6.5
+          ],
+          "cmyk_lut": [
+            100.0,
+            98.5,
+            0.0,
+            7.0
+          ]
+        },
+        {
+          "set": "random",
+          "hex": "#FDE1CB",
+          "dE00": 0.54,
+          "cmyk_direct": [
+            0.3,
+            15.0,
+            21.9,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.8,
+            14.7,
+            22.3,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FAFBF3",
+          "dE00": 0.534,
+          "cmyk_direct": [
+            2.2,
+            0.3,
+            6.7,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.2,
+            1.0,
+            6.7,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F3F4FA",
+          "dE00": 0.516,
+          "cmyk_direct": [
+            5.8,
+            3.5,
+            0.5,
+            0.0
+          ],
+          "cmyk_lut": [
+            5.5,
+            3.5,
+            1.1,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FAF4FA",
+          "dE00": 0.505,
+          "cmyk_direct": [
+            2.1,
+            5.0,
+            0.1,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.0,
+            5.2,
+            0.8,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#FFF7F9",
+          "dE00": 0.494,
+          "cmyk_direct": [
+            0.0,
+            3.9,
+            1.3,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.0,
+            4.0,
+            2.0,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#DFF4FF",
+          "dE00": 0.404,
+          "cmyk_direct": [
+            13.5,
+            0.0,
+            0.0,
+            0.1
+          ],
+          "cmyk_lut": [
+            13.7,
+            0.7,
+            0.5,
+            0.0
+          ]
+        },
+        {
+          "set": "near_gray",
+          "hex": "#F9F7F9",
+          "dE00": 0.398,
+          "cmyk_direct": [
+            2.8,
+            3.0,
+            1.7,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.8,
+            3.1,
+            2.3,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFAACE",
+          "dE00": 0.375,
+          "cmyk_direct": [
+            0.0,
+            45.9,
+            0.3,
+            0.0
+          ],
+          "cmyk_lut": [
+            0.0,
+            45.8,
+            1.4,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#00AD8B",
+          "dE00": 0.319,
+          "cmyk_direct": [
+            76.1,
+            0.2,
+            56.3,
+            0.0
+          ],
+          "cmyk_lut": [
+            75.8,
+            0.1,
+            56.2,
+            1.3
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#FFED04",
+          "dE00": 0.31,
+          "cmyk_direct": [
+            2.9,
+            0.0,
+            90.4,
+            0.0
+          ],
+          "cmyk_lut": [
+            2.9,
+            0.7,
+            90.7,
+            0.0
+          ]
+        },
+        {
+          "set": "gamut_edge",
+          "hex": "#D7DC00",
+          "dE00": 0.3,
+          "cmyk_direct": [
+            22.2,
+            0.0,
+            95.4,
+            0.0
+          ],
+          "cmyk_lut": [
+            22.0,
+            0.3,
+            95.4,
+            0.8
+          ]
+        }
+      ],
+      "pass": true
+    }
+  }
+}

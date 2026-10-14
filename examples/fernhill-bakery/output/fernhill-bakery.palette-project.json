@@ -1,0 +1,64 @@
+{
+  "format": "palette-engine-project",
+  "version": 1,
+  "app": "Palette Engine",
+  "savedAt": "2026-09-28T12:00:00.000Z",
+  "state": {
+    "v": 1,
+    "step": "export",
+    "name": "Fernhill Bakery",
+    "path": "known",
+    "input": "#B5532A",
+    "words": "",
+    "searched": false,
+    "seed": {
+      "hex": "#b5532a",
+      "origin": "manual",
+      "tier": null,
+      "rationale": "Fired clay and the inside of a brick oven. Chosen by the client before the project began, so it is locked and the rest of the palette is built around it.",
+      "locked": true,
+      "name": "Kiln Terracotta",
+      "mappedFrom": null
+    },
+    "profile": "gracol2013_crpc6",
+    "lens": "complementary",
+    "offsets": {},
+    "filters": {},
+    "supporting": {
+      "secondary": {
+        "hex": "#0083a8",
+        "origin": "harmony:complementary",
+        "tier": "low confidence",
+        "rationale": "Complement of the terracotta, used sparingly for links and focus states. The complement rule is low-confidence evidence; it was kept because it reads clearly against the warm seed.",
+        "locked": false,
+        "name": "Harbour Teal",
+        "lens": "complementary",
+        "offset": 180
+      },
+      "tertiary": {
+        "hex": "#5b7f3a",
+        "origin": "manual",
+        "tier": null,
+        "rationale": "Named after the street. Used for success states and the seasonal menu.",
+        "locked": false,
+        "name": "Fern Green",
+        "lens": null,
+        "offset": null
+      }
+    },
+    "overrides": {
+      "light": {
+        "outline": "#b9aea8"
+      },
+      "dark": {}
+    },
+    "accepted": {
+      "light|outline|surface|non-text": "Softer outline for card borders and dividers on the menu pages. These are decorative, so WCAG 1.4.11 does not require 3:1. Do not use this color for form field borders or focus rings; use the primary role for those."
+    },
+    "scheme": "light",
+    "spot": {
+      "text": "Sample Terracotta C, 46.5, 40.2, 42.8\nSample Terracotta U, 49.0, 37.5, 38.0\nSample Rust C, 44.0, 42.0, 45.5\nSample Rust U, 47.5, 38.5, 40.0\nSample Teal C, 50.2, -22.0, -28.5\nSample Teal U, 52.0, -20.0, -24.0",
+      "illum": "D50"
+    }
+  }
+}

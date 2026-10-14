@@ -1,0 +1,369 @@
+{
+  "version": "draft-2026-10-01",
+  "space": "OKLCH (L 0-1, C, h degrees)",
+  "tier": "low confidence (engineering choice)",
+  "basis": "Family centers follow the sRGB primaries/secondaries and the measured colour-term patches of Jonauskaite, Parraga, Quiblier & Mohr (2020), Table 1, converted xyY -> OKLCH. Boundaries sit between those anchors; they are a convention, not a finding.",
+  "neutral": {
+    "C_max": 0.03,
+    "note": "Any hue with OKLCH C below 0.03 counts as neutral."
+  },
+  "families": [
+    {
+      "id": "red",
+      "h": [
+        350,
+        40
+      ],
+      "anchors": {
+        "srgb_ff0000": 29.2,
+        "patch_red": 20,
+        "patch_pink": 5
+      }
+    },
+    {
+      "id": "orange",
+      "h": [
+        40,
+        80
+      ],
+      "anchors": {
+        "srgb_ff8000": 53.0,
+        "patch_orange": 61,
+        "patch_brown": 63
+      }
+    },
+    {
+      "id": "yellow",
+      "h": [
+        80,
+        125
+      ],
+      "anchors": {
+        "srgb_ffff00": 109.8,
+        "patch_yellow": 95
+      }
+    },
+    {
+      "id": "green",
+      "h": [
+        125,
+        175
+      ],
+      "anchors": {
+        "srgb_00ff00": 142.5,
+        "patch_green": 152
+      }
+    },
+    {
+      "id": "cyan",
+      "h": [
+        175,
+        215
+      ],
+      "anchors": {
+        "srgb_00ffff": 194.8,
+        "patch_turquoise": 194
+      }
+    },
+    {
+      "id": "blue",
+      "h": [
+        215,
+        280
+      ],
+      "anchors": {
+        "srgb_0000ff": 264.1,
+        "patch_blue": 233
+      }
+    },
+    {
+      "id": "purple",
+      "h": [
+        280,
+        315
+      ],
+      "anchors": {
+        "srgb_8000ff": 293.9
+      }
+    },
+    {
+      "id": "magenta",
+      "h": [
+        315,
+        350
+      ],
+      "anchors": {
+        "srgb_ff00ff": 328.4,
+        "patch_purple": 324
+      }
+    }
+  ],
+  "colorTerms": {
+    "tier": "anchors: measured (single study's chosen prototypes); bands: low confidence (engineering choice)",
+    "source": "jon2020ip",
+    "note": "Bridges the literature's colour WORDS to regions. Anchor = the study's patch (Munsell + xyY, Table 1) in OKLCH. The study's 'purple' patch (7.5P 4/10) lands at h 324, inside magenta; its purple term/patch agreement was only .23, so purple is split across both families.",
+    "regions": {
+      "red": {
+        "families": {
+          "red": 1
+        },
+        "L": [
+          0.25,
+          0.65
+        ],
+        "C": [
+          0.12,
+          null
+        ],
+        "anchor": [
+          0.52,
+          0.19,
+          20
+        ],
+        "patch": "5R 4/14",
+        "LfloorNote": "Lightness floor lowered to 0.25 on 2026-10-01 (D34, C10 option C) so dark brand colours can be reached; a band edge, still an engineering choice"
+      },
+      "orange": {
+        "families": {
+          "orange": 1
+        },
+        "L": [
+          0.6,
+          0.82
+        ],
+        "C": [
+          0.1,
+          null
+        ],
+        "anchor": [
+          0.68,
+          0.15,
+          61
+        ],
+        "patch": "5YR 6/12"
+      },
+      "yellow": {
+        "families": {
+          "yellow": 1
+        },
+        "L": [
+          0.78,
+          null
+        ],
+        "C": [
+          0.1,
+          null
+        ],
+        "anchor": [
+          0.84,
+          0.172,
+          95
+        ],
+        "patch": "5Y 8/14"
+      },
+      "green": {
+        "families": {
+          "green": 1
+        },
+        "L": [
+          0.25,
+          0.85
+        ],
+        "C": [
+          0.08,
+          null
+        ],
+        "anchor": [
+          0.58,
+          0.154,
+          152
+        ],
+        "patch": "2.5G 5/12",
+        "LfloorNote": "Lightness floor lowered to 0.25 on 2026-10-01 (D34, C10 option C) so dark brand colours can be reached; a band edge, still an engineering choice"
+      },
+      "turquoise": {
+        "families": {
+          "cyan": 1
+        },
+        "L": [
+          0.25,
+          0.85
+        ],
+        "C": [
+          0.07,
+          null
+        ],
+        "anchor": [
+          0.66,
+          0.12,
+          194
+        ],
+        "patch": "7.5BG 6/8",
+        "LfloorNote": "Lightness floor lowered to 0.25 on 2026-10-01 (D34, C10 option C) so dark brand colours can be reached; a band edge, still an engineering choice"
+      },
+      "blue": {
+        "families": {
+          "blue": 1
+        },
+        "L": [
+          0.25,
+          0.8
+        ],
+        "C": [
+          0.08,
+          null
+        ],
+        "anchor": [
+          0.66,
+          0.137,
+          233
+        ],
+        "patch": "10B 6/10",
+        "LfloorNote": "Lightness floor lowered to 0.25 on 2026-10-01 (D34, C10 option C) so dark brand colours can be reached; a band edge, still an engineering choice"
+      },
+      "royal blue": {
+        "families": {
+          "blue": 1
+        },
+        "L": [
+          0.25,
+          0.8
+        ],
+        "C": [
+          0.08,
+          null
+        ],
+        "anchor": [
+          0.44,
+          0.3,
+          265
+        ],
+        "patch": "HSL 240 deg, 92%, 50% (Labrecque & Milne 2012, Study 1)",
+        "source": "lm2012",
+        "note": "Separate blue for the Labrecque & Milne (2012) words (competent, reliable, intelligent, successful), added 2026-10-06 (C14 decision 3, C9 option 3). Study 1 gives saturation 220/240 and lightness 120/240 in HSL but no hue angle; hue 240 is assumed, the RGB primary Study 2 states it used. The blue in the printed Fig. 1 (sampled, so approximate) agrees on lightness (OKLCH L 0.43) and hue (269 against 265) and is less saturated (C 0.15 against 0.30, which is expected from print). The anchor is used only to break ties between equal scores, so a loud blue wins ties for these words. The band edges are the same as the shared blue region and are still an engineering choice. The shared blue region keeps the Jonauskaite et al. sky blue (hue 233) for the Jonauskaite-based words."
+      },
+      "purple": {
+        "families": {
+          "purple": 0.5,
+          "magenta": 0.5
+        },
+        "L": [
+          0.25,
+          0.65
+        ],
+        "C": [
+          0.07,
+          null
+        ],
+        "anchor": [
+          0.51,
+          0.116,
+          324
+        ],
+        "patch": "7.5P 4/10",
+        "LfloorNote": "Lightness floor lowered to 0.25 on 2026-10-01 (D34, C10 option C) so dark brand colours can be reached; a band edge, still an engineering choice"
+      },
+      "pink": {
+        "families": {
+          "red": 0.5,
+          "magenta": 0.5
+        },
+        "L": [
+          0.7,
+          null
+        ],
+        "C": [
+          0.04,
+          0.16
+        ],
+        "anchor": [
+          0.77,
+          0.09,
+          5
+        ],
+        "patch": "7.5RP 7/8"
+      },
+      "brown": {
+        "families": {
+          "orange": 1
+        },
+        "L": [
+          0.25,
+          0.52
+        ],
+        "C": [
+          0.03,
+          0.12
+        ],
+        "anchor": [
+          0.41,
+          0.082,
+          63
+        ],
+        "patch": "7.5YR 3/6"
+      },
+      "white": {
+        "families": {
+          "neutral": 1
+        },
+        "L": [
+          0.93,
+          null
+        ],
+        "C": [
+          null,
+          0.03
+        ],
+        "anchor": [
+          0.96,
+          0.006,
+          null
+        ],
+        "patch": "N 9.5"
+      },
+      "grey": {
+        "families": {
+          "neutral": 1
+        },
+        "L": [
+          0.4,
+          0.85
+        ],
+        "C": [
+          null,
+          0.03
+        ],
+        "anchor": [
+          0.67,
+          0.004,
+          null
+        ],
+        "patch": "N 6"
+      },
+      "black": {
+        "families": {
+          "neutral": 1
+        },
+        "L": [
+          null,
+          0.32
+        ],
+        "C": [
+          null,
+          0.03
+        ],
+        "anchor": [
+          0.27,
+          0.002,
+          null
+        ],
+        "patch": "N 1.5"
+      }
+    }
+  },
+  "decision": {
+    "families": "approve",
+    "bridge": "approve",
+    "note": "Approved 2026-09-28; revisit the blue band after seeing phase 4 seeds"
+  }
+}

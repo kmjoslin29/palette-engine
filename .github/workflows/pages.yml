@@ -1,0 +1,60 @@
+# Publishes the tool to GitHub Pages: https://<owner>.github.io/<repository>/
+#
+# It runs only after the "test" workflow has finished successfully on main, so a version that fails its tests is never published.
+# It builds dist/site-hosted (the complete HTML document plus the six print tables; see build/make_page.mjs) and deploys that folder.
+# Nothing built is committed to the repository. Run it by hand from the Actions tab (Run workflow) to republish the current main.
+#
+# One-time setup in the repository: Settings > Pages > Build and deployment > Source: "GitHub Actions".
+# On GitHub Free the repository must be public for Pages (decision D2).
+
+name: Publish page
+
+on:
+  workflow_run:
+    workflows: ["test"]          # the `name:` line of .github/workflows/test.yml; it must match exactly
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deployment at a time; a newer run waits instead of cancelling a deployment that is half done.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    # A manual run always builds; an automatic run builds only when the test workflow succeeded.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
+    steps:
+      # Same action versions and Node version as test.yml, which is known to work.
+      - uses: actions/checkout@v4
+        with:
+          # For an automatic run, the exact commit the tests just passed on; for a manual run, the commit it was started on.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run page        # bundles the engine, then writes dist/site and dist/site-hosted; fails if the hosted document lacks its doctype, charset, viewport or lang
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/site-hosted
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,275 @@
+{
+  "purpose": "C10 plausibility check of the matcher. Brand colors are not ground truth. Words are the brands' own published self-descriptions, quoted briefly; colors are hex facts. No guideline documents are stored here.",
+  "gathered": "2026-09-30",
+  "brands": [
+    {
+      "id": "mailchimp",
+      "words_verbatim": [
+        "plainspoken",
+        "genuine",
+        "translators",
+        "dry humor",
+        "clarity",
+        "empathy",
+        "wit",
+        "straight-faced",
+        "subtle",
+        "eccentric",
+        "smart"
+      ],
+      "words_source": "https://styleguide.mailchimp.com/voice-and-tone/ (official)",
+      "synthesized_terms": [
+        "honest",
+        "sincere",
+        "amusement",
+        "compassion",
+        "intelligent",
+        "imaginative"
+      ],
+      "colors": [
+        {
+          "name": "Cavendish Yellow",
+          "hex": "#FFE01B",
+          "role": "primary",
+          "source": "secondary: shadcn.io and oh-my-design.kr listings; the official brand-assets page names the color but gives no hex"
+        }
+      ],
+      "hue_family_expected": "yellow"
+    },
+    {
+      "id": "dropbox",
+      "words_verbatim": [
+        "simple",
+        "helpful",
+        "human",
+        "magic"
+      ],
+      "words_source": "https://brand.dropbox.com/voice-and-tone (official)",
+      "synthesized_terms": [
+        "down-to-earth",
+        "cheerful",
+        "compassion",
+        "imaginative"
+      ],
+      "colors": [
+        {
+          "name": "Dropbox Blue",
+          "hex": "#0061FE",
+          "role": "primary",
+          "source": "secondary: several color-listing sites agree; brand.dropbox.com/color names it as core but the text fetch showed no hex"
+        }
+      ],
+      "hue_family_expected": "blue"
+    },
+    {
+      "id": "starbucks",
+      "words_verbatim": [
+        "helpful",
+        "clear",
+        "day-making",
+        "fresh",
+        "relevant",
+        "interesting",
+        "confidently",
+        "passionate",
+        "joy"
+      ],
+      "words_source": "https://creative.starbucks.com/voice/ (official)",
+      "synthesized_terms": [
+        "joy",
+        "interest",
+        "up-to-date",
+        "successful"
+      ],
+      "colors": [
+        {
+          "name": "Starbucks Green",
+          "hex": "#006241",
+          "role": "primary",
+          "source": "secondary: several listings; the official color page names it but the text fetch showed no hex"
+        },
+        {
+          "name": "Starbucks Green (older listings)",
+          "hex": "#00704A",
+          "role": "primary, alternative value",
+          "source": "secondary: chromacreator.com; listings disagree, both are tested"
+        }
+      ],
+      "hue_family_expected": "green"
+    },
+    {
+      "id": "ibm",
+      "words_verbatim": [
+        "catalyst",
+        "better",
+        "positive",
+        "hybrid",
+        "open",
+        "responsible",
+        "ethical",
+        "vibrant",
+        "contemporary",
+        "useful",
+        "judicious"
+      ],
+      "words_source": "https://www.ibm.com/about (mission) and https://www.ibm.com/design/language/color/ (palette description; 'vibrant', 'contemporary', 'useful and judicious' describe the color palette)",
+      "synthesized_terms": [
+        "reliable",
+        "honest",
+        "up-to-date",
+        "vivid",
+        "competent"
+      ],
+      "colors": [
+        {
+          "name": "Blue 60",
+          "hex": "#0F62FE",
+          "role": "primary",
+          "source": "official: ibm.com/design/language/color and the @carbon/colors 11.59.0 package (blue60 = #0f62fe)"
+        }
+      ],
+      "hue_family_expected": "blue"
+    },
+    {
+      "id": "atlassian",
+      "words_verbatim": [
+        "bold",
+        "optimistic",
+        "practical",
+        "wink"
+      ],
+      "words_source": "secondary: 'Bold, Optimistic, Practical, with a wink' as reported from Atlassian's voice-and-tone guidance (x.com post, 2016, and atlassian.design/content/voice-tone, which did not render for the fetch tool). May be out of date",
+      "synthesized_terms": [
+        "bold",
+        "cheerful",
+        "down-to-earth",
+        "amusement"
+      ],
+      "colors": [
+        {
+          "name": "B400 (legacy brand blue)",
+          "hex": "#0052CC",
+          "role": "primary (legacy UI palette)",
+          "source": "official package @atlaskit/theme 28.2.4 (codemod maps B400 to #0052CC). Atlassian's 2024 rebrand may use a different blue; not checked"
+        }
+      ],
+      "hue_family_expected": "blue"
+    },
+    {
+      "id": "mozilla",
+      "words_verbatim": [
+        "opinionated",
+        "optimistic",
+        "human",
+        "open"
+      ],
+      "words_source": "https://mozilla.design/mozilla/ section 02 (official)",
+      "synthesized_terms": [
+        "daring",
+        "cheerful",
+        "compassion",
+        "honest"
+      ],
+      "colors": [
+        {
+          "name": "Neon Blue",
+          "hex": "#00ffff",
+          "role": "primary"
+        },
+        {
+          "name": "Lemon Yellow",
+          "hex": "#fff44f",
+          "role": "primary"
+        },
+        {
+          "name": "Warm Red",
+          "hex": "#ff4f5e",
+          "role": "primary"
+        },
+        {
+          "name": "Neon Green",
+          "hex": "#54ffbd",
+          "role": "primary"
+        },
+        {
+          "name": "Dark Purple",
+          "hex": "#6e008b",
+          "role": "primary"
+        }
+      ],
+      "colors_source": "https://mozilla.design/mozilla/ section 04 (official). Black and white are also primary and are excluded from the hue check. No single lead color is designated",
+      "hue_family_expected": "any of the listed colors"
+    },
+    {
+      "id": "kwade-joslin-studios",
+      "words_verbatim": [
+        "creative",
+        "approachable",
+        "responsible",
+        "trustworthy",
+        "calming",
+        "exploration"
+      ],
+      "words_source": "Kwade, in conversation 2026-09-30 (the brand owner's own words: 'creative, and approachable, and both responsible trustworthy while maybe calming and up for exploration')",
+      "synthesized_terms": [
+        "imaginative",
+        "down-to-earth",
+        "reliable",
+        "calm",
+        "interest"
+      ],
+      "colors": [
+        {
+          "name": "2199 C",
+          "hex": "#03BEDF",
+          "role": "primary"
+        },
+        {
+          "name": "1505 C",
+          "hex": "#FF6900",
+          "role": "primary"
+        },
+        {
+          "name": "2364 C",
+          "hex": "#66596C",
+          "role": "muted"
+        },
+        {
+          "name": "7449 C",
+          "hex": "#41273B",
+          "role": "dark"
+        }
+      ],
+      "colors_source": "Kwade's Personal Branding Language sheet (own document, not committed). Neutrals (Warm Grey 1 C #D7D2CB, Warm Grey 8 C #8C8279, Black 6 C #101820, White #fafafa) are excluded from the hue check. The sheet lists White as #fafafa but RGB 255 255 255",
+      "hue_family_expected": "any of the listed colors"
+    },
+    {
+      "id": "the-guardian",
+      "words_verbatim": [
+        "independence",
+        "freedom",
+        "liberal",
+        "quality",
+        "faithful",
+        "honesty"
+      ],
+      "words_source": "secondary: the Scott Trust's purpose as quoted on Wikipedia (https://en.wikipedia.org/wiki/The_Guardian): 'financial and editorial independence', 'journalistic freedom and liberal values', 'a quality national newspaper', 'remaining faithful to its liberal tradition', and Orwell on its 'honesty'. The Guardian's own pages were not read (the fetch needed an approval that was not given in time)",
+      "synthesized_terms": [
+        "independent",
+        "honest",
+        "sincere",
+        "reliable"
+      ],
+      "colors": [
+        {
+          "name": "brand 400",
+          "hex": "#052962",
+          "role": "primary (masthead navy)",
+          "source": "official package @guardian/source 13.1.0, foundations palette brand.400"
+        }
+      ],
+      "hue_family_expected": "blue",
+      "note": "Added as the dark-brand case: OKLCH L of #052962 is below the blue color-word region (L 0.35 and up)"
+    }
+  ]
+}

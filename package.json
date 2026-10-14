@@ -1,0 +1,30 @@
+{
+  "name": "palette-engine",
+  "version": "1.0.0",
+  "description": "Brand palette builder: screen, print and spot values with the evidence for each choice, and exports for design and print tools.",
+  "scripts": {
+    "bundle": "node build/bundle.mjs",
+    "page": "node build/bundle.mjs && node build/make_page.mjs",
+    "example": "node build/bundle.mjs && node build/make_example.mjs",
+    "test:engine": "node build/bundle.mjs && for t in lut lab spot color gamut checks apcastub harmony ouluo matcher palette analyze export ase project sheet files example; do echo \"== $t\"; node engine/test_$t.mjs || exit 1; done && echo '== tokens' && node web/test_tokens.mjs",
+    "test:web": "node build/bundle.mjs && node build/make_page.mjs && echo '== export ui' && node web/test_export_ui.mjs && echo '== end to end' && node web/test_e2e.mjs",
+    "test": "npm run test:engine && npm run test:web"
+  },
+  "author": "Kwade Joslin",
+  "license": "MIT",
+  "dependencies": {
+    "@material/material-color-utilities": "^0.4.0",
+    "apca-w3": "^0.1.9",
+    "culori": "^4.0.2",
+    "esbuild": "^0.28.2",
+    "pdf-lib": "^1.17.1"
+  },
+  "type": "module",
+  "devDependencies": {
+    "ase-util": "^1.0.3",
+    "markdown-it": "^15.0.2",
+    "playwright-core": "^1.63.0",
+    "postcss": "^8.5.28"
+  },
+  "private": true
+}
