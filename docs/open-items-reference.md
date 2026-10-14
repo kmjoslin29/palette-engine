@@ -13,7 +13,6 @@ run `npm test`, and commit.
 
 | ID | What | Needs | Effort | Blocks |
 | --- | --- | --- | --- | --- |
-| C24 | Send PRINTING United Alliance the repository and the live page (public since 2026-10-14) | Nothing | A short email | Nothing |
 | C10 | Review the matcher's constants | Real use | Ongoing | Nothing |
 | C15 | Look at the "near-synonym, tier lowered" chips on the live page (the 27 strong synonyms were reviewed and agreed 2026-10-01) | The live page | 10 minutes | Nothing |
 | C13 | Screen-reader session | A screen reader (NVDA is free) | 1–2 hours | Nothing |
@@ -46,9 +45,9 @@ The footer's "Print profile notices" carries the registry notice, a "Credit." pa
 
 The page uses the 260% from the file's ICC registry page and says so on the card. A few very dark blues (7 of 35,937 grid points, about 0.01% of random colors) come out of the profile above 260% and show as over the limit. Tested, committed and green in CI; see `TO-CONFIRM.md` (Done).
 
-## C24. Send PRINTING United Alliance the repository
+## C24 (closed 2026-10-14). Send PRINTING United Alliance the repository
 
-They asked for it once it is ready, to share with members. The repository is public (D2 closed 2026-10-14) and the page is live at https://kmjoslin29.github.io/palette-engine/; Kwade is sending both. A short reply is drafted (the drafts are kept privately, outside the public repository).
+They asked for it once it was ready, to share with members. Kwade sent the repository (public since 2026-10-14) and the live page, https://kmjoslin29.github.io/palette-engine/, on 2026-10-14. See `TO-CONFIRM.md` (Done).
 
 ## C25 (closed 2026-10-13). Does hue matter for warm-cool?
 
