@@ -1,4 +1,4 @@
-> Repo copy as of pe-update50 (2026-10-13; delivered as pe-update50.zip; pe-update42 to 49 are committed and CI is green). The repo is authoritative; this copy goes stale until refreshed after the next update. docs/07-decisions.md in the Project has D1 to D43: D1 to D41 match the repo file Kwade attached on 2026-10-13, and D42 and D43 (pe-update46 and 47) are committed.
+> Repo copy as of pe-update57 (2026-10-14; delivered as pe-update57.zip; pe-update52 to 56 are committed, CI is green and the page is live). The repo is authoritative; this copy goes stale until refreshed after the next update. docs/07-decisions.md in the Project has D1 to D43: D1 to D41 match the repo file Kwade attached on 2026-10-13, and D42 and D43 (pe-update46 and 47) are committed.
 
 # Open items: a working reference
 
@@ -13,8 +13,7 @@ run `npm test`, and commit.
 
 | ID | What | Needs | Effort | Blocks |
 | --- | --- | --- | --- | --- |
-| C24 | Send PRINTING United Alliance the repository, once public | D2 decided | A short email | Nothing |
-| D2 | Decide whether to make the repo public | Nothing (C30 is done) | A decision | Nothing |
+| C24 | Send PRINTING United Alliance the repository and the live page (public since 2026-10-14) | Nothing | A short email | Nothing |
 | C10 | Review the matcher's constants | Real use | Ongoing | Nothing |
 | C15 | Look at the "near-synonym, tier lowered" chips on the live page (the 27 strong synonyms were reviewed and agreed 2026-10-01) | The live page | 10 minutes | Nothing |
 | C13 | Screen-reader session | A screen reader (NVDA is free) | 1–2 hours | Nothing |
@@ -49,7 +48,7 @@ The page uses the 260% from the file's ICC registry page and says so on the card
 
 ## C24. Send PRINTING United Alliance the repository
 
-They asked for it once it is ready, to share with members. Wait for D2. A short reply is drafted (the drafts are kept privately, outside the public repository).
+They asked for it once it is ready, to share with members. The repository is public (D2 closed 2026-10-14) and the page is live at https://kmjoslin29.github.io/palette-engine/; Kwade is sending both. A short reply is drafted (the drafts are kept privately, outside the public repository).
 
 ## C25 (closed 2026-10-13). Does hue matter for warm-cool?
 
@@ -79,11 +78,9 @@ Read in full and recorded as corroboration only; see `TO-CONFIRM.md` (Done) and 
 
 `engine/test_sheet.mjs` needs poppler-utils and qpdf, which the Windows machine lacks, so it did not run there. Kwade reported a green CI check afterwards (CI runs it on Linux). See `TO-CONFIRM.md` (Done).
 
-## D2. Make the repo public?
+## D2 (closed 2026-10-14). Make the repo public?
 
-C5, C22, C23 and C30 are closed; nothing blocks it except your decision. Before flipping it, check: `NOTICE.md` matches the answers; no `.icc` files are committed; `README.md` and the license read
-correctly to a stranger; `git log` contains nothing you would not want public (the email address in commits, for example). In GitHub: repository
-Settings, then the danger zone at the bottom, then "Change visibility".
+Done as a fresh one-commit repository, `kmjoslin29/palette-engine`, so no old history is public (the old clone is the private `palette-engine-archive`). The commit email is the GitHub noreply address, no `.icc` file is committed, and the correspondence with ECI and PRINTING United Alliance is in a git-ignored `private/` folder. The live page is https://kmjoslin29.github.io/palette-engine/. See `TO-CONFIRM.md` (Done: D2, C36, C37, C42).
 
 ## C9. The blue band of the color-word bridge (closed 2026-09-30)
 

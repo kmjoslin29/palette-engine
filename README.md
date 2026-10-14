@@ -5,6 +5,8 @@ documented palette: screen values, CMYK for six print conditions (three US, thre
 color roles, accessibility checks, and files that design and print tools can read. Every suggestion shows how strong the evidence behind
 it is, and every choice the designer makes (lock, override, note) travels into the exports.
 
+**Use it in your browser, with no install and no account:** https://kmjoslin29.github.io/palette-engine/
+
 It is a personal design-systems project by Kwade Joslin, designed and reviewed by him and built with Claude (Anthropic) over a series of
 phases. [`docs/02-how-it-was-made.md`](docs/02-how-it-was-made.md) says what that means in practice.
 

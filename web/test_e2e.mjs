@@ -1,6 +1,7 @@
 // Phase 6 end-to-end tests: a designer's whole session in the real page (headless Chromium), both entry paths, every step,
 // light and dark, phone width, keyboard focus, reload. Gate: zero page errors, console errors or failed requests.
 // Run after: node build/bundle.mjs && node build/make_page.mjs
+import fs from 'node:fs';
 import * as PE from '../dist/engine.mjs';
 import { makeChecker, startSite, launch, openApp, download, readZip, contrastAudit } from './harness.mjs';
 
@@ -77,6 +78,8 @@ async function resolveFailures(page) {
   await goto(page, 'checks');
   const tc = await panelText(page);
   check('Checks shows WCAG, color-blind, APCA (advisory), print and origin sections', ['Text pairs at AA', 'Color-blind views', 'APCA (advisory)', 'Print', 'Where each color came from'].every((x) => tc.includes(x)) && tc.includes('Warm, baked'));
+  const apcaVer = JSON.parse(fs.readFileSync('node_modules/apca-w3/package.json', 'utf8')).version;
+  check('the APCA section says which apca-w3 computed it, and that it is used for web content only', tc.includes(`apca-w3 ${apcaVer}`) && tc.includes('for web-content contrast only'), tc.slice(tc.indexOf('APCA (advisory)'), tc.indexOf('APCA (advisory)') + 400));
   await goto(page, 'export');
   const files = await download(page, '#exp-all'); const z = readZip(files.bytes);
   const names = Object.keys(z);

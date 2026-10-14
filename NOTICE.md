@@ -32,8 +32,8 @@ Palette Engine's own code and documentation are released under the [MIT license]
 - **The ICC profiles themselves.** They are not in this repository. See [`profiles/README.md`](profiles/README.md).
 - **Third-party packages and data.** Each keeps its own license; see [`docs/08-data-and-licences.md`](docs/08-data-and-licences.md).
   - `apca-w3` (APCA contrast) is bundled in the page under its own limited license: web-content contrast only, no change to its essential code or
-    constants, no commercial use without a signed agreement except under the W3 arrangement. Its license banner is kept in the built page. Palette Engine
-    does not change `apca-w3`.
+    constants, no commercial use without a signed agreement except under the W3 arrangement. Its license banner is kept in the built page, and the Checks
+    step names the version used (0.1.9). Palette Engine does not change `apca-w3`. Anyone who reuses the built page takes on those terms for this code.
   - `colorparsley` (AGPL-3.0), a dependency of `apca-w3`, is **not** in the built page. `apca-w3` uses it for one function the engine does not need
     (reading colors given as words or `rgb()` strings; the engine passes hex only), so the build replaces it with a small hex-only module written for this
     project (`build/stubs/colorparsley-hex.js`). A test (`engine/test_apcastub.mjs`) compares the replacement with the real package and fails if any AGPL text

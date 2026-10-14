@@ -65,5 +65,12 @@ for (const f of ['dist/engine.mjs', 'dist/engine.iife.js']) {
 }
 check('dist/engine.mjs keeps the apca-w3 licence banner (the APCA code is still shipped)', /LICENSE: W3 LICENSE/.test(fs.readFileSync(root + 'dist/engine.mjs', 'utf8')));
 
+// 5. The page states which apca-w3 and which APCA constants it uses, and that statement is read from the installed package.
+const pkg = JSON.parse(fs.readFileSync(root + 'node_modules/apca-w3/package.json', 'utf8'));
+const banner = /SAPC-8, ([0-9.]+G)-series constant (\w+)/.exec(fs.readFileSync(root + 'node_modules/apca-w3/src/apca-w3.js', 'utf8'));
+check(`the bundle reports the installed apca-w3 version (${pkg.version})`, PE.APCA_INFO.version === pkg.version, JSON.stringify(PE.APCA_INFO));
+check(`the bundle reports the APCA constants named in the package's own banner (${banner && banner[1] + '-' + banner[2]})`, !!banner && PE.APCA_INFO.algorithm === `${banner[1]}-${banner[2]}`, JSON.stringify(PE.APCA_INFO));
+check('the browser bundle carries the same statement', fs.readFileSync(root + 'dist/engine.iife.js', 'utf8').includes(JSON.stringify(pkg.version)));
+
 console.log(fails ? `\n${fails} FAILED` : '\nALL PASS');
 process.exit(fails ? 1 : 0);

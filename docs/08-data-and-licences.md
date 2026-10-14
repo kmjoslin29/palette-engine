@@ -28,7 +28,7 @@ legal advice. Check the current terms before publishing or redistributing.
 | --- | --- | --- |
 | culori 4.0.2 | Color conversion, gamut mapping, CVD filters | MIT |
 | @material/material-color-utilities 0.4.0 | HCT and Material 3 tonal palettes and schemes | Apache-2.0 |
-| apca-w3 0.1.9 | APCA contrast (advisory, web only) | "Limited W3 License": web-content contrast only; no alteration of its essential code or constants; no commercial use without a signed agreement except under the W3 arrangement; the name "APCA" may be used only for correct, current implementations. Bundled unmodified, with its license banner. The page does not yet show the `apca-w3` version (TO-CONFIRM C41) |
+| apca-w3 0.1.9 | APCA contrast (advisory, web only) | "Limited W3 License": web-content contrast only; no alteration of its essential code or constants; no commercial use without a signed agreement except under the W3 arrangement; the name "APCA" may be used only for correct, current implementations. Bundled unmodified, with its license banner. The Checks step names the installed version, read from the package at build time (`build/bundle.mjs`; tested in `engine/test_apcastub.mjs` and the end-to-end suite). Read in full 2026-10-14 and judged to fit this use; the author was not asked (TO-CONFIRM C41, Done) |
 | colorparsley 0.1.8 | A dependency of `apca-w3`; used there by one function, `calcAPCA`, to read colors | AGPL-3.0. **Not shipped:** `build/bundle.mjs` replaces it with `build/stubs/colorparsley-hex.js`, a hex-only module written for this project (the engine passes hex strings only). `engine/test_apcastub.mjs` compares the two on 200,000 random hex strings, 100,000 random color pairs and a 281,216-pair sweep of the RGB cube, and fails if AGPL text appears in the bundles. Installed by `npm ci` for tests only (TO-CONFIRM C41) |
 | pdf-lib 1.17.1 | PDF spec sheet | MIT |
 | esbuild 0.28.2 | Bundling | MIT |
@@ -38,7 +38,7 @@ legal advice. Check the current terms before publishing or redistributing.
 | IBM Plex Sans and Plex Mono | Page fonts, loaded from Google Fonts; the page falls back to system fonts | SIL Open Font License 1.1 |
 | Material Web 2.5.0 design tokens | Numeric values for interface mechanics (touch targets, state layers) were read from these; no code is copied | Apache-2.0 |
 
-Licenses above are recorded from each package's published metadata and the notes made in Phase 0; re-check on upgrade (`npm ls` and `pip show`). When `apca-w3` is upgraded, re-read what it imports: the replacement above covers only hex strings, and `engine/test_apcastub.mjs` will fail if the new version needs more.
+Licenses above are recorded from each package's published metadata and the notes made in Phase 0; re-check on upgrade (`npm ls` and `pip show`). The `apca-w3` licence makes keeping current a continuing duty: check `npm view apca-w3 version` before each release, and on a new release read its license and notes before upgrading (`engine/HANDOFF.md` has the routine). When `apca-w3` is upgraded, re-read what it imports: the replacement above covers only hex strings, and `engine/test_apcastub.mjs` will fail if the new version needs more.
 
 This page is not legal advice. Whether the `apca-w3` license and the AGPL could be combined in one distribution was not settled; shipping without `colorparsley` avoids the question rather than answering it.
 

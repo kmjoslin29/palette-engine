@@ -509,7 +509,8 @@ function apcaSection(pal) {
   const rows = pal.checks.light.rows.filter((r) => r.kind === 'text').map((r) => [h('span', { class: 'mono' }, `${r.fg} on ${r.bg}`), String(PE.apcaScore(light[r.fg], light[r.bg])), ratioText(r.ratio)]);
   return h('div', { class: 'sect stack' }, h('h3', null, 'APCA (advisory)'),
     h('p', { class: 'small muted' }, 'A readability score from the WCAG 3 drafts: web only, never applied to print, and not a pass or fail.'),
-    table(['Pair (light)', 'Lc', 'WCAG ratio'], rows, [1, 2]));
+    table(['Pair (light)', 'Lc', 'WCAG ratio'], rows, [1, 2]),
+    PE.APCA_INFO.version && h('p', { class: 'small muted' }, `Computed with apca-w3 ${PE.APCA_INFO.version} (APCA ${PE.APCA_INFO.algorithm}), used under its W3 license for web-content contrast only.`));
 }
 function printSection(pal) {
   const name = (PROFILES.find((x) => x.id === S.profile) || {}).short;

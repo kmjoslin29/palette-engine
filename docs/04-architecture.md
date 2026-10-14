@@ -30,7 +30,7 @@
 | `spot.js` | M4 | Parse pasted names and Lab values; score Coated and Uncoated by ΔE00; bands |
 | `harmony.js` | M5 | Harmony lenses, candidates with contrast, CVD collapse and nearest text-safe lightness; advisory Ou & Luo score |
 | `palette.js` | M6 | Tonal palettes (HCT), 29 light and dark roles (Material 3, 2021 tones), overrides, nearest passing tone fixes |
-| `checks.js` | M7 | WCAG 2.2 contrast, role-pair matrix, APCA (advisory), CVD simulation (Machado 2009), print ΔL* |
+| `checks.js` | M7 | WCAG 2.2 contrast, role-pair matrix, APCA (advisory; names the `apca-w3` version it was built with), CVD simulation (Machado 2009), print ΔL* |
 | `matcher.js` | M8 | Descriptor terms to ranked seed candidates |
 | `de.js` | shared | The only ΔE2000 entry point; keeps Lab in D50 |
 | `analyze.js` | glue | One call: screen record, print per profile, gamut flags |

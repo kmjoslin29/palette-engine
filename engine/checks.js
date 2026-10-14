@@ -52,6 +52,12 @@ export function contrastMatrix(colors, pairs) {
 
 // --- APCA (advisory only, screen only) --------------------------------------
 
+/** Which apca-w3 the page was built with and which APCA constants those are. Filled in by build/bundle.mjs; empty when the source is run unbundled. */
+export const APCA_INFO = {
+  version: typeof __APCA_VERSION__ === 'undefined' ? '' : __APCA_VERSION__,
+  algorithm: typeof __APCA_ALGORITHM__ === 'undefined' ? '' : __APCA_ALGORITHM__,
+};
+
 /** APCA Lc score, 1 decimal. Advisory only — never used as a pass/fail gate, never applied to print. */
 export function apcaScore(fg, bg) {
   return Math.round(calcAPCA(fg, bg) * 10) / 10;
