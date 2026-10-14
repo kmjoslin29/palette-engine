@@ -88,7 +88,7 @@ The PDF and zip tests need `poppler-utils` (pdftotext, pdftoppm), `qpdf` and `un
   8% hover, 10% focus, 10% pressed (12% on chips, switches and tabs), 3px focus ring with 2px offset, disabled 38%. Source: Material Web 2.5.0 tokens (Apache-2.0);
   m3.material.io itself could not be read by the tools used. Intentional deviations: field labels sit above the field instead of floating inside the outline; the tab
   bar is used as a wizard stepper with a done mark; the visual design is not Material's.
-- **State** is saved in browser storage (flushed on `pagehide` and when the page is hidden) and in a project file (Export step).
+- **State** is saved in browser storage (flushed on `pagehide` and when the page is hidden) and in a project file (saved from the Export step; opened from the Seed or Export step).
 - **ASE:** structure checked by three independent readers (engine `parseAse`, the `ase-util` package, a Python struct reader) plus a third-party sample, but never in
   Adobe (TO-CONFIRM C7). `ASE_TESTED_IN_ADOBE` in `web/app.js` drives the on-page notice; flip it only after that check. No ICC profile is carried; SWOP and the three European conditions are not in
   the ASE (six print conditions since D38; the first three keep positions 0 to 2 because the ASE and summary tables read them by position); the spot group appears only with pasted values.

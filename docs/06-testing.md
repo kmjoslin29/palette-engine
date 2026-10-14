@@ -17,7 +17,7 @@ Run everything with `npm test` (engine and export tests, then a fresh page build
 | Exports (needs `poppler-utils` for pdftotext and pdftoppm, `qpdf` and `unzip` installed) | `test_export`, `test_ase`, `test_sheet`, `test_files`, `test_project` | Each format parsed back by an independent reader (JSON structure, postcss for CSS, markdown-it for Markdown, three ASE readers including Python, qpdf and pdftotext for the PDF); hostile and unusual input; blocked exports; project-file validation |
 | Example | `test_example` | The committed example outputs equal a fresh build, so they cannot go stale |
 | Design tokens | `web/test_tokens` | The page's own colors pass WCAG AA in both themes |
-| Browser: exports | `web/test_export_ui` | Gating, every download parsed back, the viewer save path (mocked), project save and open, invalid and hostile project files |
+| Browser: exports | `web/test_export_ui` | Gating, every download parsed back, the viewer save path (mocked), project save and open (from the Export step and from the Seed step, including a project with no seed), invalid and hostile project files |
 | Browser: end to end | `web/test_e2e` | A whole session on both entry paths; every step in light and dark at 375px and 1100px: no sideways scroll, WCAG AA text contrast, an accessible name on every control; keyboard focus ring; reload; blocked storage; hostile saved data |
 
 ## The Phase 6 gate

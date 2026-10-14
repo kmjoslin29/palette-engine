@@ -11,7 +11,7 @@ Each format is parsed back by a reader that shares no code with the writer, in t
 | Color specification (text) | `<name>-color-spec.md` | Per-color values, CMYK for all six print conditions (with their regions) and gamut flags, spot matches, contrast, evidence tier, rationale, locks and accepted failures |
 | Adobe swatches (.ase) | `<name>.ase` | Groups: Screen RGB; Print GRACoL coated CMYK; Print uncoated CMYK; Spot approximations (Lab, named e.g. "185 C (approx.)"). Optional: the 84 tonal-palette colors |
 | Brand color sheet (PDF) | `<name>-color-spec-sheet.pdf` | US Letter: summary, one page per color, roles, role-pair checks. Footer states profile, intent and that swatches are not proofs |
-| Save or open project | `<name>.palette-project.json` | Everything chosen, so work is not tied to one browser. Loading validates strictly and refuses a bad file with reasons |
+| Save or open project | `<name>.palette-project.json` | Everything chosen, so work is not tied to one browser. Loading validates strictly and refuses a bad file with reasons. Opening is offered on the Seed step as well as on the Export step, so a saved project can be the starting point |
 
 "Download all" gives one `<name>-color-files.zip` with the seven files and a `README.txt`. `<name>` comes from the project name, reduced to `a–z 0–9 -`.
 

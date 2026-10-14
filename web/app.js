@@ -182,9 +182,13 @@ function chooseSeed(hex, origin, tier, extra) {
 }
 function renderSeed() {
   const known = S.path === 'known';
+  const opener = projectOpener('seed', 'outlined');
+  const seedMsg = exportUi.projectMsg && exportUi.projectMsg.where === 'seed' ? exportUi.projectMsg : null;
   const box = h('div', { class: 'stack' },
     h('div', { class: 'stack-s' }, h('h2', { id: 'panel-title', tabindex: '-1' }, 'Choose a seed color'),
-      h('p', { class: 'lead' }, 'The seed is the brand primary. Start with a color you have, or with words that describe the brand.')),
+      h('p', { class: 'lead' }, 'The seed is the brand primary. Start with a color you have, or with words that describe the brand.'),
+      h('div', { class: 'row' }, opener.button, opener.input, h('span', { class: 'small muted' }, 'Have a project file from an earlier session? Open it to carry on.')),
+      opener.confirm, seedMsg && projectResult(seedMsg)),
     segmented([{ id: 'known', label: 'I have a color' }, { id: 'words', label: 'I have words' }], S.path, (id) => { S.path = id; commit(); }, 'How to start'),
     S.seed && seedCard(),
     known ? renderKnown() : renderWords());
@@ -578,35 +582,49 @@ async function runExport(id) {
   exportUi.busy = ''; exportUi.results[id] = res; render(); say(res.text);
   const b = document.getElementById(`exp-${id}`); if (b) b.focus();
 }
-async function openProject(file) {
-  const fail = (errors, warnings) => { exportUi.projectMsg = { ok: false, errors, warnings: warnings || [] }; render(); say('The project file was not opened'); };
+async function openProject(file, where = 'export') {
+  const fail = (errors, warnings) => { exportUi.projectMsg = { ok: false, where, errors, warnings: warnings || [] }; render(); say('The project file was not opened'); };
   if (!file) return;
   if (file.size > PE.MAX_PROJECT_BYTES) return fail(['The file is too large to be a Palette Engine project.']);
   let text; try { text = await file.text(); } catch (e) { return fail(['The file could not be read.']); }
   const r = PE.parseProject(text);
   if (!r.ok) return fail(r.errors, r.warnings);
-  S = r.state; S.step = 'export'; if (!S.seed) S.step = 'seed';
-  exportUi.results = {}; exportUi.projectMsg = { ok: true, errors: [], warnings: r.warnings, savedAt: r.savedAt, name: file.name };
+  S = r.state; // the step it was saved on (a project with no seed is always on Seed: validateState)
+  exportUi.results = {}; exportUi.projectMsg = { ok: true, where: S.step, errors: [], warnings: r.warnings, savedAt: r.savedAt, name: file.name };
   saveNote = 'Opened from a project file'; commit(); say('Project opened');
+  requestAnimationFrame(() => { const t = $('#panel-title'); if (t) t.focus({ preventScroll: false }); }); // the control that was used is gone after the redraw
 }
-function projectSection() {
+// One way to open a project file, used on the Seed step (so a saved project can be the starting point) and on the Export step.
+// Opening over existing work asks first (rule S12.1); a failed open changes nothing (S11.2) and says why (S11.1).
+function projectOpener(where, cls) {
   const hasWork = !!S.seed;
   const input = h('input', { type: 'file', id: 'project-file', accept: '.json,application/json', style: 'display:none', 'aria-label': 'Open a project file', tabindex: '-1' });
-  input.addEventListener('change', () => { const f = input.files && input.files[0]; input.value = ''; if (f) openProject(f); });
+  input.addEventListener('change', () => { const f = input.files && input.files[0]; input.value = ''; if (f) openProject(f, where); });
   const pick = () => { exportUi.confirmOpen = false; input.click(); };
+  const button = h('button', { type: 'button', class: `btn ${cls}`, id: 'open-project', onclick: () => (hasWork ? (exportUi.confirmOpen = true, render(), (document.getElementById('open-confirm') || {}).focus?.()) : pick()) }, 'Open project file…');
+  const confirm = exportUi.confirmOpen && notice('warn', h('div', { class: 'stack-s' }, h('div', null, h('b', null, 'Replace your current work? '), 'Opening a project file replaces what is on this page. Save it first if you want to keep it.'),
+    h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn filled small', id: 'open-confirm', onclick: pick }, 'Choose a file to open'), h('button', { type: 'button', class: 'btn text small', onclick: () => { exportUi.confirmOpen = false; render(); } }, 'Cancel'))));
+  return { input, button, confirm };
+}
+function projectResult(m) {
+  if (!m) return null;
+  return m.ok
+    ? notice('pass', h('b', null, 'Opened. '), `${m.name}${m.savedAt ? `, saved ${m.savedAt}` : ''}.`, m.warnings.length > 0 && ` Note: ${m.warnings.slice(0, 5).join(' ')}`)
+    : notice('fail', h('div', { class: 'stack-s' }, h('div', null, h('b', null, 'That file was not opened, and your work is unchanged. ')), h('ul', null, m.errors.slice(0, 12).map((e) => h('li', null, e))), m.errors.length > 12 && h('div', null, `…and ${m.errors.length - 12} more.`)));
+}
+function projectSection() {
+  const { input, button, confirm } = projectOpener('export', 'outlined');
   const m = exportUi.projectMsg;
   return h('div', { class: 'sect stack' }, h('h3', null, 'Save or open project'),
     h('p', { class: 'small muted' }, 'Save your choices (colors, locks, notes, overrides, accepted failures, pasted spot values) as a JSON file to open later or on another device. Saving is never blocked by accessibility failures.'),
     field('project-name', 'Project name (used in file names and the spec)', S.name, { compact: true, oninput: (v) => { S.name = v; save(); } }),
     h('div', { class: 'row' },
       h('button', { type: 'button', class: 'btn outlined', id: 'exp-project', disabled: !!exportUi.busy, onclick: () => runExport('project') }, 'Save project file'),
-      h('button', { type: 'button', class: 'btn outlined', id: 'open-project', onclick: () => (hasWork ? (exportUi.confirmOpen = true, render(), (document.getElementById('open-confirm') || {}).focus?.()) : pick()) }, 'Open project file…'),
+      button,
       input),
     exportUi.results.project && h('div', { class: 'small', role: 'status' }, exportUi.results.project.text),
-    exportUi.confirmOpen && notice('warn', h('div', { class: 'stack-s' }, h('div', null, h('b', null, 'Replace your current work? '), 'Opening a project file replaces what is on this page. Save it first if you want to keep it.'),
-      h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn filled small', id: 'open-confirm', onclick: pick }, 'Choose a file to open'), h('button', { type: 'button', class: 'btn text small', onclick: () => { exportUi.confirmOpen = false; render(); } }, 'Cancel')))),
-    m && !m.ok && notice('fail', h('div', { class: 'stack-s' }, h('div', null, h('b', null, 'That file was not opened, and your work is unchanged. ')), h('ul', null, m.errors.slice(0, 12).map((e) => h('li', null, e))), m.errors.length > 12 && h('div', null, `…and ${m.errors.length - 12} more.`))),
-    m && m.ok && notice('pass', h('b', null, 'Opened. '), `${m.name}${m.savedAt ? `, saved ${m.savedAt}` : ''}.`, m.warnings.length > 0 && ` Note: ${m.warnings.slice(0, 5).join(' ')}`));
+    confirm,
+    projectResult(m));
 }
 function renderExport() {
   const pal = palette(); const items = exportStatus(pal);
@@ -642,7 +660,8 @@ function renderExport() {
 }
 
 // --- shell ------------------------------------------------------------------------------------------------------
-function setStep(id) { S.step = id; commit(); requestAnimationFrame(() => { const t = $('#panel-title'); if (t) t.focus({ preventScroll: false }); }); }
+function setStep(id) { if (exportUi.projectMsg && exportUi.projectMsg.where !== 'export') exportUi.projectMsg = null; // the Export step keeps its note, as before; any other step's note ends when the person leaves it
+  S.step = id; commit(); requestAnimationFrame(() => { const t = $('#panel-title'); if (t) t.focus({ preventScroll: false }); }); }
 function renderTabs() {
   const tabs = $('#tabs'); tabs.replaceChildren(...STEPS.map((s, i) => { const disabled = i > 0 && !S.seed; const done = (s.id === 'seed' && S.seed) || (s.id === 'support' && (S.supporting.secondary || S.supporting.tertiary));
     return h('button', { type: 'button', class: 'tab', role: 'tab', id: `tab-${s.id}`, 'aria-selected': String(S.step === s.id), 'aria-controls': 'panel', tabindex: S.step === s.id ? '0' : '-1', disabled: disabled, onclick: () => setStep(s.id) },
@@ -697,7 +716,10 @@ function renderNow() {
   renderTabs();
   const panel = $('#panel'); panel.setAttribute('aria-labelledby', `tab-${S.step}`);
   const view = { seed: renderSeed, analyze: renderAnalyze, support: renderSupport, palette: renderPalette, checks: renderChecks, export: renderExport }[S.step]();
-  panel.replaceChildren(view);
+  // After opening a project that was saved on a step other than Seed or Export, say so on that step (those two show the note inside their own section).
+  const m = exportUi.projectMsg;
+  const note = m && m.ok && m.where === S.step && S.step !== 'seed' && S.step !== 'export' ? projectResult(m) : null;
+  panel.replaceChildren(note ? h('div', { class: 'stack' }, note, view) : view);
 }
 let resetArmed = false;
 function init() {

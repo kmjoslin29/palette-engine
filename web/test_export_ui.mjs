@@ -100,7 +100,7 @@ const open = (state, o = {}) => openApp(browser, url, { state, step: 'export', .
   const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#open-confirm')]);
   await fc.setFiles('tmp/test_ui/saved.palette-project.json'); await page.waitForSelector('text=Opened.');
   const st = await page.evaluate(() => JSON.parse(JSON.stringify(window.__PE_APP.state)));
-  const want = PE.parseProject(saved.bytes.toString()).state; want.step = 'export';
+  const want = PE.parseProject(saved.bytes.toString()).state;
   check('opened state equals the saved state (seed, name, supporting, locks, spot text)', JSON.stringify(st) === JSON.stringify(want), JSON.stringify(st).slice(0, 200));
   // invalid files
   const bad = { 'not-json.json': '{nope', 'wrong.json': '{"format":"other","state":{}}', 'badhex.json': JSON.stringify({ format: 'palette-engine-project', version: 1, state: { v: 1, seed: { hex: 'red', origin: 'manual' } } }), 'proto.json': '{"format":"palette-engine-project","version":1,"state":{"v":1,"__proto__":{"polluted":true},"accepted":{"__proto__":"x"}}}' };
@@ -117,6 +117,60 @@ const open = (state, o = {}) => openApp(browser, url, { state, step: 'export', .
   check('no prototype pollution', (await page.evaluate(() => ({}).polluted)) === undefined);
   check('no console or page errors during project open', errors.length === 0, errors.join(' | '));
   await ctx.close();
+}
+
+// 4b. open a project file from the Seed step (a saved project is a way to start, so it must not need a seed first) ---------------------
+{
+  const saved = 'tmp/test_ui/saved.palette-project.json'; // written by section 4 above
+  const want = PE.parseProject(fs.readFileSync(saved, 'utf8')).state;
+  // (a) a brand-new page: no seed, every later step locked
+  const { ctx, page, errors } = await openApp(browser, url, {});
+  check('Seed step with no work: the later tabs are locked and "Open project file" is offered', await page.$eval('#tab-export', (b) => b.disabled) && await page.isVisible('#open-project'));
+  check('the Seed-step button has a text name and is a real button', (await page.textContent('#open-project')).includes('Open project file') && (await page.$eval('#open-project', (b) => b.tagName)) === 'BUTTON');
+  const box = await page.$eval('#open-project', (b) => { const r = b.getBoundingClientRect(); return [r.width, r.height]; });
+  check('the Seed-step button is at least 40 px tall (the .btn target; its hit area is 48 px)', box[1] >= 40 && box[0] >= 48, JSON.stringify(box));
+  const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.click('#open-project')]);
+  check('with no work on the page there is nothing to replace: the file chooser opens at once, with no confirmation', !(await page.isVisible('#open-confirm')));
+  await fc.setFiles(saved); await page.waitForSelector('text=Opened.');
+  const st = await page.evaluate(() => JSON.parse(JSON.stringify(window.__PE_APP.state)));
+  check('opened from the Seed step: state equals the saved state and the step it was saved on (Export) is showing', JSON.stringify(st) === JSON.stringify(want) && (await page.$eval('#tab-export', (b) => b.getAttribute('aria-selected'))) === 'true', JSON.stringify(st).slice(0, 160));
+  check('opened from the Seed step: every later tab is now unlocked', await page.$$eval('#tabs button', (bs) => bs.every((b) => !b.disabled)));
+  // (b) a bad file from the Seed step, with work on the page: asks first, then refuses, says why, changes nothing, and the note stays on the Seed step
+  await page.click('#tab-seed'); await page.waitForSelector('#open-project');
+  fs.writeFileSync('tmp/test_ui/seed-bad.json', '{nope');
+  const before = await page.evaluate(() => JSON.stringify(window.__PE_APP.state));
+  await page.click('#open-project'); await page.waitForSelector('#open-confirm');
+  check('Seed step with work on the page: opening asks before replacing it', await page.isVisible('text=Replace your current work?'));
+  const [fc2] = await Promise.all([page.waitForEvent('filechooser'), page.click('#open-confirm')]);
+  await fc2.setFiles('tmp/test_ui/seed-bad.json'); await page.waitForSelector('#panel .notice.fail');
+  const after = await page.evaluate(() => JSON.stringify(window.__PE_APP.state));
+  check('a bad file opened from the Seed step: refused with a reason, shown on the Seed step, work unchanged', before === after && (await page.$$eval('#panel .notice.fail li', (l) => l.length)) >= 1 && (await page.textContent('#panel')).includes('Choose a seed color'));
+  await page.click('#tab-palette'); await page.click('#tab-seed');
+  check('the failure note does not follow the person to other steps', (await page.$$('#panel .notice.fail')).length === 0);
+  check('no console or page errors opening from the Seed step', errors.length === 0, errors.join(' | '));
+  await ctx.close();
+  // (c) a saved project that has no seed yet: opens, stays on the Seed step, and says so there
+  const empty = PE.defaultState(); empty.name = 'No seed yet';
+  fs.writeFileSync('tmp/test_ui/noseed.palette-project.json', PE.serializeProject(empty));
+  const b = await openApp(browser, url, {});
+  const [fc3] = await Promise.all([b.page.waitForEvent('filechooser'), b.page.click('#open-project')]);
+  await fc3.setFiles('tmp/test_ui/noseed.palette-project.json'); await b.page.waitForSelector('#panel .notice.pass');
+  check('a saved project with no seed opens on the Seed step and the confirmation is shown there', (await b.page.textContent('#panel')).includes('Choose a seed color') && (await b.page.textContent('#panel .notice.pass')).includes('Opened.'));
+  check('no console or page errors opening a project with no seed', b.errors.length === 0, b.errors.join(' | '));
+  await b.ctx.close();
+  // (d) a project saved on the Palette step opens on the Palette step (not Export), says so there, and moves focus to the step heading
+  const mid = stateA(); mid.step = 'palette';
+  fs.writeFileSync('tmp/test_ui/palette-step.palette-project.json', PE.serializeProject(mid));
+  const d = await openApp(browser, url, {});
+  const [fc4] = await Promise.all([d.page.waitForEvent('filechooser'), d.page.click('#open-project')]);
+  await fc4.setFiles('tmp/test_ui/palette-step.palette-project.json'); await d.page.waitForSelector('#panel .notice.pass');
+  check('a project saved on the Palette step opens on the Palette step', (await d.page.$eval('#tab-palette', (x) => x.getAttribute('aria-selected'))) === 'true' && (await d.page.evaluate(() => window.__PE_APP.state.step)) === 'palette');
+  check('the "Opened." note is shown on that step', (await d.page.textContent('#panel .notice.pass')).includes('Opened.'));
+  check('focus moves to the step heading after the redraw (the button that was used is gone)', await d.page.evaluate(() => document.activeElement && document.activeElement.id === 'panel-title'));
+  await d.page.click('#tab-checks'); await d.page.waitForSelector('#panel-title');
+  check('the note ends when the person leaves that step', !(await d.page.textContent('#panel')).includes('Opened.'));
+  check('no console or page errors opening a project saved on another step', d.errors.length === 0, d.errors.join(' | '));
+  await d.ctx.close();
 }
 
 // 5. layout, dark mode, contrast, touch targets ----------------------------------------------------------------------------

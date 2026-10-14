@@ -14,7 +14,7 @@ phases. [`docs/02-how-it-was-made.md`](docs/02-how-it-was-made.md) says what tha
 ## What it does
 
 1. **Seed.** Enter a color (hex, `rgb()`, `oklch()`), or pick descriptor words (calm, trustworthy, bold…) and choose from 3–5 candidates.
-   Colors outside sRGB are flagged "P3 only" and mapped in, with the original kept.
+   Colors outside sRGB are flagged "P3 only" and mapped in, with the original kept. A saved project file can be opened from this step too, to carry on where you left off.
 2. **Analyze.** Screen values (sRGB, OKLCH, HCT, Lab D50); CMYK and total ink for six print conditions, grouped by region (North America: GRACoL 2013 coated, SWOP 2013, GRACoL 2013 uncoated; Europe: PSO Coated v3, PSO Uncoated v3, a FOGRA39 file);
    a print-gamut flag with the nearest printable color; a scorer that ranks spot colors the designer pastes in.
 3. **Supporting colors.** Harmony lenses (analogous, complementary, split, triadic, square, empirical) with the evidence tier on each card.
@@ -35,9 +35,9 @@ Two rules run through everything:
 Everything below comes from the fictional Fernhill Bakery sample in [`examples/fernhill-bakery/`](examples/fernhill-bakery/) (invented brand and spot names, no Pantone
 data). The step images are cropped to the top of each step.
 
-**1. Seed.** Start from a color you have, or from words. The brand color can be named, locked and given a rationale, and that note travels into every export.
+**1. Seed.** Start from a color you have, from words, or from a saved project file (the Open project file button). The brand color can be named, locked and given a rationale, and that note travels into every export.
 
-![Seed step: the brand color #B5532A named Kiln Terracotta, locked, with a written rationale](docs/images/step-1-seed.png)
+![Seed step: an Open project file button above the choice of color or words, and the brand color #B5532A named Kiln Terracotta, locked, with a written rationale](docs/images/step-1-seed.png)
 
 **2. Analyze.** Screen values, CMYK and total ink for six print conditions, a print-gamut flag with the nearest printable color, and a scorer for spot colors you paste in.
 
