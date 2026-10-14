@@ -20,7 +20,8 @@ ${rd('web/style.css')}
 `;
 const body = `<div class="wrap">
   <header class="top">
-    <div class="brand"><h1>Palette Engine</h1><span class="muted">A brand palette with screen, print and spot values, and the evidence for each choice.</span></div>
+    <div class="brand"><h1>Palette Engine</h1><span class="muted">A brand palette with screen, print and spot values, and the evidence for each choice.</span>
+      <p class="muted scope"><b>A reference and support tool, not a brand generator.</b> Screen and contrast values are calculated. Suggestions are research averages, and print and spot values are approximations, so check them before relying on them.</p></div>
     <div class="row"><span class="savestate" id="savestate"></span><button type="button" class="btn outlined small" id="reset">New project</button></div>
   </header>
   <div class="tabs" role="tablist" aria-label="Steps" id="tabs"></div>
