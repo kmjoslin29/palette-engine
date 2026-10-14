@@ -589,7 +589,7 @@ async function openProject(file, where = 'export') {
   let text; try { text = await file.text(); } catch (e) { return fail(['The file could not be read.']); }
   const r = PE.parseProject(text);
   if (!r.ok) return fail(r.errors, r.warnings);
-  S = r.state; // the step it was saved on (a project with no seed is always on Seed: validateState)
+  S = r.state; S.step = S.seed ? where : 'seed'; // stay on the step it was opened from (a project with no seed has nothing to show past Seed)
   exportUi.results = {}; exportUi.projectMsg = { ok: true, where: S.step, errors: [], warnings: r.warnings, savedAt: r.savedAt, name: file.name };
   saveNote = 'Opened from a project file'; commit(); say('Project opened');
   requestAnimationFrame(() => { const t = $('#panel-title'); if (t) t.focus({ preventScroll: false }); }); // the control that was used is gone after the redraw
@@ -716,10 +716,7 @@ function renderNow() {
   renderTabs();
   const panel = $('#panel'); panel.setAttribute('aria-labelledby', `tab-${S.step}`);
   const view = { seed: renderSeed, analyze: renderAnalyze, support: renderSupport, palette: renderPalette, checks: renderChecks, export: renderExport }[S.step]();
-  // After opening a project that was saved on a step other than Seed or Export, say so on that step (those two show the note inside their own section).
-  const m = exportUi.projectMsg;
-  const note = m && m.ok && m.where === S.step && S.step !== 'seed' && S.step !== 'export' ? projectResult(m) : null;
-  panel.replaceChildren(note ? h('div', { class: 'stack' }, note, view) : view);
+  panel.replaceChildren(view);
 }
 let resetArmed = false;
 function init() {
