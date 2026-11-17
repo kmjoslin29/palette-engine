@@ -54,13 +54,14 @@
 | --- | --- |
 | Seed | Color entry, descriptor words and seed candidates, or a whole existing palette (up to seven colors) |
 | Analyze | Every color at a glance when there is more than one; screen values, print per profile with gamut flags, the spot scorer for the chosen color |
-| Supporting colors | Harmony lenses, filters, up to three secondary and three tertiary slots, where picks go, harmonize per extended color |
+| Supporting colors | Harmony lenses (a radio list), filters, up to three secondary and three tertiary slots, where picks go (a radio list), harmonize per extended color |
 | Palette and roles | Light and dark roles, overrides, role-pair table with fixes and accepted-failure notes |
 | Checks | WCAG summary, color-blind views, APCA, print legibility, color origins |
 | Export | Seven outputs, "download all", project file save and open |
 
 Interface mechanics follow Material Design 3 (values taken from the Material Web 2.5.0 tokens): 48px touch targets, 40px buttons, 32px chips, 48px tabs with a 3px
 indicator, a 52×32 switch, state layers 8% hover and 10% focus and pressed (12% on chips, switches and tabs), a 3px focus ring with a 2px offset, 38% for disabled.
+Choice controls follow the m3.material.io guidelines, read in the Claude app's browser on 2026-11-17: segmented buttons hold 2 to 5 options and, past five, chips are the suggested control; a single-select chip set is an alternative to segmented buttons, but all chip sets on one page should be either single-select or multi-select; radio buttons are listed vertically, one option always selected, with a 20dp icon, 40dp state layer and 48dp target, recommended for five or fewer options. So the Analyze color switcher (up to seven colors) is a single-select chip set, the only chip set on that step, and on Supporting colors the Lens and Send picks to choices are stacked radio lists, leaving Show only (multi-select) as that step's one chip set. One intentional deviation: Lens has six options and Send picks to can reach six, against the radio guidance of five or fewer; Kwade chose visible radio lists over dropdown menus (2026-11-17) so every lens and its evidence tag stays in view.
 Intentional deviations: field labels sit above the field instead of floating in the outline; the tab bar is used as a wizard stepper with a done mark; the visual
 design is Kwade's, not Material's.
 

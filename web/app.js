@@ -120,8 +120,21 @@ function fixLine(acc) {
 function segmented(options, current, onPick, label, cls) {
   return h('div', { class: cls ? `seg ${cls}` : 'seg', role: 'group', 'aria-label': label }, options.map((o) => h('button', { type: 'button', 'aria-pressed': String(o.id === current), onclick: () => onPick(o.id) }, o.label)));
 }
-function chip(label, pressed, onclick, extra) {
-  return h('button', { type: 'button', class: 'chip', 'aria-pressed': String(!!pressed), onclick }, h('span', { class: 'tick', 'aria-hidden': 'true' }, '✓'), label, extra);
+function chip(label, pressed, onclick, extra, id) {
+  return h('button', { type: 'button', class: 'chip', id, 'aria-pressed': String(!!pressed), onclick }, h('span', { class: 'tick', 'aria-hidden': 'true' }, '✓'), label, extra);
+}
+/**
+ * A stacked radio list (Material 3 radio buttons: listed vertically, one option always selected, the label selects too).
+ * Used where one choice is made from a visible set, so that each page's chip sets stay all multi-select (Material 3 chips:
+ * do not mix single- and multi-select chip sets on one page). The page re-renders on change, so focus is put back on the
+ * chosen option and arrow keys keep moving through the group.
+ */
+function radioList(name, legend, options, current, onPick, note) {
+  return h('fieldset', { class: 'radios' }, h('legend', null, legend),
+    options.map((o) => h('label', { class: 'radio', for: `${name}-${o.id}` },
+      h('input', { type: 'radio', id: `${name}-${o.id}`, name, value: o.id, checked: o.id === current, onchange: () => { onPick(o.id); const el = document.getElementById(`${name}-${o.id}`); if (el) el.focus(); } }),
+      h('span', { class: 'rl' }, o.label, o.extra ? h('span', { class: 'small muted' }, ` ${o.extra}`) : null))),
+    note || null);
 }
 function toggleSwitch(label, on, onchange, disabled) {
   return h('button', { type: 'button', class: 'switch', role: 'switch', 'aria-checked': String(!!on), disabled: !!disabled, onclick: () => onchange(!on) }, h('span', { class: 'track' }, h('span', { class: 'handle' })), label);
@@ -374,7 +387,8 @@ function renderAnalyze() {
       h('p', { class: 'lead' }, many ? 'Every color side by side first, then screen values, what a press can print and a spot-color scorer for one color at a time.' : 'Screen values, what a press can print, and a scorer for spot colors you already have values for.')),
     many && analyzeOverview(list),
     many && h('div', { class: 'stack-s' }, h('h3', { id: 'detail-title', tabindex: '-1' }, `Details: ${cur.label}${cur.rec.name ? ` · ${cur.rec.name}` : ''}`),
-      segmented(list.map((x) => ({ id: x.id, label: x.label })), cur.id, (id) => { S.focus = id; commit(); }, 'Color to analyze', 'seg-wrap')),
+      // Up to seven colors: Material 3 segmented buttons hold 2 to 5 options, so this is a single-select chip set (the only chip set on this step).
+      h('div', { class: 'chips', role: 'group', 'aria-label': 'Color to analyze' }, list.map((x) => chip(x.label, x.id === cur.id, () => { S.focus = x.id; commit(); const b = $(`#focus-${x.id}`); if (b) b.focus(); }, null, `focus-${x.id}`)))),
     h('div', { class: 'grid cols-2' },
       h('div', { class: 'stack' },
         h('div', { class: 'big-sw', style: `background:${a.screen.hex};color:${inkOn(a.screen.hex)}` }, h('span', { class: 'hex' }, a.screen.hex.toUpperCase()), h('span', { class: 'mono small' }, okText(a.screen.oklch))),
@@ -481,12 +495,11 @@ function targetPicker() {
   const opts = [];
   for (const tier of PE.SUPPORT_TIERS) {
     const list = tierList(tier);
-    list.forEach((r, i) => opts.push({ tier, i, text: `${slotLabel(tier, i)} · ${r.hex.toUpperCase()}`, locked: r.locked }));
-    if (list.length < MAX_TIER) opts.push({ tier, i: list.length, text: `${slotLabel(tier, list.length)} · ${list.length ? 'new' : 'empty'}` });
+    list.forEach((r, i) => opts.push({ id: PE.slotId(tier, i), label: slotLabel(tier, i), extra: `· ${r.hex.toUpperCase()}${r.locked ? ' · locked' : ''}` }));
+    if (list.length < MAX_TIER) opts.push({ id: PE.slotId(tier, list.length), label: slotLabel(tier, list.length), extra: `· ${list.length ? 'new' : 'empty'}` });
   }
   const t = targetOf();
-  return h('div', { class: 'stack-s' }, h('h4', { id: 'target-label' }, 'Send picks to'),
-    h('div', { class: 'chips', role: 'group', 'aria-labelledby': 'target-label' }, opts.map((o) => chip(o.text, o.tier === t.tier && o.i === t.i, () => { setTarget(o.tier, o.i); commit(); }, o.locked ? h('span', { class: 'small muted' }, ' · locked') : null))),
+  return radioList('target', 'Send picks to', opts, t.id, (id) => { const m = /^(secondary|tertiary)([23])?$/.exec(id); setTarget(m[1], m[2] ? Number(m[2]) - 1 : 0); commit(); },
     h('p', { class: 'small muted' }, t.rec ? `A pick replaces ${t.label} (${t.rec.hex.toUpperCase()}).` : `A pick fills ${t.label}.`));
 }
 function renderSupport() {
@@ -501,13 +514,14 @@ function renderSupport() {
       h('p', { class: 'lead' }, 'Each lens proposes colors from a rule, with its evidence on the card; the evidence is weak for classical wheel geometry. Treat the lenses as a starting vocabulary.'),
       h('p', { class: 'small muted' }, `Up to ${MAX_TIER} secondary and ${MAX_TIER} tertiary colors. Secondary 1 and Tertiary 1 set Material's secondary and tertiary roles; the others become extended colors, each with its own color, on-color, container and on-container roles.`)),
     h('div', { class: 'grid cols-2' }, PE.SUPPORT_TIERS.map((tier) => tierColumn(tier))),
-    h('div', { class: 'stack-s' }, h('h4', null, 'Lens'),
-      h('div', { class: 'chips' }, lensKeys.map((k) => chip(PE.LENSES[k].name, S.lens === k, () => { S.lens = k; commit(); }, h('span', { class: 'small muted' }, `· ${PE.LENSES[k].tier === 'low confidence' ? 'low confidence' : 'supported but contested'}`)))),
+    h('div', { class: 'grid cols-2' },
+      h('div', { class: 'stack-s' },
+      radioList('lens', 'Lens', lensKeys.map((k) => ({ id: k, label: PE.LENSES[k].name, extra: `· ${PE.LENSES[k].tier === 'low confidence' ? 'low confidence' : 'supported but contested'}` })), S.lens in PE.LENSES ? S.lens : 'complementary', (k) => { S.lens = k; commit(); }),
       notice('', h('b', null, `${lens.name}: `), PE.TIER_NOTE[lens.tier], ` Hue offsets are computed on the ${PE.WHEEL}; an artist's RYB wheel or an RGB wheel gives different complements for the same color.`),
       h('div', { class: 'row' }, h('div', { style: 'width:min(100%,320px)' }, field('offsets', 'Hue offsets in degrees (editable)', (off || lens.offsets).join(', '), { compact: true, mono: true,
         onchange: (v) => { const n = v.split(/[\s,;]+/).filter(Boolean).map(Number); if (n.length && n.every((x) => Number.isFinite(x) && Math.abs(x) <= 360)) { S.offsets[S.lens] = n; } commit(); } })),
         off && h('button', { type: 'button', class: 'btn text', onclick: () => { delete S.offsets[S.lens]; commit(); } }, 'Reset offsets'))),
-    targetPicker(),
+      targetPicker()),
     filterBar(true), filteredGrid(cands, true, (c) => harmonyCard(c)));
 }
 function harmonyCard(c) {

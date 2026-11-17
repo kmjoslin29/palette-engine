@@ -218,3 +218,14 @@ fieldset.pal-tier legend { padding: 0 6px; font: 600 14px/20px var(--font); colo
 td .pill { white-space: nowrap; }
 .role .m .mono { overflow-wrap: anywhere; }
 .cvd-list { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+
+/* Stacked radio lists (Material 3 radio button specs: 20dp icon, 40dp state layer, 48dp target; listed vertically) */
+fieldset.radios { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 0; align-content: start; }
+fieldset.radios legend { padding: 0 0 4px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); font-weight: 600; }
+.radio { position: relative; display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 8px 0 4px; border-radius: 8px; cursor: pointer; }
+.radio input { flex: none; width: 20px; height: 20px; margin: 0 10px; accent-color: var(--ink); cursor: pointer; }
+.radio::before { content: ""; position: absolute; left: 4px; top: 50%; width: 40px; height: 40px; margin-top: -20px; border-radius: 50%; background: var(--ink); opacity: 0; pointer-events: none; }
+.radio:hover::before { opacity: .08; } .radio:active::before { opacity: .12; }
+.radio input:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.radio:has(input:focus-visible)::before { opacity: .10; }
+.radio .rl { line-height: 20px; }

@@ -173,7 +173,7 @@ async function resolveFailures(page) {
   t = await panelText(page);
   check('Supporting: both tiers are full (3 of 3) and say which colors set the core roles', (t.match(/3 of 3/g) || []).length === 2 && /Sets Material's secondary role palette/.test(t) && /Extended color: its own tertiary3/.test(t));
   check('Supporting: no Beyond-sRGB warning for colors typed as hex', !/Beyond sRGB\./.test(t));
-  await page.click('.chip:has-text("Tertiary 2 ·")');
+  await page.check('#target-tertiary2');
   check('Supporting: a candidate goes to the slot chosen under Send picks to', /A pick replaces Tertiary 2 \(#793974\)/.test(await panelText(page)) && (await page.$$('button:has-text("Use for Tertiary 2")')).length > 0);
   await page.click('article.card >> nth=0 >> button:has-text("Use for Tertiary 2")');
   s = await st(page);
@@ -323,6 +323,20 @@ for (const scheme of ['light', 'dark']) for (const width of [375, 1100]) {
   check('keyboard focus on a button, chip, switch or tab draws a 3px ring', !!seen && seen.w === '3px' && seen.s === 'solid', JSON.stringify(seen));
   await page.focus('#tab-support'); await page.keyboard.press('Enter');
   check('the Enter key opens a step from the tab bar', (await st(page)).step === 'support');
+  // pe-update63: Lens and Send picks to are stacked radio lists (Material 3 radio buttons); the page's only chip set is Show only (multi-select)
+  check('Supporting: Lens and Send picks to are radio lists, and the only chips left are the Show only filters', (await page.$$('fieldset.radios input[name="lens"]')).length === 6 && (await page.$$('fieldset.radios input[name="target"]')).length >= 2 && (await page.$$eval('#panel .chip', (c) => c.every((x) => x.closest('.stack-s').querySelector('h4')?.textContent === 'Show only'))));
+  const lensBefore = (await st(page)).lens;
+  await page.focus('fieldset.radios input[name="lens"]:checked'); await page.keyboard.press('ArrowDown');
+  const afterKey = await page.evaluate(() => ({ id: document.activeElement.id, checked: document.activeElement.checked }));
+  check('Supporting: an arrow key moves the lens, and focus stays on the chosen radio after the page redraws', (await st(page)).lens !== lensBefore && afterKey.checked && afterKey.id === `lens-${(await st(page)).lens}`, JSON.stringify(afterKey));
+  const ring = await page.evaluate(() => { const c = getComputedStyle(document.activeElement); return c.outlineWidth + ' ' + c.outlineStyle; });
+  check('Supporting: a focused radio draws the 3px focus ring', ring === '3px solid', ring);
+  const box = await page.$eval('label[for="lens-analogous"]', (l) => l.getBoundingClientRect().height);
+  check('Supporting: each radio row is at least 48px tall (Material 3 target size)', box >= 48, String(box));
+  await goto(page, 'analyze');
+  check('Analyze: the color switcher is a single-select chip set (more than five options), the only chip set on the step', (await page.$$('#panel [aria-label="Color to analyze"] .chip')).length === 5 && (await page.$$('#panel .seg[aria-label="Color to analyze"]')).length === 0 && (await page.$$('#panel .chip')).length === 5);
+  await page.click('#focus-tertiary2');
+  check('Analyze: a chip keeps keyboard focus after the page redraws', (await page.evaluate(() => document.activeElement.id)) === 'focus-tertiary2' && (await st(page)).focus === 'tertiary2');
   await ctx.close();
 }
 
