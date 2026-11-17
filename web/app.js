@@ -186,6 +186,22 @@ function lockAndNote(rec, idPrefix, onchange) {
 function hexOf(str) { const a = PE.analyze(str, {}); return a ? a : null; }
 
 // --- Step 1: seed ---------------------------------------------------------------------------------------------------
+/**
+ * Reads a typed color (D46). The color parser also reads a bare word made of the letters a to f as shorthand hex ("bad" is
+ * #BBAADD, "cafe" is #CCAAFFEE), so bare hex without # is accepted only as six digits with at least one numeral (0083A8);
+ * anything else that looks like bare hex is refused with a hint to add the #. Hex with #, rgb(), oklch() and the other CSS
+ * color functions, and CSS color names (teal) read as before. Returns { a } or { error }.
+ */
+function readTypedColor(text) {
+  const t = (text || '').trim();
+  if (/^[0-9a-f]{3,8}$/i.test(t)) {
+    if (t.length === 6 && /\d/.test(t)) { const a = PE.analyze(`#${t}`, {}); return a ? { a } : { error: 'notColor' }; }
+    return [3, 4, 6, 8].includes(t.length) ? { error: 'bareHex', hex: `#${t}` } : { error: 'notColor' };
+  }
+  const a = PE.analyze(t, {});
+  return a ? { a } : { error: 'notColor' };
+}
+const typedColorMessage = (r) => (r.error === 'bareHex' ? `"${r.hex.slice(1)}" is read as a word, not a color. If you meant the hex code, type ${r.hex}.` : 'That is not a color this tool can read. Try #1F5FA8, rgb(31 95 168) or oklch(0.49 0.13 255).');
 function chooseSeed(hex, origin, tier, extra) {
   if (S.seed && S.seed.locked) return;
   const keep = S.seed || {};
@@ -229,8 +245,8 @@ function renderKnown() {
       S.seed && S.seed.locked && h('span', { class: 'small muted' }, 'The seed is locked. Unlock it to replace it.')));
 }
 function useInput(v) {
-  S.input = v; const a = PE.analyze(v, {});
-  if (!a) { S.seedError = 'That is not a color this tool can read. Try #1F5FA8, rgb(31 95 168) or oklch(0.49 0.13 255).'; commit(); return; }
+  S.input = v; const r = readTypedColor(v); const a = r.a;
+  if (!a) { S.seedError = typedColorMessage(r); commit(); return; }
   chooseSeed(a.screen.hex, 'manual', null, { mappedFrom: a.screen.mappedFrom });
 }
 // palette path (D44): enter a whole existing palette at once, for reviewing a brand that already exists
@@ -368,10 +384,11 @@ function analyzeOverview(list) {
       p ? (p.inGamut ? pill(`✓ ΔE00 ${p.gamutDE00.toFixed(1)}`, 'pass') : pill(`✕ ΔE00 ${p.gamutDE00.toFixed(1)}`, 'fail')) : h('span', { class: 'muted' }, '—'),
       h('span', { class: 'mono' }, ratioText(acc.vsWhite)), h('span', { class: 'mono' }, ratioText(acc.vsBlack)),
       partners.length ? pill(`! Close to ${partners.join(', ')}`, 'warn') : pill('✓ Distinct', 'pass'),
-      h('button', { type: 'button', class: 'btn text small', 'aria-pressed': String(S.focus === x.id), 'aria-label': `Show details for ${x.label}`, onclick: () => { S.focus = x.id; commit(); const t = $('#detail-title'); if (t) t.focus(); } }, S.focus === x.id ? 'Shown below' : 'Details')];
+      // Visible text "Details" is the start of the accessible name (WCAG 2.5.3); aria-pressed says which one is shown below.
+      h('button', { type: 'button', class: 'btn text small', 'aria-pressed': String(S.focus === x.id), 'aria-label': `Details for ${x.label}`, onclick: () => { S.focus = x.id; commit(); const t = $('#detail-title'); if (t) t.focus(); } }, 'Details')];
   });
   return h('div', { class: 'stack-s' }, h('h3', null, `Every color at a glance (${list.length})`),
-    table(['Color', 'Hex', `CMYK, ${prof.short}`, 'Print gamut', 'On white', 'On black', 'Color-blind views', ''], rows, [4, 5]),
+    table(['Color', 'Hex', `CMYK, ${prof.short}`, 'Print gamut', 'On white', 'On black', 'Color-blind views', 'Details'], rows, [4, 5]),
     h('p', { class: 'small muted' }, cvd.length ? `Close under color-blind simulation (ΔE00 under 10, a convention): ${cvd.map((f) => `${labelOf(f.a)} and ${labelOf(f.b)} under ${f.type} (${f.dE00.toFixed(1)})`).join('; ')}. Pair those colors with a label, shape or position, not color alone (WCAG 1.4.1).` : 'Every pair stays distinct under protan, deutan and tritan simulation (Machado et al. 2009, full severity).'));
 }
 function renderAnalyze() {
@@ -451,7 +468,7 @@ function renderSpot(a, against) {
 // Each tier holds up to MAX_TIER colors (D44). Secondary 1 and Tertiary 1 set Material's secondary and tertiary role
 // palettes; Secondary 2–3 and Tertiary 2–3 are extended colors with roles of their own. A pick from a lens goes to the
 // slot chosen under "Send picks to".
-const supportUi = { open: { secondary: false, tertiary: false } };
+const supportUi = { open: { secondary: false, tertiary: false }, errors: {} };
 const tierList = (tier) => S.supporting[tier];
 const slotLabel = (tier, i) => `${cap(tier)} ${i + 1}`;
 function targetOf() {
@@ -580,10 +597,12 @@ function supportSlot(tier, i, s) {
 function manualEntry(tier, i, replace) {
   const id = `manual-${PE.slotId(tier, i)}`;
   const locked = () => { const r = tierList(tier)[i]; return r && r.locked; };
-  const wrap = h('div', { class: 'stack-s' }, field(id, replace ? 'Replace with your own color' : 'Enter your own color', '', { compact: true, mono: true, placeholder: '#D9822B', onenter: (v) => set(v) }),
+  const wrap = h('div', { class: 'stack-s' }, field(id, replace ? 'Replace with your own color' : 'Enter your own color', supportUi.errors[id] ? supportUi.errors[id].value : '', { compact: true, mono: true, placeholder: '#D9822B', error: supportUi.errors[id] && supportUi.errors[id].msg, onenter: (v) => set(v) }),
     h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn outlined small', disabled: locked(), onclick: () => set($(`#${id}`).value) }, 'Set')));
   function set(v) {
-    const a = PE.analyze(v, {}); if (!a) { const f = $(`#${id}`); if (f) { f.setAttribute('aria-invalid', 'true'); f.parentElement.classList.add('err'); } say('Not a color'); return; }
+    const r = readTypedColor(v); const a = r.a;
+    if (!a) { supportUi.errors[id] = { msg: typedColorMessage(r), value: v }; commit(); const f = $(`#${id}`); if (f) f.focus(); say(typedColorMessage(r)); return; }
+    delete supportUi.errors[id];
     if (locked()) return;
     const list = tierList(tier); const cur = list[i];
     list[Math.min(i, list.length)] = { hex: a.screen.hex, origin: 'manual', tier: null, lens: null, offset: null, rationale: cur ? cur.rationale : '', locked: false,

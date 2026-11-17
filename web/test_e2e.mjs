@@ -162,7 +162,7 @@ async function resolveFailures(page) {
   let t = await panelText(page);
   check('Analyze: every color at a glance, seven rows, with CMYK, gamut, contrast and a color-blind verdict', /Every color at a glance \(7\)/.test(t) && (await page.$eval('#panel table', (tb) => tb.querySelectorAll('tbody tr').length)) === 7);
   check('Analyze: colors that collapse under color-blind views are named', /Close under color-blind simulation/.test(t) && /Close to/.test(t));
-  await page.click('#panel button[aria-label="Show details for Tertiary 2"]');
+  await page.click('#panel button[aria-label="Details for Tertiary 2"]');
   t = await panelText(page);
   check('Analyze: Details moves the detail view to that color and focuses its heading', (await st(page)).focus === 'tertiary2' && /Details: Tertiary 2 · Plum/.test(t) && (await page.evaluate(() => document.activeElement.id)) === 'detail-title' && t.includes('#793974'));
   check('Analyze: the spot scorer names the color it scores against', /scored against Tertiary 2/.test(t));
@@ -264,6 +264,43 @@ async function resolveFailures(page) {
   check('review: replacing existing work asks first', /Replace them/.test(await panelText(page)));
   await page.click('.slot.filled [role="switch"]');
   check('review: locking the seed while the question is open hides Replace them', (await st(page)).seed.locked === true && !/Replace them/.test(await panelText(page)));
+  await ctx.close();
+}
+
+// ---- D46 (C48): typed colors need explicit color syntax; bare words made of a to f are not read as hex ------------------
+{
+  const { ctx, page, errors } = await openApp(browser, site.url);
+  await page.fill('#seed-input', 'bad'); await page.click('button:has-text("Use this color")');
+  let t = await panelText(page);
+  check('D46: "bad" is not read as #BBAADD; the error says to add the #', (await st(page)).seed === null && t.includes('"bad" is read as a word, not a color. If you meant the hex code, type #bad.'), t.slice(0, 200));
+  check('D46: the error is text, tied to the field and announced', await page.$eval('#seed-input', (e) => e.getAttribute('aria-invalid') === 'true' || e.closest('.field').classList.contains('err')) && (await page.$$('.field.err .errtext[role="alert"]')).length === 1);
+  for (const [typed, hex] of [['#bad', '#bbaadd'], ['1F5FA8', '#1f5fa8'], ['teal', '#008080'], ['oklch(0.49 0.13 255)', null]]) {
+    await page.fill('#seed-input', typed); await page.click('button:has-text("Use this color")');
+    const s = await st(page);
+    check(`D46: "${typed}" still reads as a color`, !!s.seed && (hex === null || s.seed.hex === hex), JSON.stringify(s.seed && s.seed.hex));
+  }
+  await page.fill('#seed-input', 'facade'); await page.click('button:has-text("Use this color")');
+  check('D46: a six-letter word with no numeral ("facade") is refused with the # hint', (await st(page)).seed.hex !== '#facade' && (await panelText(page)).includes('type #facade'));
+  await goto(page, 'support');
+  await page.fill('#manual-tertiary', 'cafe'); await page.press('#manual-tertiary', 'Enter');
+  t = await panelText(page);
+  check('D46: Enter your own color refuses "cafe", shows the message under the field and keeps what was typed', (await st(page)).supporting.tertiary.length === 0 && t.includes('If you meant the hex code, type #cafe.') && (await page.inputValue('#manual-tertiary')) === 'cafe');
+  await page.fill('#manual-tertiary', '#2E7D32'); await page.press('#manual-tertiary', 'Enter');
+  check('D46: a valid color then clears the error and sets the slot', (await st(page)).supporting.tertiary[0]?.hex === '#2e7d32' && !(await panelText(page)).includes('type #cafe'));
+  check('D46: zero console errors', errors.length === 0, errors.join(' | '));
+  await ctx.close();
+}
+
+// ---- C49 audit fixes (pe-update64): one main landmark around the steps; visible text is part of each control's name ----------
+{
+  const st5 = PE.defaultState(); const mk = (hex) => ({ hex, origin: 'manual', tier: null, rationale: '', locked: false, lens: null, offset: null });
+  st5.seed = { hex: '#1f5fa8', origin: 'manual', tier: null, rationale: '', locked: false };
+  st5.supporting.secondary = [mk('#d9822b'), mk('#0083a8')]; st5.supporting.tertiary = [mk('#2e7d32'), mk('#7a4fa0')];
+  const { ctx, page } = await openApp(browser, site.url, { state: st5, step: 'analyze' });
+  check('C49: the page has one main landmark, and the step tabs and panel are inside it (ST4.1)', (await page.$$('main')).length === 1 && (await page.$$('main #panel[role="tabpanel"]')).length === 1 && (await page.$$('main #tabs[role="tablist"]')).length === 1 && (await page.$$('main[role]')).length === 0);
+  const names = await page.$$eval('#panel table button', (b) => b.map((x) => [x.textContent.trim(), x.getAttribute('aria-label') || '']));
+  check('C49: each Details button\'s accessible name starts with its visible text (WCAG 2.5.3, F3.1)', names.length === 5 && names.every(([t, n]) => n.startsWith(t)), JSON.stringify(names));
+  check('C49: no empty column header in the overview table', await page.$eval('#panel table', (tb) => [...tb.querySelectorAll('th')].every((th) => th.textContent.trim().length > 0)));
   await ctx.close();
 }
 

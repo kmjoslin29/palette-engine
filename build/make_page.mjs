@@ -24,8 +24,10 @@ const body = `<div class="wrap">
       <p class="muted scope"><b>A reference and support tool, not a brand generator.</b> Screen and contrast values are calculated. Suggestions are research averages, and print and spot values are approximations, so check them before relying on them.</p></div>
     <div class="row"><span class="savestate" id="savestate"></span><button type="button" class="btn outlined small" id="reset">New project</button></div>
   </header>
+  <main id="main">
   <div class="tabs" role="tablist" aria-label="Steps" id="tabs"></div>
-  <main class="panel" id="panel" role="tabpanel" tabindex="-1"></main>
+  <div class="panel" id="panel" role="tabpanel" tabindex="-1"></div>
+  </main>
   <footer class="foot" id="foot"></footer>
 </div>
 <div class="sr" id="live" aria-live="polite" role="status"></div>

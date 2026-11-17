@@ -1,4 +1,4 @@
-> Repo copy as of pe-update61 (2026-11-03; docs only, UI/UX decisions renumbered; pe-update60 is committed; pe-update52 to 59 are committed, CI is green and the page is live on GitHub Pages; pe-update60 is docs only). The repo is authoritative; this copy goes stale until refreshed after the next update. docs/07-decisions.md in the Project has D1 to D43: D1 to D41 match the repo file Kwade attached on 2026-10-13, and D42 and D43 (pe-update46 and 47) are committed.
+> Repo copy as of pe-update64 (2026-11-17; pe-update62 and 63 are committed as 0ea220f and 3f4c642, CI green; pe-update64: typed colors need explicit syntax, D46, and the C49 audit fixes). The repo is authoritative; this copy goes stale until refreshed after the next update. docs/07-decisions.md has D1 to D46.
 
 # Engine notes
 
@@ -118,7 +118,9 @@ Start a new session for this. Read `TO-CONFIRM.md` first.
 
 ## Starting a new session
 
-**State on 2026-11-17 (pe-update63):** pe-update62 is committed (0ea220f, CI green) and Kwade checked it on the live page. pe-update63 brings the choice controls in line with m3.material.io (read in the Claude app's browser): the Analyze color switcher is a single-select chip set (more than five options), and Lens and Send picks to are stacked radio lists, so each step's chip sets are all one kind. Open from these two updates: C48 (the single color field reads words as shorthand hex), C49 (screen-reader pass on the new controls), C50 (record the two UI/UX decisions in the rules pack).
+**State on 2026-11-17 (pe-update64):** typed colors need explicit color syntax (D46, C48 closed); an automated accessibility audit (axe-core) of the new controls found and fixed two problems in them and one older one (the page had no main landmark); C50's rules-pack build waits for Kwade's commit to the master pack; C49 waits for his NVDA session.
+
+**Earlier, pe-update63:** pe-update62 is committed (0ea220f, CI green) and Kwade checked it on the live page. pe-update63 brings the choice controls in line with m3.material.io (read in the Claude app's browser): the Analyze color switcher is a single-select chip set (more than five options), and Lens and Send picks to are stacked radio lists, so each step's chip sets are all one kind. Open from these two updates: C48 (the single color field reads words as shorthand hex), C49 (screen-reader pass on the new controls), C50 (record the two UI/UX decisions in the rules pack).
 
 **Earlier, pe-update62:** up to three secondary and three tertiary colors (D44): Secondary 2–3 and Tertiary 2–3 are Material 3 extended colors with four roles each, built through the same scheme path as Secondary 1 / Tertiary 1 (`extendedOf` in `engine/palette.js`); harmonize is opt-in per extended color and changes roles only; the Seed step has a third tab, "I have a palette"; Analyze shows every color at a glance; project files are version 2 (`engine/project.js`: `supportSlots`, `supportingForPalette`, `slotId`), and version 1 files and browser storage are migrated on load. Also the sRGB tolerance fix (D45). Older projects export byte-identically. Open: C47 (live check by Kwade, screen reader, Material 3 points not re-checked live).
 
@@ -134,7 +136,7 @@ Start a new session for this. Read `TO-CONFIRM.md` first.
 | A screen-reader session | C18, C20 (re-test), then C19 (step navigation), then C21 (reading load). |
 | Equipment Kwade does not have | C6 (Pantone guide), C7 and C8 (Adobe). |
 | Kwade's judgment, deferred on purpose | C10 (seed quality on the live page), C15 (the near-synonym chip, not yet seen by him), C13 (stays open). |
-| Kwade, to do next | Apply and push pe-update63, let CI run. Then C50 (the two UI/UX decisions into the rules pack) and C48 (a decision). The UI/UX pass (C38) is still waiting for his scope. |
+| Kwade, to do next | Apply and push pe-update64, let CI run. Commit `tmp/rules-pack-227/` to the master rules pack and replace the Project and `_Shared/` copies (C50). NVDA session for C49 with C18 to C21. The UI/UX pass (C38) is still waiting for his scope. |
 
 **Decisions that need Kwade before anything changes:** the matcher tie-break and the color-word bands (D34, D35) are not changed without asking. Brand data comes from published sources only. No researcher or contact email addresses go in the repo.
 
