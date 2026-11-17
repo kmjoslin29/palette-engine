@@ -5,7 +5,7 @@ import postcss from 'postcss';
 import MarkdownIt from 'markdown-it';
 import { converter } from 'culori';
 import * as PE from '../dist/engine.mjs';
-import { luts, lex, model, stateA, stateB, stateC, stateD } from './export_fixtures.mjs';
+import { luts, lex, model, stateA, stateB, stateC, stateD, stateE } from './export_fixtures.mjs';
 
 let fails = 0;
 const check = (name, ok, detail = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${!ok && detail ? '  ' + String(detail).slice(0, 300) : ''}`); if (!ok) fails++; };
@@ -41,11 +41,12 @@ const noBareCmyk = (node) => { let bad = false; (function w(n) { if (!n || typeo
 function checkForge(json, m, state, label) {
   const out = [];
   const t = JSON.parse(json);
-  const pal = PE.buildPalette(state.seed.hex, ['secondary', 'tertiary'].filter((k) => state.supporting[k]).map((k) => ({ role: k, hex: state.supporting[k].hex })), { overrides: state.overrides });
+  const pal = PE.buildPalette(state.seed.hex, PE.supportingForPalette(state), { overrides: state.overrides });
   const toks = tokens(t.color).concat(tokens(t['color-dark']));
   out.push(['valid JSON with Forge root keys', typeof t.$description === 'string' && t.$version === '1.0.0' && t.color && t['color-dark']]);
   out.push(['every token is a lowercase six-digit hex with $type color', toks.length > 0 && toks.every((k) => HEX.test(k.node.$value) && k.node.$type === 'color'), toks.find((k) => !HEX.test(k.node.$value))?.path]);
-  out.push(['token count: 6 palettes x 14 tones + brand + 29 roles light + 29 roles dark', toks.length === 6 * 14 + m.colors.length + 29 + 29, String(toks.length)]);
+  const nr = PE.rolesOf(m.palette).length, np = 6 + m.palette.extended.length;
+  out.push([`token count: ${np} palettes x 14 tones + brand + ${nr} roles light + ${nr} roles dark`, toks.length === np * 14 + m.colors.length + nr + nr, String(toks.length)]);
   out.push(['$themes: light -> color, dark -> color-dark, and both groups exist', t.$themes.length === 2 && t.$themes.every((x) => t[x.group] && typeof t[x.group] === 'object') && t.$themes[0].group === 'color' && t.$themes[1].group === 'color-dark']);
   out.push(['names are DTCG-legal (no { } . or leading $)', nameProblems(t).length === 0, nameProblems(t).join(',')]);
   const names = { primary: 'primary', secondary: 'secondary', tertiary: 'tertiary', neutral: 'neutral', neutralVariant: 'neutral-variant', error: 'error' };
@@ -55,7 +56,7 @@ function checkForge(json, m, state, label) {
   const roleBad = [];
   for (const r of PE.ROLES) { if (t.color.role[r].$value !== pal.schemes.light[r].toLowerCase()) roleBad.push(`light.${r}`); if (t['color-dark'].role[r].$value !== pal.schemes.dark[r].toLowerCase()) roleBad.push(`dark.${r}`); }
   out.push(['all 58 role tokens (light and dark) equal a fresh buildPalette, overrides included', roleBad.length === 0, roleBad.join(',')]);
-  out.push(['brand tokens equal the state colors', m.colors.every((c) => t.color.brand[c.slot].$value === (c.slot === 'primary' ? state.seed.hex : state.supporting[c.slot].hex).toLowerCase())]);
+  out.push(['brand tokens equal the state colors', m.colors.every((c) => t.color.brand[c.slot].$value === (c.slot === 'primary' ? state.seed.hex : PE.supportSlots(state).find((x) => x.id === c.slot).rec.hex).toLowerCase())]);
   out.push(['no bare $extensions.cmyk (Forge form) anywhere', noBareCmyk(t)]);
   const ext = t.color.brand.primary.$extensions['com.kwadejoslin.palette'];
   out.push(['brand extension carries rationale, lock, name and tier exactly as in the state', ext.rationale === (state.seed.rationale || '') && ext.locked === !!state.seed.locked && ext.name === m.colors[0].name && ext.tier === (state.seed.tier || null), JSON.stringify([ext.rationale, ext.locked, ext.name, ext.tier])]);
@@ -71,7 +72,8 @@ function checkForge(json, m, state, label) {
   out.push(['spot entries are labeled approx. with band and source', (sp.coated.length + sp.uncoated.length === 0) || [...sp.coated, ...sp.uncoated].every((x) => /\(approx\.\)$/.test(x.name) && x.band && typeof x.dE00 === 'number' && x.check === 'none')]);
   return out.map(([n, ok, d]) => [`${label}: ${n}`, ok, d]);
 }
-for (const [label, m, s] of [['A', MA, SA], ['B', MB, SB], ['C', MC, SC]]) for (const [n, ok, d] of checkForge(PE.forgeTokensJson(m), m, s, `Forge ${label}`)) check(n, !!ok, d);
+const SE = stateE(), ME = model(SE);
+for (const [label, m, s] of [['A', MA, SA], ['B', MB, SB], ['C', MC, SC], ['E', ME, SE]]) for (const [n, ok, d] of checkForge(PE.forgeTokensJson(m), m, s, `Forge ${label}`)) check(n, !!ok, d);
 { // negative controls
   const t = JSON.parse(PE.forgeTokensJson(MA)); t.color.primary['40'].$value = '#12345';
   const bad = tokens(t.color).some((k) => !HEX.test(k.node.$value));
@@ -120,7 +122,7 @@ function checkCss(css, m, label) {
     if (!D2[v] || D2[v].value !== pal.schemes.dark[r]) bad.push(`attr ${v}`);
   }
   out.push(['all 29 roles: light on :root, dark in both dark blocks, values equal the palette', bad.length === 0, bad.join(',')]);
-  out.push(['both dark blocks declare the same set of variables', JSON.stringify(Object.keys(D1)) === JSON.stringify(Object.keys(D2)) && Object.keys(D1).length === 29]);
+  out.push(['both dark blocks declare the same set of variables', JSON.stringify(Object.keys(D1)) === JSON.stringify(Object.keys(D2)) && Object.keys(D1).length === PE.rolesOf(pal).length]);
   const toneBad = [];
   for (const [k, n] of Object.entries({ primary: 'primary', secondary: 'secondary', tertiary: 'tertiary', neutral: 'neutral', neutralVariant: 'neutral-variant', error: 'error' })) for (const t of PE.TONES) { const v = `--color-${n}-${t}`; if (!L[v] || L[v].value !== pal.tones[k][t]) toneBad.push(v); }
   out.push(['all 84 tone variables equal the palette', toneBad.length === 0, toneBad.join(',')]);
@@ -132,7 +134,7 @@ function checkCss(css, m, label) {
   out.push(['color-scheme is set for light and dark', light.nodes.some((n) => n.prop === 'color-scheme' && n.value === 'light') && dark1.nodes.some((n) => n.prop === 'color-scheme' && n.value === 'dark') && dark2.nodes.some((n) => n.prop === 'color-scheme' && n.value === 'dark')]);
   return out.map(([n, ok, d]) => [`CSS ${label}: ${n}`, ok, d]);
 }
-for (const [label, m] of [['A', MA], ['B', MB], ['C', MC]]) for (const [n, ok, d] of checkCss(PE.cssVariables(m), m, label)) check(n, !!ok, d);
+for (const [label, m] of [['A', MA], ['B', MB], ['C', MC], ['E', ME]]) for (const [n, ok, d] of checkCss(PE.cssVariables(m), m, label)) check(n, !!ok, d);
 {
   const css = PE.cssVariables(MA);
   check('control: a broken value is caught by the CSS checker', checkCss(css.replace(/(--color-role-primary: )#[0-9a-f]{6}/, '$1#000000'), MA, 'x').some(([, ok]) => !ok));
@@ -148,7 +150,7 @@ function checkMd(src, m, state, label) {
   const html = md.render(src);
   const plain = norm(textOf(html));
   out.push(['renders with no raw HTML from designer text', !/<(script|b|img|iframe)\b/i.test(html.replace(/<blockquote>|<\/blockquote>/g, ''))]);
-  const notes = [state.seed.rationale, state.supporting.secondary?.rationale, state.supporting.tertiary?.rationale, ...m.accepted.map((f) => f.note), ...m.acceptedStale.map((f) => f.note)].filter((x) => x && x.trim());
+  const notes = [state.seed.rationale, ...PE.supportSlots(state).map((x) => x.rec.rationale), ...m.accepted.map((f) => f.note), ...m.acceptedStale.map((f) => f.note)].filter((x) => x && x.trim());
   const missing = notes.filter((n) => !squash(textOf(html)).includes(squash(n)));
   out.push([`every rationale and accepted-failure note is visible (${notes.length} checked)`, missing.length === 0, missing[0]]);
   out.push(['every color name is visible verbatim', m.colors.every((c) => squash(textOf(html)).includes(squash(c.name))), m.colors.map((c) => c.name).join('|')]);
@@ -190,6 +192,36 @@ check('D: the model itself still builds (so the UI can show what is blocking)', 
 check('B: accepting every failure with a note lifts the block', MB.unresolved.length === 0 && (() => { PE.forgeTokens(MB); return true; })());
 check('a whitespace-only note does not count as accepted', (() => { const s = stateB(); s.accepted[PE.acceptKey('light', 'onSurface', 'surface', 'text')] = '   \n '; return model(s).unresolved.length === 1; })());
 check('with no lookup tables the exports still build and say print is unavailable', (() => { const m = PE.buildExportModel(stateA(), {}, { lex, date: '2026-09-28' }); return m.colors[0].print === null && /lookup tables did not load/.test(PE.markdownSpec(m)) && JSON.parse(PE.forgeTokensJson(m)).color.brand.primary.$extensions['com.kwadejoslin.palette'].print === null; })());
+
+// ---- D44: a seven-color palette (three secondary, three tertiary) -----------------------------------------------------------
+{
+  const ids = 'primary,secondary,secondary2,secondary3,tertiary,tertiary2,tertiary3';
+  check('E: seven brand colors in slot order, each labeled by tier and position', ME.colors.map((c) => c.slot).join() === ids && ME.colors.find((c) => c.slot === 'secondary').label === 'Secondary 1' && ME.colors.find((c) => c.slot === 'tertiary3').label === 'Tertiary 3');
+  check('E: names stay unique across tiers (the duplicate gets its slot)', new Set(ME.colors.map((c) => c.name.toLowerCase())).size === 7 && ME.colors.some((c) => c.name === 'Harbour Teal (tertiary2)'));
+  check('E: a tier with one color keeps its old label, so older projects export as before', MA.colors.find((c) => c.slot === 'secondary').name === 'Complement, kept for the call-to-action.'.slice(0, 0) + MA.colors.find((c) => c.slot === 'secondary').name && MA.colors.find((c) => c.slot === 'secondary').label === 'Secondary');
+  const forge = JSON.parse(PE.forgeTokensJson(ME)), d = JSON.parse(PE.dtcgTokensJson(ME));
+  const extRoles = ['secondary2', 'secondary3', 'tertiary2', 'tertiary3'].flatMap(PE.extRoles);
+  check('E: Forge and DTCG carry all 16 extended roles in light and dark', [forge, d].every((t) => extRoles.every((r) => t.color.role[r] && t['color-dark'].role[r])));
+  check('E: Forge and DTCG carry a brand token and a tonal palette for every extended color', [forge, d].every((t) => ids.split(',').every((k) => t.color.brand[k]) && ['secondary2', 'secondary3', 'tertiary2', 'tertiary3'].every((k) => t.color[k] && Object.keys(t.color[k]).length === 14)));
+  check('E: the brand token keeps the entered value even when its roles are harmonized', forge.color.brand.secondary3.$value === '#f2c14e' && ME.palette.extended.find((e) => e.id === 'secondary3').source !== '#f2c14e');
+  const css = PE.cssVariables(ME); const root = postcss.parse(css);
+  const decls = {}; root.walkDecls((x) => { (decls[x.prop] = decls[x.prop] || []).push(x.value); });
+  check('E: CSS has every extended role in light, prefers-dark and data-theme dark', extRoles.every((r) => (decls[`--color-role-${r.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()}`] || []).length === 3));
+  check('E: CSS has brand variables and tonal palettes for extended colors', decls['--color-brand-tertiary3'] && decls['--color-secondary2-40'] && decls['--color-tertiary3-90']);
+  const md = PE.markdownSpec(ME);
+  check('E: Markdown explains extended colors, the harmonized one, and the brand colors\' color-blind check', md.includes('### Extended colors') && /Secondary 3 \(`secondary3`\): roles built from the harmonized color/.test(md) && md.includes('Brand colors as entered, color-blind views'));
+  check('E: Markdown role table and tonal palettes include the extended colors', md.includes('`onTertiary3Container`') && /\| Tone \| primary \| secondary \| tertiary \| secondary2 \| secondary3 \| tertiary2 \| tertiary3 \| neutral/.test(md));
+  check('E: Markdown is deterministic', md === PE.markdownSpec(model(stateE())));
+  const groups = PE.aseContents(ME, { includeTones: true });
+  const names = groups[0].colors.map((c) => c.name);
+  check('E: ASE swatches include all seven colors, and with tones the extended palettes too', ME.colors.every((c) => names.includes(c.name)) && names.includes('Secondary 2 40') && names.includes('Tertiary 3 90') && new Set(names).size === names.length);
+  // an unresolved failure on an extended role blocks every exporter, and a note lifts it
+  const s2 = stateE(); s2.overrides.light.onSecondary2 = '#1a90b5';
+  const m2 = model(s2);
+  check('E: a failing extended role pair blocks export', m2.unresolved.some((f) => f.fg === 'onSecondary2') && [PE.forgeTokens, PE.cssVariables, PE.markdownSpec].every((f) => { try { f(m2); return false; } catch (e) { return e instanceof PE.ExportBlockedError; } }));
+  const s3 = stateE(); s3.overrides.light.onSecondary2 = '#1a90b5'; for (const f of m2.unresolved) s3.accepted[f.key] = 'Accepted for the test.';
+  check('E: an accepted note on the extended pair lifts the block', model(s3).unresolved.length === 0);
+}
 
 console.log(fails ? `\n${fails} FAILED` : '\nALL PASS');
 process.exit(fails ? 1 : 0);

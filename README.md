@@ -37,17 +37,19 @@ Two rules run through everything:
 Everything below comes from the fictional Fernhill Bakery sample in [`examples/fernhill-bakery/`](examples/fernhill-bakery/) (invented brand and spot names, no Pantone
 data). The step images are cropped to the top of each step.
 
-**1. Seed.** Start from a color you have, from words, or from a saved project file (the Open project file button). The brand color can be named, locked and given a rationale, and that note travels into every export.
+**1. Seed.** Start from a color you have, from words, from a whole palette you already use (up to seven colors, for reviewing an existing brand), or from a saved project file (the Open project file button). The brand color can be named, locked and given a rationale, and that note travels into every export.
 
-![Seed step: an Open project file button above the choice of color or words, and the brand color #B5532A named Kiln Terracotta, locked, with a written rationale](docs/images/step-1-seed.png)
+![Seed step: an Open project file button above the choice of a color, words or a palette, and the brand color #B5532A named Kiln Terracotta, locked, with a written rationale](docs/images/step-1-seed.png)
 
-**2. Analyze.** Screen values, CMYK and total ink for six print conditions, a print-gamut flag with the nearest printable color, and a scorer for spot colors you paste in.
+**2. Analyze.** Screen values, CMYK and total ink for six print conditions, a print-gamut flag with the nearest printable color, and a scorer for spot colors you paste in. With more than one color, every color is shown side by side first, with a color-blind check between them.
 
 ![Analyze step: screen values, CMYK bars for GRACoL 2013 coated, and a table of all six print conditions with two flagged out of gamut](docs/images/step-2-analyze.png)
 
-**3. Supporting colors.** Harmony lenses propose secondary and tertiary colors, each with the strength of its evidence on the card.
+![Analyze step with six colors: a table of every color with CMYK, print gamut, contrast on white and black, and which colors are close under color-blind views](docs/images/step-2-analyze-palette.png)
 
-![Supporting colors step: a secondary and a tertiary color, each with an evidence tier, a lock switch and a rationale field](docs/images/step-3-supporting-colors.png)
+**3. Supporting colors.** Harmony lenses propose secondary and tertiary colors, each with the strength of its evidence on the card. Up to three of each: Secondary 1 and Tertiary 1 set Material's secondary and tertiary roles, and the others become extended colors with roles of their own, optionally harmonized toward the primary.
+
+![Supporting colors step: Secondary 1 and Tertiary 1, each with an evidence tier, a lock switch and a rationale field, and buttons to add a second secondary or tertiary color](docs/images/step-3-supporting-colors.png)
 
 **4. Palette and roles.** Material 3 roles in light and dark, with every text and UI pair checked against WCAG 2.2.
 

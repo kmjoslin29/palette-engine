@@ -34,7 +34,7 @@
 | `matcher.js` | M8 | Descriptor terms to ranked seed candidates |
 | `de.js` | shared | The only ΔE2000 entry point; keeps Lab in D50 |
 | `analyze.js` | glue | One call: screen record, print per profile, gamut flags |
-| `project.js` | state | The single definition of project state; strict validation and save/load of project files |
+| `project.js` | state | The single definition of project state (version 2: up to three colors per supporting tier; version 1 files are migrated on load); strict validation and save/load of project files |
 | `export/*` | exports | One shared model feeds every exporter (see [05](05-exports.md)) |
 
 ## Rules every module follows
@@ -52,9 +52,9 @@
 
 | Step | What it holds |
 | --- | --- |
-| Seed | Color entry, or descriptor words and seed candidates |
-| Analyze | Screen values, print per profile with gamut flags, the spot scorer |
-| Supporting colors | Harmony lenses, filters, secondary and tertiary slots |
+| Seed | Color entry, descriptor words and seed candidates, or a whole existing palette (up to seven colors) |
+| Analyze | Every color at a glance when there is more than one; screen values, print per profile with gamut flags, the spot scorer for the chosen color |
+| Supporting colors | Harmony lenses, filters, up to three secondary and three tertiary slots, where picks go, harmonize per extended color |
 | Palette and roles | Light and dark roles, overrides, role-pair table with fixes and accepted-failure notes |
 | Checks | WCAG summary, color-blind views, APCA, print legibility, color origins |
 | Export | Seven outputs, "download all", project file save and open |

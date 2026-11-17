@@ -5,6 +5,7 @@
 
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { ROLES } from '../palette.js';
+import { keyRoleList } from './markdown.js';
 import { contrastRatio } from '../checks.js';
 import { assertExportable, pairLabel, shortCite, oklchText, tacText, byRegion } from './model.js';
 
@@ -153,9 +154,11 @@ export async function buildSpecSheetPdf(model) {
   // ---- Summary ----------------------------------------------------------------------------------------------------
   S.text(model.name, { size: 24, k: 'bold', gap: 2 });
   S.text(`Brand color specification  |  ${model.date}`, { size: 10.5, color: MUTED, gap: 10 });
-  const n = model.colors.length, bw = (CW - (n - 1) * 10) / n; S.ensure(96); const top = S.y;
-  model.colors.forEach((c, i) => { const x = M.l + i * (bw + 10); S.rect(x, top, bw, 88, c.hex, { border: RULE }); const ink = inkOn(c.hex); S.label(c.name, x + 8, top + 8, { size: 10, k: 'bold', color: ink, maxWidth: bw - 16 }); S.label(c.hex.toUpperCase(), x + 8, top + 70, { size: 10, k: 'mono', color: ink }); S.label(c.slot, x + 8, top + 22, { size: 8, color: ink }); });
-  S.y = top + 98;
+  // Up to four tiles in a row; five to seven colors (D44) wrap onto a second row so names stay readable.
+  const n = model.colors.length, perRow = n <= 4 ? n : Math.ceil(n / 2), rowsN = Math.ceil(n / perRow), bw = (CW - (perRow - 1) * 10) / perRow;
+  S.ensure(96 * rowsN); const top = S.y;
+  model.colors.forEach((c, i) => { const x = M.l + (i % perRow) * (bw + 10), y = top + Math.floor(i / perRow) * 98; S.rect(x, y, bw, 88, c.hex, { border: RULE }); const ink = inkOn(c.hex); S.label(c.name, x + 8, y + 8, { size: 10, k: 'bold', color: ink, maxWidth: bw - 16 }); S.label(c.hex.toUpperCase(), x + 8, y + 70, { size: 10, k: 'mono', color: ink }); S.label(c.slot, x + 8, y + 22, { size: 8, color: ink }); });
+  S.y = top + 98 * rowsN;
 
   S.heading('Colors at a glance');
   S.table([{ w: 96 }, { w: 68, k: 'mono' }, { w: 78 }, { w: 78 }, { w: 84 }, { w: 84 }, { w: 40 }], ['Color', 'Hex', 'CMYK, GRACoL coated', 'CMYK, GRACoL uncoated', 'Pantone coated (approx.)', 'Pantone uncoated (approx.)', 'On white'],
@@ -194,7 +197,7 @@ export async function buildSpecSheetPdf(model) {
     if (c.print) { const nb = c.print[c0.profiles[0].id].printableNeighbor; S.rect(M.l + half + 12, top2, half, sh, nb, { border: RULE }); S.label(`Press neighbor, ${c0.profiles[0].short}`, M.l + half + 20, top2 + 7, { size: 8.5, k: 'bold', color: inkOn(nb), maxWidth: half - 16 }); S.label(`${nb.toUpperCase()}  (an approximation, not a proof)`, M.l + half + 20, top2 + sh - 16, { size: 8, k: 'mono', color: inkOn(nb), maxWidth: half - 16 }); }
     S.y = top2 + sh + 8;
 
-    const key = { primary: 'primary', secondary: 'secondary', tertiary: 'tertiary' }[c.slot];
+    const key = c.slot; // tonal palettes are keyed by slot id, extended colors included (D44)
     S.ensure(50); const ty = S.y; const tw = CW / model.tones.length;
     model.tones.forEach((t, i) => { const hx = model.palette.tones[key][t]; const x = M.l + i * tw; S.rect(x, ty, tw - 2, 20, hx, { border: RULE }); S.label(String(t), x + 2, ty + 23, { size: 6.5, k: 'bold' }); S.label(hx.toUpperCase().slice(1), x + 2, ty + 31, { size: 5.6, k: 'mono', maxWidth: tw - 3 }); });
     S.label(`Tonal palette (${c.slot})`, M.l, ty + 40, { size: 7, color: MUTED });
@@ -246,6 +249,24 @@ export async function buildSpecSheetPdf(model) {
   });
   S.y = y0 + 16 + ROLES.length * rowH + 6;
 
+  // Extended colors (D44) get their own page: four roles each, light and dark, plus the harmonize state.
+  const ext = model.palette.extended || [];
+  if (ext.length) {
+    S.newPage();
+    S.text('Extended color roles, light and dark', { size: 16, k: 'bold', gap: 2 });
+    S.text('Material 3 has one secondary and one tertiary role palette, so Secondary 2-3 and Tertiary 2-3 are extended colors (as in Material Theme Builder), built and checked the same way as Secondary 1 and Tertiary 1.', { size: 9, color: MUTED, gap: 8 });
+    const extRoleList = ext.flatMap((e) => e.roles);
+    const ey = S.y; S.ensure(rowH * (extRoleList.length + 1));
+    ['light', 'dark'].forEach((mode, mi) => {
+      const x = M.l + mi * (col + 16); S.label(mode === 'light' ? 'Light' : 'Dark', x, ey, { size: 10, k: 'bold' });
+      extRoleList.forEach((r, i) => { const hx = model.palette.schemes[mode][r]; const yy = ey + 16 + i * rowH; S.rect(x, yy, 22, 12, hx, { border: RULE }); S.label(r, x + 28, yy + 1, { size: 8 }); S.label(hx.toUpperCase(), x + col - 52, yy + 1, { size: 8, k: 'mono' }); });
+    });
+    S.y = ey + 16 + extRoleList.length * rowH + 8;
+    for (const e of ext) S.text(`${e.label}: ${e.harmonize && e.harmonized ? `roles built from the harmonized color ${e.harmonized.hex.toUpperCase()} (hue moved ${e.harmonized.hueShift > 0 ? '+' : ''}${e.harmonized.hueShift} degrees toward the primary, dE00 ${e.harmonized.dE00}); the brand token keeps ${e.hex.toUpperCase()}.` : `roles built from ${e.hex.toUpperCase()} as entered (not harmonized).`}`, { size: 8.5, gap: 3 });
+    const bc = model.palette.brandCvd;
+    S.text(bc.length ? `Brand colors as entered, color-blind views: ${bc.map((f) => `${f.a} and ${f.b} under ${f.type} (dE00 ${f.dE00.toFixed(1)})`).join('; ')}. Pair these with a label, shape or position, not color alone (WCAG 1.4.1).` : 'Brand colors as entered stay distinct from each other under protan, deutan and tritan views.', { size: 8.5, color: MUTED, gap: 8 });
+  }
+
   S.newPage();
   S.text('Role-pair checks', { size: 16, k: 'bold', gap: 2 });
   S.text(`${c0.wcag}. ${c0.apca}. Color-blind views: ${c0.cvd}.`, { size: 9, color: MUTED, gap: 8 });
@@ -256,7 +277,7 @@ export async function buildSpecSheetPdf(model) {
       return [pairLabel(r), `${(Math.round(r.ratio * 100) / 100).toFixed(2)}:1`, r.kind === 'text' ? '4.5:1' : '3:1', pass ? { text: 'pass', color: PASS } : acc ? { text: 'accepted with a note', color: WARN, k: 'bold' } : { text: 'FAIL', color: FAIL, k: 'bold' }];
     }));
     const cvd = model.palette.checks[mode].cvd;
-    S.text(cvd.length ? `Color-blind collapse (${mode}): ${cvd.map((f) => `${f.a} and ${f.b} under ${f.type} (dE00 ${f.dE00.toFixed(1)})`).join('; ')}. Do not rely on these roles differing by color alone (WCAG 1.4.1).` : `Color-blind views (${mode}): primary, secondary, tertiary and error stay distinct under protan, deutan and tritan simulation.`, { size: 8.5, color: MUTED, gap: 8 });
+    S.text(cvd.length ? `Color-blind collapse (${mode}): ${cvd.map((f) => `${f.a} and ${f.b} under ${f.type} (dE00 ${f.dE00.toFixed(1)})`).join('; ')}. Do not rely on these roles differing by color alone (WCAG 1.4.1).` : `Color-blind views (${mode}): ${keyRoleList(model.palette)} stay distinct under protan, deutan and tritan simulation.`, { size: 8.5, color: MUTED, gap: 8 });
   }
 
   // ---- header and footer on every page ----------------------------------------------------------------------------

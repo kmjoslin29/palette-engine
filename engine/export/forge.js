@@ -4,8 +4,8 @@
 // Palette Engine writes print and spot data under $extensions.com.kwadejoslin.palette instead (namespaced, per DTCG's vendor-key rule).
 // DTCG 2025.10 has no $version and no theming (the resolver module covers modes), so that file drops $version and $themes.
 
-import { TONES, ROLES } from '../palette.js';
-import { NS, PALETTE_KEYS, assertExportable, colorRecord, pairLabel } from './model.js';
+import { TONES, rolesOf } from '../palette.js';
+import { NS, paletteKeysOf, assertExportable, colorRecord, pairLabel } from './model.js';
 
 const hexBytes = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
 
@@ -30,7 +30,7 @@ function rootExtension(model) {
 function tree(model, toValue) {
   const pal = model.palette;
   const color = {};
-  for (const [key, name] of Object.entries(PALETTE_KEYS)) {
+  for (const [key, name] of Object.entries(paletteKeysOf(pal))) {
     color[name] = {};
     for (const t of TONES) {
       const hex = pal.tones[key][t];
@@ -42,7 +42,7 @@ function tree(model, toValue) {
   }
   color.brand = {};
   for (const c of model.colors) color.brand[c.slot] = { $value: toValue(c.hex), $type: 'color', $description: c.name, $extensions: { [NS]: colorRecord(c, model) } };
-  const roles = (mode) => Object.fromEntries(ROLES.map((r) => [r, { $value: toValue(pal.schemes[mode][r]), $type: 'color' }]));
+  const roles = (mode) => Object.fromEntries(rolesOf(pal).map((r) => [r, { $value: toValue(pal.schemes[mode][r]), $type: 'color' }]));
   color.role = roles('light');
   return { color, colorDark: { role: roles('dark') } };
 }

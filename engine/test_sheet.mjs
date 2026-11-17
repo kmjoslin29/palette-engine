@@ -45,7 +45,7 @@ for (const [k, [s]] of Object.entries(cases)) {
   check(`${k}: no body text runs into the footer zone`, straddle(pages).length === 0, straddle(pages).slice(0, 5).join(' '));
   check(`${k}: the layout's own boxes agree (all inside margins; body clear of the footer)`, r.boxes.every((pg) => pg.every((b) => b.x >= L - 0.5 && b.x + b.w <= R + 0.5 && (b.y + b.h <= 716.5 || b.y >= 725 || b.y + b.h <= 40))), JSON.stringify(r.boxes.flat().find((b) => !(b.x >= L - 0.5 && b.x + b.w <= R + 0.5 && (b.y + b.h <= 716.5 || b.y >= 725 || b.y + b.h <= 40)))));
   const t = squash(r.text);
-  const notes = [s.seed.rationale, s.supporting.secondary?.rationale, s.supporting.tertiary?.rationale, ...m.accepted.map((f) => f.note), ...m.acceptedStale.map((f) => f.note)].filter((x) => x && x.trim());
+  const notes = [s.seed.rationale, ...PE.supportSlots(s).map((x) => x.rec.rationale), ...m.accepted.map((f) => f.note), ...m.acceptedStale.map((f) => f.note)].filter((x) => x && x.trim());
   const missing = notes.filter((n) => !t.includes(squash(n)));
   check(`${k}: every rationale, lock and accepted-failure note is in the PDF text (${notes.length} checked)`, missing.length === 0, missing[0]);
   check(`${k}: every color name and hex is in the PDF text`, m.colors.every((c) => t.includes(squash(c.name)) && t.includes(c.hex.toUpperCase())));
@@ -76,7 +76,7 @@ function pairLabel(f) { return PE.pairLabel(f); }
 {
   const s = stateA();
   s.seed.rationale = 'Café “quoted” – dash… naïve résumé ©®™ ½ × ° € ' + 'X'.repeat(400) + '\n\n' + 'long words '.repeat(300);
-  s.supporting.secondary.rationale = 'emoji 🌊 and 蓝色 and Δ ≥ → ✓';
+  s.supporting.secondary[0].rationale = 'emoji 🌊 and 蓝色 and Δ ≥ → ✓';
   s.name = 'Ünïcode & Co';
   const r = await make('U', model(s)); const pages = words(r.file); const t = squash(r.text);
   check('Latin text with curly quotes, dashes, accents, ©®™, ½ × ° € survives', ['Café', '“quoted”', '–', 'naïve', 'résumé', '©®™', '½', '×', '°', '€'].every((x) => t.includes(squash(x))));

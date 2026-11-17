@@ -49,9 +49,17 @@ export function labD50(input) {
 }
 
 /** True if the color (any culori mode, e.g. an oklch object) sits inside the sRGB cube. */
+// Floating-point tolerance for the sRGB test (pe-update62). A hex color round-tripped through OKLCH can come back with a
+// channel like -1.3e-14 (#0083A8), which a strict test flags "P3 only"; about 1 in 6 hex colors was flagged that way.
+// 1e-6 is far below one 8-bit step (1/255 = 0.0039), so no color that differs on screen is let through.
+export const SRGB_EPSILON = 1e-6;
+const toRgbExact = converter('rgb');
 export function inSrgbGamut(input) {
   const c = coerce(input);
-  return c ? inSrgb(c) : false;
+  if (!c) return false;
+  if (inSrgb(c)) return true;
+  const r = toRgbExact(c);
+  return [r.r, r.g, r.b].every((v) => v >= -SRGB_EPSILON && v <= 1 + SRGB_EPSILON);
 }
 
 /**

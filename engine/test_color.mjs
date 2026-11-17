@@ -51,5 +51,14 @@ console.log('white labD50 ~ (100,0,0):', Math.abs(w.l - 100) < 0.1 && Math.abs(w
 
 // normalize() shape check
 const n = normalize('#1F5FA8');
+// pe-update62: no hex color is "P3 only" (floating-point tolerance in the sRGB test)
+{
+  const check = (name, ok, d = '') => { console.log(`${name}: ${ok ? 'PASS' : `FAIL ${d}`}`); if (!ok) process.exitCode = 1; };
+  let flagged = 0; for (let r = 0; r < 256; r += 17) for (let g = 0; g < 256; g += 17) for (let b = 0; b < 256; b += 17) { const hx = '#' + [r, g, b].map((v) => v.toString(16).padStart(2, '0')).join(''); if (!inSrgbGamut(hx)) flagged++; }
+  check('every hex color on a 16-step grid (4,096) counts as inside sRGB', flagged === 0, String(flagged));
+  check('#0083A8 (red channel -1e-14 after the OKLCH round trip) counts as inside sRGB', inSrgbGamut('#0083a8') && inSrgbGamut(oklch('#0083a8')));
+  check('a color clearly beyond sRGB is still flagged', !inSrgbGamut('oklch(0.7 0.3 145)') && !inSrgbGamut('color(display-p3 0 1 0)'));
+}
+
 console.log('normalize() shape:', n.hex === '#1f5fa8' && n.srgb.length === 3 && 'l' in n.oklch && 'l' in n.labD50
   ? 'PASS' : `FAIL ${JSON.stringify(n)}`);

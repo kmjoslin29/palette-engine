@@ -42,7 +42,8 @@ const groupEnd = () => block(T_GROUP_END, new Uint8Array(0));
 export function aseContents(model, { includeTones = false } = {}) {
   assertExportable(model);
   const items = model.colors.map((c) => ({ name: c.name, hex: c.hex, print: c.print, spot: c.spot }));
-  if (includeTones) for (const [key, label] of [['primary', 'Primary'], ['secondary', 'Secondary'], ['tertiary', 'Tertiary'], ['neutral', 'Neutral'], ['neutralVariant', 'Neutral variant'], ['error', 'Error']])
+  const toneSets = [['primary', 'Primary'], ['secondary', 'Secondary'], ['tertiary', 'Tertiary'], ...(model.palette.extended || []).map((e) => [e.id, e.label]), ['neutral', 'Neutral'], ['neutralVariant', 'Neutral variant'], ['error', 'Error']];
+  if (includeTones) for (const [key, label] of toneSets)
     for (const t of model.tones) { const hex = model.palette.tones[key][t]; items.push({ name: `${label} ${t}`, hex, print: model.printOf(hex), spot: null }); }
   const rgb = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
   const groups = [{ name: ASE_GROUPS.screen, colors: items.map((i) => ({ name: i.name, model: 'RGB ', values: rgb(i.hex), type: 'global' })) }];

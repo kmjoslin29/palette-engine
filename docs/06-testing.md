@@ -8,7 +8,7 @@ Run everything with `npm test` (engine and export tests, then a fresh page build
 | --- | --- | --- |
 | Print lookup | `test_lut`, `test_lab` | The JavaScript lookup equals the Python build on 11,000 colors per profile; culori's sRGB→Lab D50 agrees with LittleCMS to ΔE00 0.004 |
 | Spot scorer | `test_spot` | ΔE2000 matches colour-science on 1,150 pairs (max difference 1e-13) and the published Sharma, Wu & Dalal (2005) test pairs (max 0.00004); parser and bands |
-| Color maths | `test_color` | hex → OKLCH → hex exact for 10,000 random colors plus corners and grays; gamut-mapping behavior (lightness and hue drift measured) |
+| Color maths | `test_color` | hex → OKLCH → hex exact for 10,000 random colors plus corners and grays; gamut-mapping behavior (lightness and hue drift measured); no hex color on a 4,096-color grid is flagged beyond sRGB (D45) |
 | Gamut | `test_gamut` | `#00FF00` flags out of print gamut on GRACoL coated; neutral grays do not; pure black flags with an explanatory note |
 | Checks | `test_checks` | `#767676` on white is 4.54:1 (passes AA); `#777777` is 4.48:1 (fails); CVD collapses a red/green pair; APCA sanity; print ΔL* |
 | APCA without the AGPL parser | `test_apcastub` | The hex-only stand-in for `colorparsley` returns exactly what the real package returns on 200,000 random hex strings; APCA scores from the built bundle equal those from the unmodified `apca-w3` + `colorparsley` on 100,000 random pairs and a 281,216-pair sweep of the RGB cube; the bundles contain no AGPL text. Does not test colors given as words or `rgb()` strings, which the engine never passes; the bundle reports the installed `apca-w3` version and the APCA constants named in its own banner, which the page prints on the Checks step |
@@ -18,7 +18,7 @@ Run everything with `npm test` (engine and export tests, then a fresh page build
 | Example | `test_example` | The committed example outputs equal a fresh build, so they cannot go stale |
 | Design tokens | `web/test_tokens` | The page's own colors pass WCAG AA in both themes |
 | Browser: exports | `web/test_export_ui` | Gating, every download parsed back, the viewer save path (mocked), project save and open (from the Export step and from the Seed step, including a project with no seed), invalid and hostile project files |
-| Browser: end to end | `web/test_e2e` | A whole session on both entry paths; every step in light and dark at 375px and 1100px: no sideways scroll, WCAG AA text contrast, an accessible name on every control; keyboard focus ring; reload; blocked storage; hostile saved data |
+| Browser: end to end | `web/test_e2e` | A whole session on all three entry paths (color, words, a whole palette with seven colors: entry errors, the overview, the detail switcher, where picks go, harmonize, move up, remove, add, locks, extended overrides and exports), a version 1 state in browser storage; every step in light and dark at 375px and 1100px: no sideways scroll, WCAG AA text contrast, an accessible name on every control; keyboard focus ring; reload; blocked storage; hostile saved data |
 
 ## The Phase 6 gate
 

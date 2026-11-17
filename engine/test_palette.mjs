@@ -44,5 +44,37 @@ check('fix tone is a valid tone and reports its gap', fails2.every((f) => f.fix 
 // CVD: primary/secondary/tertiary/error collapse detection runs.
 check('cvd list is an array', Array.isArray(b.checks.light.cvd));
 
+// ---- D44: extended colors (Secondary 2–3, Tertiary 2–3) --------------------------------------------------------------------
+{
+  const one = PE.buildPalette('#b5532a', [{ role: 'secondary', hex: '#0083a8' }]);
+  const ext = PE.buildPalette('#b5532a', [{ role: 'secondary', hex: '#5b7f3a' }, { role: 'secondary2', hex: '#0083a8' }, { role: 'tertiary', hex: '#7a4fa0' }, { role: 'tertiary2', hex: '#c2185b' }]);
+  const pairs = [['secondary', 'secondary2'], ['onSecondary', 'onSecondary2'], ['secondaryContainer', 'secondary2Container'], ['onSecondaryContainer', 'onSecondary2Container']];
+  check('an extended color gets exactly the roles it would get as Secondary 1, light and dark', ['light', 'dark'].every((m) => pairs.every(([a, b]) => one.schemes[m][a] === ext.schemes[m][b])));
+  const tOne = PE.buildPalette('#b5532a', [{ role: 'tertiary', hex: '#c2185b' }]);
+  check('Tertiary 2 gets the roles it would get as Tertiary 1', ['light', 'dark'].every((m) => tOne.schemes[m].tertiaryContainer === ext.schemes[m].tertiary2Container && tOne.schemes[m].onTertiary === ext.schemes[m].onTertiary2));
+  check('extended colors leave the core roles alone', ['light', 'dark'].every((m) => PE.ROLES.every((r) => PE.buildPalette('#b5532a', [{ role: 'secondary', hex: '#5b7f3a' }, { role: 'tertiary', hex: '#7a4fa0' }]).schemes[m][r] === ext.schemes[m][r])));
+  check('a palette with no extended colors has exactly the 29 core roles and no extended list entries', Object.keys(one.schemes.light).length === 29 && one.extended.length === 0 && PE.rolesOf(one).length === 29);
+  check('rolesOf lists core roles, then four per extended color in slot order', PE.rolesOf(ext).slice(29).join() === 'secondary2,onSecondary2,secondary2Container,onSecondary2Container,tertiary2,onTertiary2,tertiary2Container,onTertiary2Container');
+  check('each extended color has a tonal palette under its id', ['secondary2', 'tertiary2'].every((k) => ext.tones[k] && ext.tones[k][40] === PE.buildPalette('#b5532a', [{ role: k.replace('2', ''), hex: k === 'secondary2' ? '#0083a8' : '#c2185b' }]).tones[k.replace('2', '')][40]));
+  const textPairs = ext.checks.light.rows.filter((r) => r.kind === 'text').map((r) => `${r.fg}/${r.bg}`);
+  check('the role checks cover on-color and on-container for each extended color', ['onSecondary2/secondary2', 'onSecondary2Container/secondary2Container', 'onTertiary2/tertiary2', 'onTertiary2Container/tertiary2Container'].every((p) => textPairs.includes(p)));
+  check('color-blind role checks include the extended colors', ext.checks.light.cvd.every((f) => typeof f.a === 'string') && PE.buildPalette('#1f5fa8', [{ role: 'secondary', hex: '#1f60a9' }, { role: 'secondary2', hex: '#1f5fa7' }]).checks.light.cvd.some((f) => f.a === 'secondary2' || f.b === 'secondary2'));
+  const failExt = PE.buildPalette('#1f5fa8', [{ role: 'secondary2', hex: '#2e7d32' }], { overrides: { light: { onSecondary2: '#3a8a3e' } } });
+  const f = failExt.checks.light.failures.find((x) => x.fg === 'onSecondary2');
+  check('an override on an extended role is applied and a failure gets a fix from that color\'s own palette', failExt.overridden.light.includes('onSecondary2') && f && f.fix && failExt.tones.secondary2 && Object.values(failExt.tones.secondary2).length > 0 && !failExt.pass);
+  check('an override for a role that does not exist is ignored', !PE.buildPalette('#1f5fa8', [], { overrides: { light: { secondary2: '#000000' } } }).overridden.light.length);
+  // harmonize: roles move, the brand value does not
+  const h0 = PE.buildPalette('#b5532a', [{ role: 'tertiary2', hex: '#7a4fa0' }]);
+  const h1 = PE.buildPalette('#b5532a', [{ role: 'tertiary2', hex: '#7a4fa0', harmonize: true }]);
+  const e1 = h1.extended[0];
+  check('harmonize changes the roles of that color only', h0.schemes.light.tertiary2 !== h1.schemes.light.tertiary2 && h0.schemes.light.primary === h1.schemes.light.primary);
+  check('harmonize keeps the brand value and reports the shifted color, hue shift (at most 15°) and ΔE00', e1.hex === '#7a4fa0' && e1.source === e1.harmonized.hex && Math.abs(e1.harmonized.hueShift) <= 15.5 && e1.harmonized.dE00 > 0 && h1.brandColors.tertiary2 === '#7a4fa0');
+  const same = PE.harmonizeToward('#b5532a', '#b5532a');
+  check('harmonizing a color toward itself changes nothing', same.hex === '#b5532a' && same.dE00 === 0);
+  // brand colors as entered
+  check('brand colors are checked against each other under color-blind views', PE.buildPalette('#d32f2f', [{ role: 'secondary', hex: '#388e3c' }]).brandCvd.some((x) => x.type === 'deutan' || x.type === 'protan') && PE.buildPalette('#1f5fa8').brandCvd.length === 0);
+  check('extTier and extRoles name the slots consistently', PE.extTier('tertiary3').tier === 'tertiary' && PE.extTier('tertiary3').n === 3 && PE.extTier('secondary') === null && PE.extRoles('secondary3').join() === 'secondary3,onSecondary3,secondary3Container,onSecondary3Container');
+}
+
 console.log(fails ? `${fails} FAILED` : 'ALL PASS');
 process.exit(fails ? 1 : 0);

@@ -54,7 +54,7 @@ check('tone swatch values match the palette', near(tones[0].colors.find((c) => c
 
 // 5. Unicode names survive (UTF-16 surrogate pairs, CJK, accents)
 {
-  const s = stateA(); s.seed.name = 'Océan 蓝色 🌊'; s.supporting.secondary.name = 'A'.repeat(300);
+  const s = stateA(); s.seed.name = 'Océan 蓝色 🌊'; s.supporting.secondary[0].name = 'A'.repeat(300);
   const m = model(s); const g = PE.parseAse(PE.buildAse(m));
   check('accents, CJK and emoji round-trip; a 300-character name is cut to 120', g[0].colors[0].name === 'Océan 蓝色 🌊' && g[0].colors[1].name.length === 120);
   fs.writeFileSync(new URL('../tmp/test_export/unicode.ase', import.meta.url), PE.buildAse(m));

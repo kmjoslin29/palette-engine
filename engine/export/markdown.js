@@ -2,7 +2,7 @@
 // Designer text (names, rationale, notes) is escaped so it renders exactly as typed and cannot inject HTML or table syntax.
 // Long free text goes in paragraphs and block quotes, never table cells, so line breaks survive.
 
-import { TONES, ROLES } from '../palette.js';
+import { TONES, rolesOf } from '../palette.js';
 import { oklch, roundOklch } from '../color.js';
 import { assertExportable, oklchText, pairLabel, shortCite, tacText, byRegion } from './model.js';
 
@@ -62,6 +62,16 @@ function colorSection(model, c) {
   return L.join('\n');
 }
 
+/** 'primary, secondary, tertiary and error', plus any extended colors, for the color-blind sentences. */
+export const keyRoleList = (pal) => { const r = ['primary', 'secondary', 'tertiary', ...(pal.extended || []).map((e) => e.id), 'error']; return `${r.slice(0, -1).join(', ')} and ${r[r.length - 1]}`; };
+/** Lines on the extended colors (D44): what they are, harmonize state, and the brand colors' own color-blind check. */
+export function extendedNotes(pal) {
+  const L = ['### Extended colors', '', 'Material 3 has one secondary and one tertiary role palette, so Secondary 2–3 and Tertiary 2–3 are extended colors (as in Material Theme Builder): each has a color, on-color, container and on-container role in light and dark, built the same way as Secondary 1 and Tertiary 1 and checked the same way.', ''];
+  for (const e of pal.extended) L.push(`- ${e.label} (${code(e.id)}): ${e.harmonize && e.harmonized ? `roles built from the harmonized color ${code(e.harmonized.hex.toUpperCase())} (hue moved ${e.harmonized.hueShift > 0 ? '+' : ''}${e.harmonized.hueShift}° toward the primary, ΔE00 ${e.harmonized.dE00} from the brand color). The brand token keeps ${code(e.hex.toUpperCase())}.` : `roles built from the brand color ${code(e.hex.toUpperCase())} as entered (not harmonized).`}`);
+  L.push('', pal.brandCvd.length ? `Brand colors as entered, color-blind views: ${pal.brandCvd.map((f) => `${mdEscape(f.a)} and ${mdEscape(f.b)} under ${f.type} (ΔE00 ${f.dE00.toFixed(1)})`).join('; ')}. Pair these with a label, shape or position, not color alone (WCAG 1.4.1).` : 'Brand colors as entered, color-blind views: every pair stays distinct under protan, deutan and tritan simulation.');
+  return L;
+}
+
 export function markdownSpec(model) {
   assertExportable(model);
   const pal = model.palette; const c0 = model.conditions;
@@ -81,9 +91,11 @@ export function markdownSpec(model) {
   L.push('## Roles', '', 'Roles come from Material 3 tonal palettes (HCT). The brand hex stays its own token; the gap to the nearest role tone is shown so nothing is silently changed.', '');
   const b = pal.brand;
   L.push(table(['Mode', 'Primary role', 'Tone gap from the brand color'], [['Light', code(b.lightPrimary.hex.toUpperCase()), b.lightPrimary.toneGap], ['Dark', code(b.darkPrimary.hex.toUpperCase()), b.darkPrimary.toneGap]]), '');
-  L.push(table(['Role', 'Light', 'Light OKLCH', 'Dark', 'Dark OKLCH'], ROLES.map((r) => [code(r), code(pal.schemes.light[r].toUpperCase()), ok(pal.schemes.light[r]), code(pal.schemes.dark[r].toUpperCase()), ok(pal.schemes.dark[r])])), '');
+  L.push(table(['Role', 'Light', 'Light OKLCH', 'Dark', 'Dark OKLCH'], rolesOf(pal).map((r) => [code(r), code(pal.schemes.light[r].toUpperCase()), ok(pal.schemes.light[r]), code(pal.schemes.dark[r].toUpperCase()), ok(pal.schemes.dark[r])])), '');
 
-  L.push('## Tonal palettes', '', table(['Tone', ...['primary', 'secondary', 'tertiary', 'neutral', 'neutralVariant', 'error'].map((k) => k)], TONES.map((t) => [String(t), ...['primary', 'secondary', 'tertiary', 'neutral', 'neutralVariant', 'error'].map((k) => code(pal.tones[k][t].toUpperCase()))])), '');
+  const palKeys = ['primary', 'secondary', 'tertiary', ...(pal.extended || []).map((e) => e.id), 'neutral', 'neutralVariant', 'error'];
+  L.push('## Tonal palettes', '', table(['Tone', ...palKeys], TONES.map((t) => [String(t), ...palKeys.map((k) => code(pal.tones[k][t].toUpperCase()))])), '');
+  if ((pal.extended || []).length) L.push(...extendedNotes(pal), '');
 
   L.push('## Role-pair checks', '', `${c0.wcag}. ${c0.apca}.`, '');
   for (const mode of ['light', 'dark']) {

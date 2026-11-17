@@ -12,17 +12,17 @@ Last reviewed 2026-10-14 (through pe-update60).
 
 | File | Module | Exports |
 | --- | --- | --- |
-| `color.js` | M1 | `parseColor`, `toBytes`, `oklch`, `labD50`, `inSrgbGamut`, `mapToSrgb`, `hexFromOklch`, `roundOklch`, `normalize` |
+| `color.js` | M1 | `parseColor`, `toBytes`, `oklch`, `labD50`, `inSrgbGamut` (1e-6 tolerance, D45), `mapToSrgb`, `hexFromOklch`, `roundOklch`, `normalize` |
 | `lut.js` | M2 | `decodeLut`, `lookup`, `roundCmyk`, `tac` |
 | `gamut.js` | M3 | `screenGamut`, `printGamut` |
 | `spot.js` | M4 | `parseEntries`, `score`, `band`, `BANDS` |
 | `harmony.js` | M5 | `harmonyCandidates`, `allCandidates`, `LENSES`, `accessibilityOf`, `nearestPassingLightness`, `ouLuoModel`, `ouLuoHarmony`, `OU_LUO_K` |
-| `palette.js` | M6 | `buildPalette(seed, supporting, {overrides})`, `nearestPassingTone`, `hctOf`, `referenceScheme`. Needs the bundle (rule 6). Material 2021 spec by default |
+| `palette.js` | M6 | `buildPalette(seed, supporting, {overrides})` (supporting roles: `secondary`, `tertiary`, and the extended `secondary2`, `secondary3`, `tertiary2`, `tertiary3` with optional `harmonize`; returns `extended` and `brandCvd` too, D44), `rolesOf`, `extRoles`, `extTier`, `harmonizeToward`, `nearestPassingTone`, `hctOf`, `referenceScheme`, `ALL_ROLES`, `MAX_PER_TIER`. Needs the bundle (rule 6). Material 2021 spec by default |
 | `checks.js` | M7 | `contrastRatio`, `textContrast`, `nonTextContrast`, `contrastMatrix`, `apcaScore`, `APCA_INFO`, `simulateCvd`, `cvdDistinctPairs`, `printLegibility` |
 | `matcher.js` | M8 | `indexLexicon`, `matchTerms`, `matchDescriptors`, `ouScores` (JS mirror of `build_lexicon.ou_scores`), `WORD_FORMS`, `baseForms`, `lowerTier`, `leanTestedRange` |
 | `analyze.js` | glue | `analyze(input, luts)`: screen record, print per profile, gamut, P3 flag |
 | `de.js` | shared | `de00` |
-| `project.js` | state | default state, strict validate and parse of project files |
+| `project.js` | state | default state, strict validate and parse of project files (version 2; version 1 migrated on load), `supportSlots`, `supportingForPalette`, `slotId`, `hasSupporting` |
 | `export/` | exports | `model.js` (one shared model), `forge.js` (Forge tokens and the W3C DTCG file), `css.js`, `markdown.js`, `ase.js`, `zip.js`, `sheet.js` (PDF), `files.js` (formats, names, `saveShape`), `index.js` |
 
 Outside `engine/`: `web/` (page: `style.css`, `app.js`, `harness.mjs` and the Playwright suites), `build/` (Python LUT and lexicon builds, esbuild bundle, page
@@ -118,9 +118,11 @@ Start a new session for this. Read `TO-CONFIRM.md` first.
 
 ## Starting a new session
 
+**State on 2026-11-17 (pe-update62, built and tested in the sandbox, waiting for Kwade to apply and push):** up to three secondary and three tertiary colors (D44): Secondary 2–3 and Tertiary 2–3 are Material 3 extended colors with four roles each, built through the same scheme path as Secondary 1 / Tertiary 1 (`extendedOf` in `engine/palette.js`); harmonize is opt-in per extended color and changes roles only; the Seed step has a third tab, "I have a palette"; Analyze shows every color at a glance; project files are version 2 (`engine/project.js`: `supportSlots`, `supportingForPalette`, `slotId`), and version 1 files and browser storage are migrated on load. Also the sRGB tolerance fix (D45). Older projects export byte-identically. Open: C47 (live check by Kwade, screen reader, Material 3 points not re-checked live).
+
 **State on 2026-10-14 (pe-update60): everything through pe-update59 is committed and green in the public repository, and the page is live on GitHub Pages. The paragraph below is older and records how it got here (it is from 2026-10-13, pe-update51).** Everything through pe-update49 is committed and the GitHub Actions run ("engine-and-browser") is green. The FOGRA39 file's ink limit is 260% (D43) and the "cool" weights are cyan 0.83, blue 0.80, purple 0.55, neutral 0.38, green 0.35 (D40 to D42). The live page is version 14. `engine/test_sheet.mjs` runs only in CI, so after any change to the PDF text, read the CI run too. The Build Spec Doc in the claude.ai Project carries dated notes for these changes. **Older state (pe-update44).** The tool has six print conditions in two regions (D38). North America: GRACoL 2013 coated (default), SWOP 2013, GRACoL 2013 uncoated. Europe: PSO Coated v3 (FOGRA51), PSO Uncoated v3 (FOGRA52) and a FOGRA39 file ("Coated FOGRA39L (VIGC 260)", from the ICC Profile Registry, provider VIGC; C23 closed 2026-10-13). pe-update38 added one script (`build/measure_cmyk_rounding.py`) and pe-update39 and 40 are docs only (C25: Xin et al. 2004 read; C22: ECI answered that derived tables need no permission while its profiles are not distributed). pe-update41 changes the page footer text (the FOGRA39 file's registry notice and a credit to ECI, C30) and adds one end-to-end check, so the end-to-end suite should now report 72 checks; the test state below describes the tree before pe-update41 and 42; see the sentences after this one for what was observed after them. It also records the C25 decision (D40: grays may rank as cool). pe-update42 makes that change (C33): the "cool" row gains a neutral weight of 0.38 in both lexicon files, `engine/matcher.js` treats neutral points as true grays (D41) and compares the minimum seed gap with a tolerance, and `engine/test_matcher.mjs` has four more checks. Kwade ran `test_matcher.mjs` and `build/test_lexicon.py` (ALL PASS) and reported that the rest of the suites passed too; he committed and pushed pe-update42 (C30 and C33 closed in pe-update43). `test_sheet.mjs` still cannot run on his machine (no qpdf), and the end-to-end count (72 expected) was not reported in numbers. The script measured the share of rounded CMYK identical to direct conversion for all six tables (C32, done): 84.81 / 83.91 / 81.94% for the US three (as in Phase 1) and 81.25 / 77.05 / 83.18% for PSO Coated v3, PSO Uncoated v3 and the FOGRA39 file. On 2026-10-13, on Windows after the C27 footer change, every engine suite passed except `test_sheet.mjs` (it needs poppler-utils and qpdf, which that machine lacks), the export UI suite passed 43 checks, the end-to-end suite 71 (it was 69 before the footer change), and `python build/test_lexicon.py` passed. CI then showed a green check (Kwade, 2026-10-13; the commit and log were not looked at). The earlier record of 595 checks, 70 of them in the browser (pe-update33), does not describe the repo: its source had no pe-update33 footer sentence or check until commit 6ecc425. The overall total has not been recomputed. Work is delivered as `pe-updateNN.zip` packages (changed files only) with a summary file and a commit message; Kwade applies and commits them from his own tree, and the working copy here never pushes.
 
-**Read in this order:** `TO-CONFIRM.md` (the one open list), `docs/07-decisions.md` (D33 to D40 are the recent ones), `docs/phase-log.md`, then this file. In the claude.ai Project, `claude/project-file-index.md` says which copy of each document is canonical.
+**Read in this order:** `TO-CONFIRM.md` (the one open list), `docs/07-decisions.md` (D40 to D45 are the recent ones), `docs/phase-log.md`, then this file. In the claude.ai Project, `claude/project-file-index.md` says which copy of each document is canonical.
 
 **What is waiting, and on whom**
 
@@ -130,7 +132,7 @@ Start a new session for this. Read `TO-CONFIRM.md` first.
 | A screen-reader session | C18, C20 (re-test), then C19 (step navigation), then C21 (reading load). |
 | Equipment Kwade does not have | C6 (Pantone guide), C7 and C8 (Adobe). |
 | Kwade's judgment, deferred on purpose | C10 (seed quality on the live page), C15 (the near-synonym chip, not yet seen by him), C13 (stays open). |
-| Kwade, to do next | Apply pe-update60 (docs only; it can be folded into the next commit). Then give the scope for the UI/UX pass (C38, which now also covers the header scope note) in a separate session. Nothing else is waiting on a test. |
+| Kwade, to do next | Apply and push pe-update62 (D44, D45), let CI run, then try the live page with a real five-to-seven-color palette (C47). The UI/UX pass (C38) is still waiting for his scope, and should now include the new controls. |
 
 **Decisions that need Kwade before anything changes:** the matcher tie-break and the color-word bands (D34, D35) are not changed without asking. Brand data comes from published sources only. No researcher or contact email addresses go in the repo.
 

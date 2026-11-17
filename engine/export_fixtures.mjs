@@ -15,8 +15,8 @@ export function stateA() {
   const s = PE.defaultState();
   s.name = 'Harbor & Co | “Studio”';
   s.seed = rec({ hex: '#1f5fa8', origin: 'manual', mappedFrom: null, name: 'Harbor Blue <b>bold</b>', locked: true, rationale: 'Chosen for trust & calm.\n- a line that looks like a list\n# and one that looks like a heading\n| pipes | and `ticks` and *stars* and _under_ [brackets](x)' });
-  s.supporting.secondary = rec({ hex: '#d9822b', origin: 'harmony:complementary', tier: 'low confidence', lens: 'complementary', offset: 180, rationale: 'Complement, kept for the call-to-action.' });
-  s.supporting.tertiary = rec({ hex: '#2e7d32', origin: 'manual', lens: null, offset: null, rationale: 'Success green.', locked: true, name: 'Harbor Blue <b>bold</b>' }); // duplicate name on purpose
+  s.supporting.secondary = [rec({ hex: '#d9822b', origin: 'harmony:complementary', tier: 'low confidence', lens: 'complementary', offset: 180, rationale: 'Complement, kept for the call-to-action.' })];
+  s.supporting.tertiary = [rec({ hex: '#2e7d32', origin: 'manual', lens: null, offset: null, rationale: 'Success green.', locked: true, name: 'Harbor Blue <b>bold</b>' })]; // duplicate name on purpose
   s.spot = { text: SPOT, illum: 'D50' };
   return s;
 }
@@ -44,4 +44,13 @@ export function stateC() {
 }
 /** D: like B but the failure has no note, so exports must be blocked. */
 export function stateD() { const s = stateB(); s.accepted = {}; return s; }
+/** E (D44): a full seven-color palette entered for review: three secondaries and three tertiaries, one extended color
+ * harmonized, names on some, a duplicate name across tiers, and spot values. */
+export function stateE() {
+  const s = stateA();
+  s.name = 'Full palette review';
+  s.supporting.secondary.push(rec({ hex: '#0083a8', origin: 'manual', lens: null, offset: null, name: 'Harbour Teal', rationale: 'Links and focus.' }), rec({ hex: '#f2c14e', origin: 'manual', lens: null, offset: null, harmonize: true, rationale: 'Highlight yellow, harmonized.' }));
+  s.supporting.tertiary.push(rec({ hex: '#7a4fa0', origin: 'harmony:triadic', tier: 'low confidence', lens: 'triadic', offset: 120, name: 'Harbour Teal' }), rec({ hex: '#c2185b', origin: 'manual', lens: null, offset: null, locked: true }));
+  return s;
+}
 export const model = (s) => PE.buildExportModel(s, luts, { lex, date: DATE });

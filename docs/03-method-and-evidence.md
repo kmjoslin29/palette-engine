@@ -203,3 +203,15 @@ Reasons:
 - The journal's standing was not checked (low confidence). An impact factor is printed in the header with no source given.
 
 It was useful only for pointing to the sources in C26. The author's contact details are not recorded here.
+
+## How many supporting colors (D44, 2026-11-17)
+
+The tool offers up to three secondary and three tertiary colors, seven brand colors with the primary. What the count rests on, by evidence tier:
+
+- **Low confidence: practitioner guidance.** Agency and brand-guideline articles converge on 1–2 primary colors, 1–5 secondary and 1–4 accent or tertiary, with totals of 3–5 for most brands and 8–10 or more for large enterprise and government systems. None cites a study; they describe common practice. Examples read: TodayMade, "How many colors should a brand have?" (1–2 primary, 1–2 secondary or accent, 3 to 5 in total, "six colors or more" for complex products); Brafton (one main, three secondary and four tertiary colors used as neutrals in its own palette); a Webiano knowledge-base table (secondary 2–5, accent 1–2, neutrals 3–8, functional 3–4; no sources given).
+- **Supported but contested: perception.** Healey (1996), "Choosing effective colours for data visualization" (IEEE Visualization '96; UBC TR-96-10): in target-search tests with 38 observers, five colors gave consistently good performance, seven isoluminant colors was the most that could be shown at once while still allowing rapid and accurate identification (and only when chosen for color distance, linear separation and color category), and nine gave mixed results. The task is finding one colored element among others on a screen, not recognizing a brand, so it bounds how many brand colors people can tell apart at a glance rather than how many a brand should have.
+- **Well-established: the role model.** Material 3 builds one secondary and one tertiary tonal palette from the seed. Extra brand colors are handled as "extended" (custom) colors, each with color, on-color, container and on-container roles in light and dark, optionally harmonized toward the source color; Material Theme Builder and its Android harmonization codelab describe this.
+
+Three plus three sits in the middle of the practitioner ranges and at Healey's seven-color ceiling. Neutrals are not counted: the tool already builds neutral and neutral-variant palettes and the surface roles from the seed. A brand with more colors than seven can still be reviewed in two passes, but the color-blind and distinctness checks are only meaningful across the colors entered together.
+
+What the tool does with many colors: the Analyze step checks every pair of brand colors as entered under protan, deutan and tritan simulation (Machado et al. 2009, full severity; flagged under ΔE00 10, a convention), and the Checks step does the same for the role colors. With seven colors, some collapse is likely; the page asks for a label, shape or position instead of relying on color alone (WCAG 1.4.1), and does not block export for it.

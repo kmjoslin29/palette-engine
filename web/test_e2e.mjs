@@ -64,10 +64,11 @@ async function resolveFailures(page) {
   const t2 = await panelText(page);
   check('the spot scorer lists pasted names as approximate and skips the bad line', /\(approx\.\)/.test(t2) && /line 5/.test(t2));
   await goto(page, 'support');
-  await page.click('button:has-text("Use as secondary")');
-  check('a harmony candidate becomes the secondary, with its lens as origin', (await st(page)).supporting.secondary.origin.startsWith('harmony:'));
+  check('picks go to Secondary 1 by default', /A pick fills Secondary 1/.test(await panelText(page)));
+  await page.click('button:has-text("Use for Secondary 1")');
+  check('a harmony candidate becomes the secondary, with its lens as origin', (await st(page)).supporting.secondary[0].origin.startsWith('harmony:'));
   await page.fill('#manual-tertiary', '#2E7D32'); await page.press('#manual-tertiary', 'Enter');
-  check('a manual color becomes the tertiary', (await st(page)).supporting.tertiary?.hex === '#2e7d32');
+  check('a manual color becomes the tertiary', (await st(page)).supporting.tertiary[0]?.hex === '#2e7d32');
   await goto(page, 'palette');
   await page.click('.role:has(span:text-is("onSurface")) button:has-text("Override")'); await page.fill('#ov-hex', '#b0b0b0'); await page.click('button:has-text("Apply")');
   check('a role override is stored', (await st(page)).overrides.light.onSurface === '#b0b0b0');
@@ -123,7 +124,7 @@ async function resolveFailures(page) {
   await page.waitForSelector('text=From descriptor words');
   const s = (await st(page)).seed;
   check('the chosen candidate is a descriptor seed with a tier and the words kept', s.origin === 'descriptor' && !!s.tier && s.words.includes('trustworthy'), JSON.stringify(s));
-  await goto(page, 'support'); await page.click('button:has-text("Use as secondary")');
+  await goto(page, 'support'); await page.click('button:has-text("Use for Secondary 1")');
   const rem = await resolveFailures(page);
   check('path A reaches an exportable palette', rem === 0);
   await goto(page, 'export');
@@ -134,10 +135,157 @@ async function resolveFailures(page) {
   await ctx.close();
 }
 
+// ---- Path C: I have a palette (D44): enter an existing seven-color palette, review it, change it --------------------------------
+{
+  const { ctx, page, errors } = await openApp(browser, site.url);
+  await page.click('button:has-text("I have a palette")');
+  await page.fill('#pal-primary', 'Kiln Terracotta #B5532A');
+  await page.fill('#pal-secondary-0', 'Harbour Teal #0083A8');
+  for (const [tier, vals] of [['secondary', ['#F2C14E', 'Oat, #E8DCC4']], ['tertiary', ['Plum oklch(0.45 0.12 330)', 'not a color']]]) {
+    for (const v of vals) { await page.click(`button:has-text("Add a ${tier} color")`); const n = await page.$$eval(`input[id^="pal-${tier}-"]`, (l) => l.length); await page.fill(`#pal-${tier}-${n - 1}`, v); }
+  }
+  await page.fill('#pal-tertiary-0', 'Fern Green #5B7F3A');
+  check('palette entry: no fourth field can be added to a tier', (await page.$$('button:has-text("Add a secondary color")')).length === 0 && (await page.$$eval('input[id^="pal-secondary-"]', (l) => l.length)) === 3);
+  await page.click('button:has-text("Use this palette")');
+  check('palette entry: an unreadable color is flagged on its own field and nothing is set', (await page.$eval('#pal-tertiary-2', (e) => e.closest('.field').classList.contains('err'))) && (await st(page)).seed === null);
+  await page.fill('#pal-tertiary-2', '#C2185B'); await page.click('button:has-text("Use this palette")');
+  await page.waitForSelector('text=Your seed');
+  let s = await st(page);
+  check('palette entry: the primary becomes the seed with its name', s.seed.hex === '#b5532a' && s.seed.name === 'Kiln Terracotta' && s.seed.origin === 'manual');
+  check('palette entry: three secondary and three tertiary colors, in order, with names split from colors', s.supporting.secondary.map((x) => x.hex).join() === '#0083a8,#f2c14e,#e8dcc4' && s.supporting.tertiary.map((x) => x.hex).join() === '#5b7f3a,#793974,#c2185b' && s.supporting.secondary[2].name === 'Oat' && s.supporting.tertiary[1].name === 'Plum' && !('name' in s.supporting.secondary[1]));
+  check('palette entry: a typed hex is never flagged as beyond sRGB', !s.supporting.secondary[0].mappedFrom && !s.seed.mappedFrom);
+  await page.fill('#pal-primary', '#1F5FA8'); await page.click('button:has-text("Use this palette")');
+  check('palette entry: replacing existing colors asks first', /This replaces your current colors/.test(await panelText(page)) && (await st(page)).seed.hex === '#b5532a');
+  await page.click('button:has-text("Cancel")'); await page.fill('#pal-primary', 'Kiln Terracotta #B5532A');
+
+  await page.click('button:has-text("Continue to analysis")'); await page.waitForSelector('text=Analyze the palette');
+  let t = await panelText(page);
+  check('Analyze: every color at a glance, seven rows, with CMYK, gamut, contrast and a color-blind verdict', /Every color at a glance \(7\)/.test(t) && (await page.$eval('#panel table', (tb) => tb.querySelectorAll('tbody tr').length)) === 7);
+  check('Analyze: colors that collapse under color-blind views are named', /Close under color-blind simulation/.test(t) && /Close to/.test(t));
+  await page.click('#panel button[aria-label="Show details for Tertiary 2"]');
+  t = await panelText(page);
+  check('Analyze: Details moves the detail view to that color and focuses its heading', (await st(page)).focus === 'tertiary2' && /Details: Tertiary 2 · Plum/.test(t) && (await page.evaluate(() => document.activeElement.id)) === 'detail-title' && t.includes('#793974'));
+  check('Analyze: the spot scorer names the color it scores against', /scored against Tertiary 2/.test(t));
+  await page.click('#panel [aria-label="Color to analyze"] button:has-text("Secondary 3")');
+  check('Analyze: the switcher shows one pressed color', (await st(page)).focus === 'secondary3' && (await page.$$eval('#panel [aria-label="Color to analyze"] button[aria-pressed="true"]', (b) => b.length)) === 1);
+
+  await goto(page, 'support');
+  t = await panelText(page);
+  check('Supporting: both tiers are full (3 of 3) and say which colors set the core roles', (t.match(/3 of 3/g) || []).length === 2 && /Sets Material's secondary role palette/.test(t) && /Extended color: its own tertiary3/.test(t));
+  check('Supporting: no Beyond-sRGB warning for colors typed as hex', !/Beyond sRGB\./.test(t));
+  await page.click('.chip:has-text("Tertiary 2 ·")');
+  check('Supporting: a candidate goes to the slot chosen under Send picks to', /A pick replaces Tertiary 2 \(#793974\)/.test(await panelText(page)) && (await page.$$('button:has-text("Use for Tertiary 2")')).length > 0);
+  await page.click('article.card >> nth=0 >> button:has-text("Use for Tertiary 2")');
+  s = await st(page);
+  check('Supporting: the pick replaces that slot and keeps its name', s.supporting.tertiary[1].origin.startsWith('harmony:') && s.supporting.tertiary[1].name === 'Plum' && s.supporting.tertiary.length === 3);
+  const harm = page.locator('.slot:has(h3:text-is("Secondary 2")) [role="switch"]:has-text("Harmonize")');
+  await harm.click();
+  t = await panelText(page);
+  check('Supporting: harmonize is per color, says what it moves and keeps the brand token', (await st(page)).supporting.secondary[1].harmonize === true && /Roles are built from #[0-9A-F]{6}: hue [-+]?\d/.test(t) && /The brand token keeps #F2C14E/.test(t));
+  check('Supporting: Secondary 1 and Tertiary 1 have no harmonize switch', (await page.$$('.slot:has(h3:text-is("Secondary 1")) [role="switch"]:has-text("armoniz")')).length === 0);
+  await page.click('.slot:has(h3:text-is("Secondary 2")) button:has-text("Move up to Secondary 1")');
+  s = await st(page);
+  check('Supporting: Move up swaps the two colors', s.supporting.secondary[0].hex === '#f2c14e' && s.supporting.secondary[1].hex === '#0083a8');
+  await page.click('.slot:has(h3:text-is("Secondary 1")) button:has-text("Remove")');
+  s = await st(page);
+  check('Supporting: removing Secondary 1 moves the next color up and announces it', s.supporting.secondary.map((x) => x.hex).join() === '#0083a8,#e8dcc4' && /moved up to Secondary 1/.test(await page.textContent('#live')));
+  await page.click('button:has-text("Add a secondary color")');
+  await page.fill('#manual-secondary3', '#F2C14E'); await page.press('#manual-secondary3', 'Enter');
+  check('Supporting: Add a secondary color fills the next slot', (await st(page)).supporting.secondary.length === 3 && (await st(page)).supporting.secondary[2].hex === '#f2c14e');
+  await page.click('.slot:has(h3:text-is("Tertiary 3")) [role="switch"]:has-text("Lock")');
+  check('Supporting: a locked color cannot be removed, moved or harmonized', await page.$eval('.slot:has(h3:text-is("Tertiary 3"))', (el) => [...el.querySelectorAll('button')].filter((b) => /Remove|Move up|Set/.test(b.textContent) || /armoniz/.test(b.textContent)).every((b) => b.disabled)));
+
+  await goto(page, 'palette');
+  t = await panelText(page);
+  check('Palette: extended colors have their own role groups and tonal palettes', /Secondary 2 \(extended\)/.test(t) && /Tertiary 3 \(extended\)/.test(t) && (await page.$$('.role:has(span:text-is("onSecondary3Container"))')).length === 1 && (await page.$$('[aria-label="tertiary3 tonal palette"]')).length === 1);
+  // on-color set to the role color itself (1:1), so the pair must fail
+  const sec2 = (await page.$eval('.role:has(span:text-is("secondary2")) .mono.muted', (e) => e.textContent)).slice(0, 7).toLowerCase();
+  await page.click('.role:has(span:text-is("onSecondary2")) button:has-text("Override")'); await page.fill('#ov-hex', sec2); await page.click('button:has-text("Apply")');
+  check('Palette: an extended role can be overridden, and a failure there blocks export', (await st(page)).overrides.light.onSecondary2 === sec2 && /Export blocked/.test(await panelText(page)), sec2);
+  const rem = await resolveFailures(page);
+  check('Palette: the extended failure can be accepted with a note', rem === 0 && Object.keys((await st(page)).accepted).some((k) => k.includes('onSecondary2')));
+  await goto(page, 'checks');
+  t = await panelText(page);
+  check('Checks: color-blind views list the extended roles and the brand colors as entered', /secondary3/.test(t) && /Brand colors as entered/.test(t) && /Harmonized/.test(t));
+  await goto(page, 'export');
+  const files = await download(page, '#exp-all'); const z = readZip(files.bytes); const names = Object.keys(z);
+  const tok = JSON.parse(z[names.find((n) => n.endsWith('-design-tokens.json'))].toString());
+  const css = z[names.find((n) => n.endsWith('-colors.css'))].toString();
+  check('Export: tokens and CSS carry the extended roles and brand colors', tok.color.role.onTertiary3Container && tok.color.brand.secondary3 && /--color-role-on-secondary2-container/.test(css) && /--color-brand-tertiary3/.test(css));
+  const proj = PE.parseProject(z[names.find((n) => n.endsWith('.palette-project.json'))].toString());
+  check('Export: the project file reloads with all seven colors, the override and the accepted note', proj.ok && proj.state.supporting.secondary.length === 3 && proj.state.supporting.tertiary.length === 3 && proj.state.overrides.light.onSecondary2 === sec2 && Object.keys(proj.state.accepted).some((k) => k.includes('onSecondary2')));
+  check('path C: zero console errors, page errors or failed requests', errors.length === 0, errors.join(' | '));
+  await ctx.close();
+}
+
+// ---- review fixes for pe-update62: notes and overrides follow the color; locks are respected ------------------------------
+{
+  const base = PE.defaultState();
+  const m = (hex, extra) => ({ hex, origin: 'manual', tier: null, rationale: '', locked: false, lens: null, offset: null, ...(extra || {}) });
+  base.seed = { hex: '#1f5fa8', origin: 'manual', tier: null, rationale: '', locked: false };
+  base.supporting.secondary = [m('#d9822b'), m('#0083a8'), m('#f2c14e')];
+  base.overrides.light.onSecondary2 = '#0083a8';
+  base.accepted['light|onSecondary2|secondary2|text'] = 'Note written about the teal.';
+  base.accepted['light|onSecondary3|secondary3|text'] = 'Note written about the gold.';
+  base.focus = 'secondary3'; base.target = 'secondary3';
+  const { ctx, page, errors } = await openApp(browser, site.url, { state: base, step: 'support' });
+  await page.click('.slot:has(h3:text-is("Secondary 1")) button:has-text("Remove")');
+  let s = await st(page);
+  check('review: after Remove, an override moves with its color (teal is now Secondary 1)', s.overrides.light.onSecondary === '#0083a8' && !('onSecondary2' in s.overrides.light), JSON.stringify(s.overrides));
+  check('review: after Remove, accepted notes move with their colors', s.accepted['light|onSecondary|secondary|text'] === 'Note written about the teal.' && s.accepted['light|onSecondary2|secondary2|text'] === 'Note written about the gold.' && !('light|onSecondary3|secondary3|text' in s.accepted), JSON.stringify(s.accepted));
+  check('review: the Analyze focus and the pick target follow the color', s.focus === 'secondary2' && s.target === 'secondary2', `${s.focus} ${s.target}`);
+  await page.click('button:has-text("Add a secondary color")'); await page.fill('#manual-secondary3', '#7a4fa0'); await page.press('#manual-secondary3', 'Enter');
+  s = await st(page);
+  check('review: a newly added color inherits no override or note from a removed one', !Object.keys(s.overrides.light).some((r) => /3/.test(r)) && !Object.keys(s.accepted).some((k) => /3/.test(k)));
+  await page.click('.slot:has(h3:text-is("Secondary 2")) button:has-text("Move up")');
+  s = await st(page);
+  check('review: Move up carries notes with the colors', s.accepted['light|onSecondary|secondary|text'] === 'Note written about the gold.' && s.accepted['light|onSecondary2|secondary2|text'] === 'Note written about the teal.');
+  await page.click('.slot:has(h3:text-is("Secondary 3")) [role="switch"]:has-text("Lock")');
+  check('review: a color cannot be removed while a locked color below it would move up', await page.$eval('.slot:has(h3:text-is("Secondary 1")) button:text-is("Remove")', (b) => b.disabled) && await page.$eval('.slot:has(h3:text-is("Secondary 2")) button:text-is("Remove")', (b) => b.disabled) && !(await page.$eval('.slot:has(h3:text-is("Secondary 3")) button:text-is("Remove")', (b) => b.disabled === false)));
+  // a seed locked while the replace question is open cannot be replaced
+  await goto(page, 'seed'); await page.click('button:has-text("I have a palette")');
+  await page.fill('#pal-primary', '#B5532A');
+  check('review: Use this palette is refused while any color is locked', (await page.$eval('button:has-text("Use this palette")', (b) => b.disabled)) && /A color is locked/.test(await panelText(page)) && (await st(page)).seed.hex === '#1f5fa8');
+  check('review: palette-entry fields cap their length', (await page.getAttribute('#pal-primary', 'maxlength')) === '120');
+  check('review fixes: zero console errors', errors.length === 0, errors.join(' | '));
+  await ctx.close();
+}
+{
+  // a seed that gets locked after the replace question opened is still protected
+  const base = PE.defaultState();
+  base.seed = { hex: '#1f5fa8', origin: 'manual', tier: null, rationale: '', locked: false }; base.path = 'palette';
+  base.paletteInput = { primary: '#B5532A', secondary: ['#0083A8', 'bad', 'bad too'], tertiary: [''] };
+  const { ctx, page } = await openApp(browser, site.url, { state: base, step: 'seed' });
+  await page.click('button:has-text("Use this palette")');
+  check('review: errors show on the rows that hold them (a word like "bad" is not read as the hex #BBAADD)', await page.$eval('#pal-secondary-1', (e) => e.closest('.field').classList.contains('err')) && await page.$eval('#pal-secondary-2', (e) => e.closest('.field').classList.contains('err')));
+  await page.click('button[aria-label="Remove Secondary 2 (extended)"]');
+  check('review: removing a row clears that tier\'s stale errors instead of shifting them', !(await page.$eval('#pal-secondary-1', (e) => e.closest('.field').classList.contains('err'))));
+  await page.fill('#pal-secondary-1', '#F2C14E'); await page.click('button:has-text("Use this palette")');
+  check('review: replacing existing work asks first', /Replace them/.test(await panelText(page)));
+  await page.click('.slot.filled [role="switch"]');
+  check('review: locking the seed while the question is open hides Replace them', (await st(page)).seed.locked === true && !/Replace them/.test(await panelText(page)));
+  await ctx.close();
+}
+
+// ---- version 1 work kept in browser storage opens in the new format --------------------------------------------------------
+{
+  const v1 = JSON.parse(fs.readFileSync('engine/fixtures/project_v1_fernhill.json', 'utf8')).state;
+  const { ctx, page, errors } = await openApp(browser, site.url, { state: v1 });
+  await page.waitForSelector('#panel-title');
+  const s = await st(page);
+  check('a version 1 state in browser storage is restored, migrated to lists', s.v === 2 && s.seed.hex === v1.seed.hex && s.supporting.secondary.length === 1 && s.supporting.secondary[0].hex === v1.supporting.secondary.hex && /Restored/.test(await page.textContent('#savestate')));
+  check('version 1 restore: zero console errors', errors.length === 0, errors.join(' | '));
+  await ctx.close();
+}
+
 // ---- every step, light and dark, phone and desktop ---------------------------------------------------------------------------
 const sample = PE.defaultState();
 sample.name = 'Sweep test'; sample.seed = { hex: '#1f5fa8', origin: 'manual', tier: null, rationale: 'Sweep.', locked: false, mappedFrom: null };
-sample.supporting.secondary = { hex: '#d9822b', origin: 'harmony:complementary', tier: 'low confidence', lens: 'complementary', offset: 180, rationale: '', locked: false };
+sample.supporting.secondary = [{ hex: '#d9822b', origin: 'harmony:complementary', tier: 'low confidence', lens: 'complementary', offset: 180, rationale: '', locked: false },
+  { hex: '#0083a8', origin: 'manual', tier: null, lens: null, offset: null, rationale: '', locked: false, name: 'Harbour Teal', harmonize: true }];
+sample.supporting.tertiary = [{ hex: '#2e7d32', origin: 'manual', tier: null, lens: null, offset: null, rationale: '', locked: false },
+  { hex: '#7a4fa0', origin: 'manual', tier: null, lens: null, offset: null, rationale: '', locked: true }];
+sample.paletteInput = { primary: 'Harbor Blue #1F5FA8', secondary: ['#D9822B', 'Harbour Teal #0083A8'], tertiary: ['#2E7D32', '#7A4FA0'] };
 sample.spot = { text: SPOT, illum: 'D50' };
 sample.words = 'calm, bold'; sample.searched = true;
 for (const scheme of ['light', 'dark']) for (const width of [375, 1100]) {
@@ -145,7 +293,13 @@ for (const scheme of ['light', 'dark']) for (const width of [375, 1100]) {
   let worst = 0, audited = 0, badNames = [], fails = [];
   for (const id of STEPS) {
     await goto(page, id);
-    if (id === 'seed') { await page.click('button:has-text("I have words")'); }
+    if (id === 'seed') { // audit the palette-entry view too, then leave the words view open for the main audit
+      await page.click('button:has-text("I have a palette")');
+      worst = Math.max(worst, await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth));
+      const ap = await contrastAudit(page); audited += ap.count; fails.push(...ap.fail.map((f) => `seed/palette: ${f.t}`));
+      badNames.push(...(await page.$$eval('#panel button, #panel input, #panel textarea', (els) => els.filter((e) => e.type !== 'file' && !(e.getAttribute('aria-label') || (e.labels && e.labels.length) || e.textContent.trim() || e.getAttribute('title'))).map((e) => `${e.tagName}#${e.id}`))));
+      await page.click('button:has-text("I have words")');
+    }
     worst = Math.max(worst, await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth));
     const au = await contrastAudit(page); audited += au.count; fails.push(...au.fail.map((f) => `${id}: ${f.t}`));
     badNames.push(...(await page.$$eval('#panel button, #panel input, #panel textarea, #panel select', (els) => els.filter((e) => e.type !== 'file' && !(e.getAttribute('aria-label') || (e.labels && e.labels.length) || e.textContent.trim() || e.getAttribute('title'))).map((e) => `${e.tagName}#${e.id}`))));

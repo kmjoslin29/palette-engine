@@ -1,10 +1,10 @@
 {
   "format": "palette-engine-project",
-  "version": 1,
+  "version": 2,
   "app": "Palette Engine",
   "savedAt": "2026-09-28T12:00:00.000Z",
   "state": {
-    "v": 1,
+    "v": 2,
     "step": "export",
     "name": "Fernhill Bakery",
     "path": "known",
@@ -12,40 +12,55 @@
     "words": "",
     "searched": false,
     "seed": {
+      "hex": "#b5532a",
+      "origin": "manual",
       "tier": null,
       "rationale": "Fired clay and the inside of a brick oven. Chosen by the client before the project began, so it is locked and the rest of the palette is built around it.",
       "locked": true,
-      "hex": "#b5532a",
-      "origin": "manual",
-      "mappedFrom": null,
-      "name": "Kiln Terracotta"
+      "name": "Kiln Terracotta",
+      "mappedFrom": null
     },
     "profile": "gracol2013_crpc6",
     "lens": "complementary",
     "offsets": {},
     "filters": {},
     "supporting": {
-      "secondary": {
-        "tier": "low confidence",
-        "rationale": "Complement of the terracotta, used sparingly for links and focus states. The complement rule is low-confidence evidence; it was kept because it reads clearly against the warm seed.",
-        "locked": false,
-        "hex": "#0083a8",
-        "origin": "harmony:complementary",
-        "lens": "complementary",
-        "offset": 180,
-        "name": "Harbour Teal"
-      },
-      "tertiary": {
-        "tier": null,
-        "rationale": "Named after the street. Used for success states and the seasonal menu.",
-        "locked": false,
-        "hex": "#5b7f3a",
-        "origin": "manual",
-        "lens": null,
-        "offset": null,
-        "name": "Fern Green"
-      }
+      "secondary": [
+        {
+          "hex": "#0083a8",
+          "origin": "harmony:complementary",
+          "tier": "low confidence",
+          "rationale": "Complement of the terracotta, used sparingly for links and focus states. The complement rule is low-confidence evidence; it was kept because it reads clearly against the warm seed.",
+          "locked": false,
+          "name": "Harbour Teal",
+          "lens": "complementary",
+          "offset": 180
+        }
+      ],
+      "tertiary": [
+        {
+          "hex": "#5b7f3a",
+          "origin": "manual",
+          "tier": null,
+          "rationale": "Named after the street. Used for success states and the seasonal menu.",
+          "locked": false,
+          "name": "Fern Green",
+          "lens": null,
+          "offset": null
+        }
+      ]
     },
+    "paletteInput": {
+      "primary": "",
+      "secondary": [
+        ""
+      ],
+      "tertiary": [
+        ""
+      ]
+    },
+    "focus": "primary",
+    "target": "secondary",
     "overrides": {
       "light": {
         "outline": "#b9aea8"

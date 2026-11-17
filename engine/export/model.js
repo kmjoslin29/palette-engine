@@ -8,12 +8,14 @@ import { parseEntries, score } from '../spot.js';
 import { accessibilityOf, LENSES, TIER_NOTE, WHEEL, ouLuoHarmony } from '../harmony.js';
 import { cvdDistinctPairs } from '../checks.js';
 import { indexLexicon, matchDescriptors } from '../matcher.js';
-import { PRINT_PROFILES, PRINT_REGIONS, acceptKey } from '../project.js';
+import { PRINT_PROFILES, PRINT_REGIONS, acceptKey, supportSlots, supportingForPalette } from '../project.js';
 
 export const NS = 'com.kwadejoslin.palette';
 export const GENERATOR = { name: 'Palette Engine', phase: 5 };
 export const SLOTS = [['primary', 'Primary'], ['secondary', 'Secondary'], ['tertiary', 'Tertiary']];
 export const PALETTE_KEYS = { primary: 'primary', secondary: 'secondary', tertiary: 'tertiary', neutral: 'neutral', neutralVariant: 'neutral-variant', error: 'error' };
+/** Tonal palette keys and token names, core first, then each extended color (secondary2 ...) in slot order. */
+export const paletteKeysOf = (pal) => ({ ...PALETTE_KEYS, ...Object.fromEntries((pal.extended || []).map((e) => [e.id, e.id])) });
 
 export class ExportBlockedError extends Error {
   constructor(items) {
@@ -74,8 +76,7 @@ function evidenceFor(slot, rec, seedHex, ctx) {
 export function buildExportModel(state, luts = {}, ctx = {}) {
   if (!state || !state.seed) throw new Error('A seed color is needed before anything can be exported.');
   const date = ctx.date || new Date().toISOString().slice(0, 10);
-  const supporting = ['secondary', 'tertiary'].filter((k) => state.supporting[k]).map((k) => ({ role: k, hex: state.supporting[k].hex }));
-  const palette = buildPalette(state.seed.hex, supporting, { overrides: state.overrides });
+  const palette = buildPalette(state.seed.hex, supportingForPalette(state), { overrides: state.overrides });
   const printReady = PRINT_PROFILES.every((p) => luts[p.id]);
   const printCache = new Map();
   const printOf = (hex) => {
@@ -98,15 +99,18 @@ export function buildExportModel(state, luts = {}, ctx = {}) {
   };
 
   const colors = [];
-  const slotRecs = [['primary', state.seed], ['secondary', state.supporting.secondary], ['tertiary', state.supporting.tertiary]];
-  for (const [slot, rec] of slotRecs) {
-    if (!rec) continue;
+  // Slot ids: primary, secondary, secondary2, secondary3, tertiary, tertiary2, tertiary3 (D44). A tier with one color keeps
+  // the label it had before ("Secondary"), so a project with one of each exports exactly as it did.
+  const slots = supportSlots(state);
+  const tierCount = (t) => slots.filter((x) => x.tier === t).length;
+  const slotRecs = [['primary', state.seed, 'Primary', 'primary'], ...slots.map((x) => [x.id, x.rec, tierCount(x.tier) > 1 ? x.label : SLOTS.find(([k]) => k === x.tier)[1], x.tier])];
+  for (const [slot, rec, label, tier] of slotRecs) {
     const a = analyze(rec.hex, {});
     const acc = accessibilityOf(rec.hex);
     const cvd = slot === 'primary' ? [] : cvdDistinctPairs({ seed: state.seed.hex, candidate: rec.hex }).map((f) => ({ type: f.type, dE00: f.dE00 }));
-    const label = SLOTS.find(([k]) => k === slot)[1];
+    const ext = (palette.extended || []).find((e) => e.id === slot);
     colors.push({
-      id: slot, slot, role: slot, name: (rec.name || '').trim() || label, hex: rec.hex.toLowerCase(), origin: rec.origin, locked: !!rec.locked,
+      id: slot, slot, slotTier: tier, label, role: slot, ...(ext ? { harmonized: ext.harmonized } : {}), name: (rec.name || '').trim() || label, hex: rec.hex.toLowerCase(), origin: rec.origin, locked: !!rec.locked,
       tier: rec.tier || null, rationale: rec.rationale || '',
       screen: { hex: rec.hex.toLowerCase(), srgb: a.screen.srgb, oklch: a.screen.oklch, hct: a.screen.hct, p3Only: !!rec.mappedFrom, mappedFrom: rec.mappedFrom ? { l: round(rec.mappedFrom.l, 2), c: round(rec.mappedFrom.c, 3), h: round(rec.mappedFrom.h) } : null },
       labD50: { l: round(a.labD50.l, 1), a: round(a.labD50.a, 1), b: round(a.labD50.b, 1) },

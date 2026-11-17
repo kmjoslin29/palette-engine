@@ -17,6 +17,7 @@ Each format is parsed back by a reader that shares no code with the writer, in t
 
 ## Rules
 
+- **Extended colors (D44).** Secondary 2–3 and Tertiary 2–3 appear in every format: brand tokens (`secondary2` … `tertiary3`), a tonal palette each, four roles each in light and dark (`secondary2`, `onSecondary2`, `secondary2Container`, `onSecondary2Container`; CSS `--color-role-on-secondary2-container`), a section in the Markdown spec, a page of extended roles in the PDF, and the ASE swatches (and tone swatches when asked). A project with one secondary and one tertiary exports exactly as before.
 - **Blocked by accessibility.** All outputs except the project file are blocked while any WCAG AA role-pair failure has neither a fix nor an accepted note.
 - **Notes travel.** Every rationale, lock and accepted-failure note appears in the Markdown spec and the PDF, and in the token files' extension data.
 - **Nothing hidden.** A note that no longer matches a failing pair (because a color changed) is kept and marked stale rather than deleted.
