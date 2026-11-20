@@ -189,6 +189,14 @@ async function resolveFailures(page) {
   await goto(page, 'export');
   t = await panelText(page);
   check('Export: the summary says what is kept, replaced and added before anything is saved', /What will export/.test(t) && /Supporting colors: 5 kept, 1 replaced\./.test(t) && new RegExp(`#793974 → ${propHex.toUpperCase()}`).test(t));
+  check('Export: the palette review is offered once a proposal exists, apart from the final files', (await page.$$('#exp-review')).length === 1 && /Before you choose/.test(t) && /not part of Download all/.test(t));
+  const rvf = await download(page, '#exp-review');
+  check('Export: the palette review downloads as a PDF named -palette-review.pdf', /-palette-review\.pdf$/.test(rvf.name) && rvf.bytes.subarray(0, 5).toString() === '%PDF-' && rvf.bytes.length > 5000);
+  await goto(page, 'checks');
+  t = await panelText(page);
+  check('Checks: the comparison sits at the top with both columns and a plain sentence per proposal (D48)', /Brand as entered against the proposals/.test(t) && /With the proposals/.test(t) && /Tertiary 2: #793974 or/.test(t) && /The proposal is ΔE00 \d+\.\d from the existing color/.test(t));
+  check('Checks: the comparison comes before the WCAG summary', await page.evaluate(() => { const hs = [...document.querySelectorAll('#panel h3')].map((x) => x.textContent); return hs.indexOf('Brand as entered against the proposals') === 0; }));
+  await goto(page, 'export');
   await page.click('#panel button:has-text("Change in Supporting colors")');
   check('Export: Change in Supporting colors goes back to Step 3', (await st(page)).step === 'support');
   await page.click('#cmp-tertiary2 button:has-text("Use existing")');
@@ -466,6 +474,7 @@ for (const scheme of ['light', 'dark']) for (const width of [375, 1100]) {
   check('D47: neutrals get no role group of their own', !/Neutral 1/.test(await panelText(page)) && (await page.$$('[aria-label="tertiary2 tonal palette"]')).length === 0);
   await goto(page, 'export');
   t = await panelText(page);
+  check('D48: with no proposals there is no palette review to save', (await page.$$('#exp-review')).length === 0);
   check('D47: the export summary lists the brand neutrals as swatches only', /Supporting colors: 3 kept, 2 brand neutrals\./.test(t) && /Swatch only, no roles/.test(t));
   await goto(page, 'support');
   await page.click('.slot:has(h3:text-is("Neutral 2")) button:has-text("Move back to Tertiary colors")');

@@ -240,3 +240,6 @@ fieldset.radios legend { padding: 0 0 4px; font-size: 12px; letter-spacing: 0.06
 .cmp-gap { flex: 0 1 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 2px; }
 @media (max-width: 560px) { .cmp-row { flex-direction: column; } .cmp-gap { flex: none; flex-direction: row; gap: 8px; } .cmp-side { flex: none; } }
 .seg button[disabled] { opacity: .38; cursor: not-allowed; } .seg button[disabled]::before { display: none; }
+/* Brand as entered against the proposals (D48): fewer is better, so a lower count reads as pass. Words carry it too. */
+.pass-text { color: var(--pass); font-weight: 600; } .fail-text { color: var(--fail); font-weight: 600; }
+.cmp-say { border-top: 1px solid var(--line); padding-top: 8px; }

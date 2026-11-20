@@ -10,9 +10,9 @@ import { contrastRatio } from '../checks.js';
 import { assertExportable, pairLabel, shortCite, oklchText, tacText, byRegion } from './model.js';
 
 export const PAGE = { w: 612, h: 792 }; // US Letter, points
-const M = { l: 48, r: 48, top: 54, bottom: 76 };
-const CW = PAGE.w - M.l - M.r;
-const INK = '#1b1b1f', MUTED = '#55555c', RULE = '#c9c9d0', SOFT = '#f3f3f6', PASS = '#1b6b2f', FAIL = '#a01c1c', WARN = '#8a5a00';
+export const M = { l: 48, r: 48, top: 54, bottom: 76 };
+export const CW = PAGE.w - M.l - M.r;
+export const INK = '#1b1b1f', MUTED = '#55555c', RULE = '#c9c9d0', SOFT = '#f3f3f6', PASS = '#1b6b2f', FAIL = '#a01c1c', WARN = '#8a5a00';
 
 // --- text safety -----------------------------------------------------------------------------------------------------
 const WIN = new Set([...'€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ']);
@@ -28,11 +28,12 @@ export function pdfSafe(str, replaced = null) {
   }
   return out;
 }
-const hexRgb = (hex) => { const n = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255); return rgb(n[0], n[1], n[2]); };
-const inkOn = (hex) => (contrastRatio('#000000', hex) >= contrastRatio('#ffffff', hex) ? '#000000' : '#ffffff');
-const cmykText = (c) => `${c[0]} / ${c[1]} / ${c[2]} / ${c[3]}`;
+export const hexRgb = (hex) => { const n = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255); return rgb(n[0], n[1], n[2]); };
+export const inkOn = (hex) => (contrastRatio('#000000', hex) >= contrastRatio('#ffffff', hex) ? '#000000' : '#ffffff');
+export const cmykText = (c) => `${c[0]} / ${c[1]} / ${c[2]} / ${c[3]}`;
 
-class Sheet {
+/** Layout cursor and drawing helpers, shared by the brand color sheet and the palette review (D48). */
+export class Sheet {
   constructor(pdf, fonts, model) {
     this.pdf = pdf; this.f = fonts; this.model = model; this.replaced = new Set(); this.boxes = []; this.pages = [];
     this.newPage();

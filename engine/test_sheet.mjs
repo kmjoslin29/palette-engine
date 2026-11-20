@@ -106,6 +106,19 @@ function pairLabel(f) { return PE.pairLabel(f); }
   check('F: the replaced color\'s page says what it replaces', t.includes(squash('replaces the existing #0083A8')));
   const pages = words(r.file); check('F: nothing on the sheet runs outside the margins or into the footer', outside(pages).length === 0 && straddle(pages).length === 0, [...outside(pages), ...straddle(pages)].slice(0, 6).join(' '));
 }
+{ // D48: the palette review PDF, checked the same way as the brand color sheet
+  const F = stateF(); const mF = model(F);
+  const f = await PE.buildFile('review', mF, F); const file = dir + 'review_F.pdf'; fs.writeFileSync(file, f.data);
+  const doc = await PDFDocument.load(f.data); const pages = words(file); const t = squash(run('pdftotext', [file, '-']).stdout);
+  check('review: every page is US Letter, and pdftotext agrees', doc.getPages().every((p) => { const { width, height } = p.getSize(); return width === 612 && height === 792; }) && pages.length === doc.getPageCount());
+  const q = run('qpdf', ['--check', file]); check('review: qpdf --check finds no structural problems', q.status === 0, q.stdout + q.stderr);
+  check('review: summary, strips, one page per proposal (2) and the notes page: 5 pages', doc.getPageCount() === 5);
+  check('review: every page says it is a review draft', pages.every((p) => squash(p.words.map((w) => w.t).join(' ')).includes(squash('Review draft, not final colors'))));
+  check('review: the comparison table and the four vision rows are there', t.includes(squash('Brand as entered')) && t.includes(squash('With the proposals')) && ['Typical color vision', 'Protanopia', 'Deuteranopia', 'Tritanopia'].every((x) => t.includes(squash(x))));
+  check('review: each proposal page has both colors and a decision box', t.includes(squash('Secondary 2: Harbour Teal')) && t.includes('#0083A8') && t.includes('#00739A') && (t.match(/Keepexisting/g) || []).length === 2 && (t.match(/Useproposal/g) || []).length === 2);
+  check('review: dE00 is written as dE00, never "Delta E00"', !t.includes('DeltaE00'));
+  check('review: nothing runs outside the margins or into the footer', outside(pages).length === 0 && straddle(pages).length === 0, [...outside(pages), ...straddle(pages)].slice(0, 6).join(' '));
+}
 check('control: text missing from a PDF is detected', !squash('nothing here').includes(squash(stateA().seed.rationale)));
 console.log(fails ? `\n${fails} FAILED` : '\nALL PASS');
 process.exit(fails ? 1 : 0);

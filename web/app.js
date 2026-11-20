@@ -560,13 +560,7 @@ function emptySlot(tier, i) {
     manualEntry(tier, i),
     i > 0 && h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn text', onclick: () => { supportUi.open[tier] = false; if (t.id === id) setTarget(tier, 0); commit(); } }, 'Cancel')));
 }
-/**
- * Distance labels for a proposal against the existing color (D47). "Within print tolerance" follows reproduction practice
- * (ISO 12647-2 allows 3.5 ΔE00 for CMY solids; brand-color studies put acceptability near 3). The 10 boundary is this tool's
- * own label, not a standard: no standard says when a deliberate change stops reading as the same color.
- */
-function distanceLabel(d) { return d <= 3 ? 'Within print tolerance' : d <= 10 ? 'Visible adjustment' : 'New color'; }
-const deBetween = (a, b) => Math.round(PE.de00(PE.labD50(a), PE.labD50(b)) * 10) / 10;
+const distanceLabel = PE.distanceLabel, deBetween = PE.deBetween; // D47 labels live in the engine (review.js)
 /** Existing color beside its proposal, the distance between them, and the switch that decides which one exports (D47). */
 function compareBlock(tier, i, s) {
   const p = s.proposal; const label = slotLabel(tier, i); const use = PE.choiceOf(s);
@@ -811,12 +805,40 @@ function originSection() {
   const rows = recs.map(([label, v, i, x]) => [label, h('span', { class: 'mono' }, v.hex.toUpperCase()), x === 'neutral' ? 'Brand neutral' : choiceText(x), v.origin, v.tier ? tierPill(v.tier) : 'Your choice', v.locked ? 'Yes' : 'No', i ? (x.stored.harmonize ? 'Yes (roles only)' : 'No') : '—', v.rationale || '—']);
   return h('div', { class: 'sect stack' }, h('h3', null, 'Where each color came from'), table(['Role', 'Color', 'Choice', 'Origin', 'Evidence tier', 'Locked', 'Harmonized', 'Rationale'], rows));
 }
+/** The comparison model (D48) with the default print profile when the tables have loaded. */
+function reviewNow() {
+  const id = PE.PRINT_PROFILES[0].id;
+  const printOf = lutStatus === 'ready' ? (hex) => { const p = PE.analyze(hex, luts).print[id]; return { [id]: { cmyk: p.cmyk, inGamut: p.inGamut, printableNeighbor: p.printableNeighbor.hex } }; } : null;
+  return PE.reviewModel(S, { printOf });
+}
+/** Top of Checks when any slot has a proposal: the brand as entered against the proposals (D48). */
+function comparisonSection() {
+  if (!S.seed || !PE.supportSlots(S).some((x) => x.stored.proposal)) return null;
+  const rv = reviewNow(); const te = rv.totals.existing, tp = rv.totals.proposed;
+  const cell = (a, b) => h('span', { class: b < a ? 'pass-text' : b > a ? 'fail-text' : '' }, String(b), b < a ? ' (fewer)' : b > a ? ' (more)' : '');
+  const rows = [
+    ['Brand colors that look alike to someone color-blind (pairs under ΔE00 10)', te.brandCvd, tp.brandCvd],
+    ['Key roles that collapse under color-blind views, light (pairs)', te.roleCvdLight, tp.roleCvdLight],
+    ['Key roles that collapse under color-blind views, dark (pairs)', te.roleCvdDark, tp.roleCvdDark],
+    ['Role pairs failing WCAG 2.2 AA, light and dark', te.wcag, tp.wcag],
+    ...(te.gamut == null ? [] : [[`Brand colors outside ${rv.profile} print gamut`, te.gamut, tp.gamut]]),
+  ].map(([k, a, b]) => [k, String(a), cell(a, b)]);
+  return h('div', { class: 'sect stack' }, h('h3', null, 'Brand as entered against the proposals'),
+    h('p', { class: 'small muted' }, `${rv.proposalCount} of ${rv.rows.length} supporting colors have a proposal. Each is compared whichever side is in use, so this answers "what would change" before you switch. Role overrides are left out so both sides are built the same way; brand neutrals are not counted. Fewer is better on every row.`),
+    table(['Measure', 'Brand as entered', 'With the proposals'], rows),
+    h('div', { class: 'stack-s' }, rv.rows.filter((x) => x.proposal).map((x) => h('div', { class: 'stack-s cmp-say' },
+      h('div', { class: 'row', style: 'gap:8px' }, h('span', { class: 'dot-s', style: `background:${x.existing.hex}`, 'aria-hidden': 'true' }), h('span', { 'aria-hidden': 'true' }, '→'), h('span', { class: 'dot-s', style: `background:${x.proposal.hex}`, 'aria-hidden': 'true' }),
+        h('b', null, `${x.label}: ${x.existing.hex.toUpperCase()} or ${x.proposal.hex.toUpperCase()}`), pill(x.choice === 'proposal' ? 'Proposal in use' : 'Existing in use')),
+      h('p', { class: 'small' }, x.sentences.join(' '))))),
+    h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn outlined small', onclick: () => setStep('export') }, 'Save the palette review (PDF)'),
+      h('span', { class: 'small muted' }, 'A review draft for a client meeting, in Export.')));
+}
 function renderChecks() {
   const pal = palette();
   return h('div', { class: 'stack' },
     h('div', { class: 'stack-s' }, h('h2', { id: 'panel-title', tabindex: '-1' }, 'Checks'),
       h('p', { class: 'lead' }, 'WCAG 2.2 decides pass or fail. Color-blind and APCA results are shown beside it so you can weigh them.')),
-    exportBanner(pal), summaryCards(pal), cvdSection(pal), apcaSection(pal), printSection(pal), originSection());
+    comparisonSection(), exportBanner(pal), summaryCards(pal), cvdSection(pal), apcaSection(pal), printSection(pal), originSection());
 }
 
 
@@ -932,6 +954,18 @@ function exportSummary() {
     table(['Slot', 'Exports as', 'Decision'], rows),
     h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn outlined small', onclick: () => setStep('support') }, 'Change in Supporting colors')));
 }
+/** The palette review (D48): offered once any slot has a proposal; never blocked, never in Download all. */
+function reviewCard() {
+  if (!S.seed || !PE.supportSlots(S).some((x) => x.stored.proposal)) return null;
+  const f = PE.REVIEW_FORMAT; const r = exportUi.results.review; const n = PE.supportSlots(S).filter((x) => x.stored.proposal).length;
+  return h('div', { class: 'sect stack-s' }, h('h3', null, 'Before you choose'),
+    h('div', { class: 'slot filled' },
+      h('div', { class: 'row-between' }, h('h3', null, f.label), h('span', { class: 'mono small muted' }, `${PE.slugify((S.name || '').trim() || 'palette')}${f.suffix}`)),
+      h('p', null, f.plain), h('p', { class: 'small muted' }, `${f.blurb} Compares ${n} proposal${n === 1 ? '' : 's'}. Saving it is never blocked, and it is not part of Download all.`),
+      lutStatus !== 'ready' && h('p', { class: 'small muted' }, 'Print data is still loading; CMYK appears once it has.'),
+      h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn filled', id: 'exp-review', disabled: !!exportUi.busy, onclick: () => runExport('review') }, exportUi.busy === 'review' ? 'Building…' : 'Save'),
+        r && h('span', { class: 'small', role: 'status' }, r.text))));
+}
 function renderExport() {
   const pal = palette(); const items = exportStatus(pal);
   const blocked = items.length > 0; const noLut = lutStatus !== 'ready';
@@ -955,6 +989,7 @@ function renderExport() {
       h('p', { class: 'lead' }, 'Design tokens are named color values that design and code tools share. The text spec, Adobe swatches and printable sheet come from the same model, so every rationale, lock and accepted failure appears in each.')),
     exportBanner(pal),
     exportSummary(),
+    reviewCard(),
     blocked && h('div', { class: 'stack-s' }, h('ul', null, items.slice(0, 12).map((f) => h('li', null, h('span', { class: 'mono' }, `${f.mode}: ${f.fg} on ${f.bg}${f.kind === 'non-text' ? ' (UI)' : ''}`)))), items.length > 12 && h('div', { class: 'small muted' }, `…and ${items.length - 12} more.`),
       h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn outlined', onclick: () => setStep('palette') }, 'Go to Palette and roles'))),
     !blocked && noLut && (lutStatus === 'failed' ? notice('warn', 'The print lookup tables did not load, so print data cannot be included and exports are unavailable. The project file still works.') : h('p', { class: 'muted' }, 'Loading print data…')),

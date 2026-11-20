@@ -6,6 +6,8 @@ import { cssVariables } from './css.js';
 import { markdownSpec } from './markdown.js';
 import { buildAse } from './ase.js';
 import { buildSpecSheetPdf } from './sheet.js';
+import { buildReviewPdf } from './review-pdf.js';
+import { reviewModel } from '../review.js';
 import { zipStore } from './zip.js';
 import { assertExportable } from './model.js';
 import { serializeProject } from '../project.js';
@@ -20,12 +22,17 @@ export const FORMATS = [
   { id: 'pdf', label: 'Brand color sheet (PDF)', plain: 'Printable US Letter reference.', suffix: '-color-spec-sheet.pdf', mime: 'application/pdf', gated: true, blurb: 'US Letter: a summary, one page per color, roles and role-pair checks.' },
   { id: 'project', label: 'Save or open project', plain: 'Keeps your work so you can resume it later.', suffix: '.palette-project.json', mime: 'application/json', gated: false, blurb: 'Everything you have chosen, so the work is not tied to this browser. Open it again from this page.' },
 ];
+/**
+ * The palette review (D48) is not one of the final files: it is never gated, it is not in "Download all", and it is offered
+ * only when at least one supporting color has a proposal.
+ */
+export const REVIEW_FORMAT = { id: 'review', label: 'Palette review (PDF)', plain: 'Existing colors beside their proposals, for a client meeting. A review draft, not a final file.', suffix: '-palette-review.pdf', mime: 'application/pdf', gated: false, blurb: 'US Letter: a summary of what changes, the palette in color-blind simulations, one page per proposal with a decision box, and how to read it.' };
 const enc = new TextEncoder();
 export const extOf = (name) => (name.match(/\.([a-z0-9]+)$/i) || [, ''])[1].toLowerCase();
 
 /** Build one file. Returns { id, label, name, mime, data (string | Uint8Array), bytes, warnings }. */
 export async function buildFile(id, model, state, opts = {}) {
-  const f = FORMATS.find((x) => x.id === id); if (!f) throw new Error(`Unknown export ${id}`);
+  const f = id === 'review' ? REVIEW_FORMAT : FORMATS.find((x) => x.id === id); if (!f) throw new Error(`Unknown export ${id}`);
   if (f.gated) assertExportable(model);
   const name = `${model.slug}${f.suffix}`; let data, warnings = [];
   if (id === 'forge') data = forgeTokensJson(model);
@@ -35,6 +42,7 @@ export async function buildFile(id, model, state, opts = {}) {
   else if (id === 'ase') data = buildAse(model, { includeTones: !!opts.aseTones });
   else if (id === 'pdf') { const r = await buildSpecSheetPdf(model); data = r.bytes; warnings = r.warnings; }
   else if (id === 'project') data = serializeProject(state, { now: opts.now });
+  else if (id === 'review') { const r = await buildReviewPdf(reviewModel(state, { printOf: model.printOf }), { date: model.date }); data = r.bytes; warnings = r.warnings; }
   return { id, label: f.label, name, mime: f.mime, data, bytes: typeof data === 'string' ? enc.encode(data).length : data.length, warnings };
 }
 /** Every file, in listing order. Requires an exportable model. */

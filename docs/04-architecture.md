@@ -35,6 +35,7 @@
 | `de.js` | shared | The only ΔE2000 entry point; keeps Lab in D50 |
 | `analyze.js` | glue | One call: screen record, print per profile, gamut flags |
 | `project.js` | state | The single definition of project state (version 3: up to three colors per supporting tier, each existing color with an optional proposal and a choice, plus up to three brand neutrals, D47; version 1 files are migrated on load and version 2 files open unchanged); the choice, proposal and neutral operations (`setChoice`, `setProposal`, `clearProposal`, `moveToNeutrals`, `restoreNeutral`, `remapTier`) so they are tested in the engine; strict validation and save/load of project files |
+| `review.js` | review | The brand as entered against its proposals (D48): `reviewModel` (both palettes built without overrides; per-slot stats, closest color under each color-blind type, role previews, totals, strips, plain sentences), `distanceLabel`, `deBetween`. Read by the Checks step and `export/review-pdf.js` |
 | `export/*` | exports | One shared model feeds every exporter (see [05](05-exports.md)) |
 
 ## Rules every module follows
@@ -56,8 +57,8 @@
 | Analyze | Every color at a glance when there is more than one; screen values, print per profile with gamut flags, the spot scorer for the chosen color |
 | Supporting colors | Harmony lenses (a radio list), filters, up to three secondary and three tertiary slots, where picks go (a radio list), harmonize per extended color; on an existing color, the proposal beside it with an Existing / Proposal segmented switch; the neutral flag and the Brand neutrals group |
 | Palette and roles | Light and dark roles from the colors in use, overrides, role-pair table with fixes and accepted-failure notes; a role group built from a proposal is tagged with the color it replaces |
-| Checks | WCAG summary, color-blind views, APCA, print legibility, color origins |
-| Export | "What will export" summary (kept, replaced, added, brand neutrals, proposals not used), seven outputs, "download all", project file save and open |
+| Checks | When any slot has a proposal, first "Brand as entered against the proposals" (D48); then WCAG summary, color-blind views, APCA, print legibility, color origins |
+| Export | "What will export" summary (kept, replaced, added, brand neutrals, proposals not used), the Palette review (PDF) under "Before you choose" when a proposal exists (D48), seven outputs, "download all", project file save and open |
 
 Interface mechanics follow Material Design 3 (values taken from the Material Web 2.5.0 tokens): 48px touch targets, 40px buttons, 32px chips, 48px tabs with a 3px
 indicator, a 52×32 switch, state layers 8% hover and 10% focus and pressed (12% on chips, switches and tabs), a 3px focus ring with a 2px offset, 38% for disabled.

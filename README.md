@@ -25,6 +25,8 @@ phases. [`docs/02-how-it-was-made.md`](docs/02-how-it-was-made.md) says what tha
 4. **Palette and roles.** Material 3 tonal palettes and 29 light/dark roles, built with HCT. Every text and UI pair is checked against WCAG 2.2;
    each failure carries a nearest passing fix. Colors can be locked, overridden, and given a rationale note.
 5. **Checks.** WCAG 2.2 (the pass/fail gate), color-blind views (Machado 2009), APCA (advisory, web only), print legibility, color origins.
+   When colors have proposals, Checks opens by comparing the brand as entered with the proposals, and Export offers a Palette review PDF for a client meeting
+   (side by side, color-blind simulations, a decision box per color), separate from the final files.
 6. **Export.** A summary of what will export (kept, replaced, added, brand neutrals) first, then design tokens (JSON and W3C standard), website colors (CSS), a text specification (Markdown), Adobe swatches (`.ase`), a printable
    brand color sheet (PDF), and a project file to save and reopen the work.
 

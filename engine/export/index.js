@@ -6,4 +6,5 @@ export * from './markdown.js';
 export * from './ase.js';
 export * from './zip.js';
 export * from './sheet.js';
+export * from './review-pdf.js';
 export * from './files.js';
