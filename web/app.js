@@ -117,8 +117,8 @@ function fixLine(acc) {
   return h('div', { class: 'row small' }, h('span', { class: 'swatch', style: `width:20px;height:20px;border-radius:4px;border:1px solid var(--line);background:${acc.textFix.hex};display:inline-block` }),
     h('span', null, `Nearest text-safe lightness: `), h('span', { class: 'mono' }, acc.textFix.hex.toUpperCase()), h('span', { class: 'muted' }, `(${ratioText(PE.contrastRatio(acc.textFix.hex, '#ffffff'))} on white)`));
 }
-function segmented(options, current, onPick, label, cls) {
-  return h('div', { class: cls ? `seg ${cls}` : 'seg', role: 'group', 'aria-label': label }, options.map((o) => h('button', { type: 'button', 'aria-pressed': String(o.id === current), onclick: () => onPick(o.id) }, o.label)));
+function segmented(options, current, onPick, label, cls, disabled) {
+  return h('div', { class: cls ? `seg ${cls}` : 'seg', role: 'group', 'aria-label': label }, options.map((o) => h('button', { type: 'button', 'aria-pressed': String(o.id === current), disabled: !!disabled, onclick: () => onPick(o.id) }, o.label)));
 }
 function chip(label, pressed, onclick, extra, id) {
   return h('button', { type: 'button', class: 'chip', id, 'aria-pressed': String(!!pressed), onclick }, h('span', { class: 'tick', 'aria-hidden': 'true' }, '✓'), label, extra);
@@ -288,7 +288,7 @@ function renderPaletteEntry() {
     h('p', { class: 'small muted' }, `Enter the colors you already have, each as a color or as a name and a color (Harbour Teal #0083A8). A color is a hex value (#0083A8 or 0083A8), rgb() or oklch(). Primary is the seed. Secondary 1 and Tertiary 1 set Material's secondary and tertiary roles; Secondary 2–${MAX_TIER} and Tertiary 2–${MAX_TIER} become extended colors with roles of their own. Leave a field empty to skip it.`),
     paletteRow('pal-primary', 'Primary (the seed)', P.primary, (v) => { P.primary = v; }),
     h('div', { class: 'grid cols-2' }, tierBlock('secondary'), tierBlock('tertiary')),
-    paletteUi.confirm && !lockedAny && notice('warn', h('div', { class: 'stack-s' }, h('span', null, h('b', null, 'This replaces your current colors. '), 'The seed and every supporting color are swapped for the ones above. Names, notes and harmonize settings on the replaced colors are dropped, and so are role overrides and accepted-failure notes.'),
+    paletteUi.confirm && !lockedAny && notice('warn', h('div', { class: 'stack-s' }, h('span', null, h('b', null, 'This replaces your current colors. '), 'The seed and every supporting color are swapped for the ones above. Names, notes, proposals and harmonize settings on the replaced colors are dropped, and so are brand neutrals, role overrides and accepted-failure notes.'),
       h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn filled small', onclick: () => usePalette(true) }, 'Replace them'), h('button', { type: 'button', class: 'btn text small', onclick: () => { paletteUi.confirm = false; commit(); } }, 'Cancel')))),
     h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn filled', disabled: lockedAny, onclick: () => usePalette(false) }, 'Use this palette'),
       lockedAny && h('span', { class: 'small muted' }, 'A color is locked. Unlock it to replace the palette.')));
@@ -301,11 +301,11 @@ function usePalette(confirmed) {
   for (const tier of PE.SUPPORT_TIERS) P[tier].forEach((v, i) => { const r = parseNamedColor(v); if (!r) return; if (r.error) { errors[`pal-${tier}-${i}`] = 'Not a color this tool can read.'; return; } out[tier].push(r); });
   paletteUi.errors = errors;
   if (Object.keys(errors).length) { commit(); const first = $(`#${Object.keys(errors)[0]}`); if (first) first.focus(); say(`${Object.keys(errors).length} field${Object.keys(errors).length === 1 ? '' : 's'} need a fix`); return; }
-  if (!confirmed && (S.seed || PE.hasSupporting(S))) { paletteUi.confirm = true; commit(); return; }
+  if (!confirmed && (S.seed || PE.hasSupporting(S) || (S.neutrals || []).length)) { paletteUi.confirm = true; commit(); return; }
   paletteUi.confirm = false;
   const rec = (r, seed) => ({ hex: r.a.screen.hex, origin: 'manual', tier: null, rationale: '', locked: false, ...(r.name ? { name: r.name } : {}), ...(r.a.screen.mappedFrom ? { mappedFrom: r.a.screen.mappedFrom } : {}), ...(seed ? {} : { lens: null, offset: null }) });
   S.seed = rec(pr, true); S.seedError = '';
-  S.supporting = { secondary: out.secondary.map((r) => rec(r)), tertiary: out.tertiary.map((r) => rec(r)) };
+  S.supporting = { secondary: out.secondary.map((r) => rec(r)), tertiary: out.tertiary.map((r) => rec(r)) }; S.neutrals = [];
   S.focus = 'primary'; S.target = 'secondary'; S.overrides = { light: {}, dark: {} }; S.accepted = {};
   commit();
   const n = 1 + out.secondary.length + out.tertiary.length;
@@ -367,7 +367,7 @@ function seedCandidateCard(s) {
 
 // --- Step 2: analyze -----------------------------------------------------------------------------------------------
 /** Every brand color in display order: [{ id, label, rec }], primary first. */
-function brandList() { return [{ id: 'primary', label: 'Primary', rec: S.seed }, ...PE.supportSlots(S)]; }
+function brandList() { return [{ id: 'primary', label: 'Primary', rec: S.seed }, ...PE.supportSlots(S), ...PE.neutralSlots(S)]; }
 function analyzeOverview(list) {
   const map = Object.fromEntries(list.map((x) => [x.id, x.rec.hex]));
   const cvd = PE.cvdDistinctPairs(map);
@@ -378,7 +378,7 @@ function analyzeOverview(list) {
     const acc = PE.accessibilityOf(x.rec.hex);
     const mine = cvd.filter((f) => f.a === x.id || f.b === x.id);
     const partners = [...new Set(mine.map((f) => labelOf(f.a === x.id ? f.b : f.a)))];
-    return [h('span', { class: 'row', style: 'gap:8px;flex-wrap:nowrap' }, h('span', { class: 'dot-s', style: `background:${x.rec.hex}`, 'aria-hidden': 'true' }), h('span', null, h('b', null, x.label), x.rec.name ? h('span', { class: 'muted' }, ` · ${x.rec.name}`) : null)),
+    return [h('span', { class: 'row', style: 'gap:8px;flex-wrap:nowrap' }, h('span', { class: 'dot-s', style: `background:${x.rec.hex}`, 'aria-hidden': 'true' }), h('span', null, h('b', null, x.label), x.rec.name ? h('span', { class: 'muted' }, ` · ${x.rec.name}`) : null), x.choice === 'proposal' ? pill('Proposal') : null),
       h('span', { class: 'mono' }, x.rec.hex.toUpperCase()),
       p ? h('span', { class: 'mono' }, p.cmyk.join(' / ')) : h('span', { class: 'muted' }, '—'),
       p ? (p.inGamut ? pill(`✓ ΔE00 ${p.gamutDE00.toFixed(1)}`, 'pass') : pill(`✕ ΔE00 ${p.gamutDE00.toFixed(1)}`, 'fail')) : h('span', { class: 'muted' }, '—'),
@@ -477,31 +477,16 @@ function targetOf() {
   return { tier, i, id: PE.slotId(tier, i), label: slotLabel(tier, i), rec: tierList(tier)[i] || null };
 }
 function setTarget(tier, i) { S.target = PE.slotId(tier, i); }
-/** The four role names of slot i of a tier, in the order [color, on-color, container, on-container]. */
-function slotRoles(tier, i) { return i === 0 ? [tier, `on${cap(tier)}`, `${tier}Container`, `on${cap(tier)}Container`] : PE.extRoles(PE.slotId(tier, i)); }
-/**
- * After colors in a tier are removed or reordered, overrides, accepted-failure notes, the Analyze focus and the pick target
- * follow the color, not the slot (D44). `order` lists, for each new position, the old index of the color now there.
- * Anything belonging to a removed color is dropped, so a note never carries over to a color it was not written about.
- */
-function remapTier(tier, order, oldLen) {
-  const ren = {};
-  for (let o = 0; o < oldLen; o++) { const n = order.indexOf(o); const from = slotRoles(tier, o); const to = n < 0 ? null : slotRoles(tier, n); from.forEach((r, k) => { ren[r] = to ? to[k] : null; }); }
-  const mapRole = (r) => (r in ren ? ren[r] : r);
-  for (const mode of ['light', 'dark']) {
-    const next = {};
-    for (const [r, hex] of Object.entries(S.overrides[mode] || {})) { const nr = mapRole(r); if (nr) next[nr] = hex; }
-    S.overrides[mode] = next;
-  }
-  const acc = {};
-  for (const [k, v] of Object.entries(S.accepted)) { const [mode, fg, bg, kind] = k.split('|'); const nf = mapRole(fg), nb = mapRole(bg); if (nf && nb) acc[PE.acceptKey(mode, nf, nb, kind)] = v; }
-  S.accepted = acc;
-  const slotMap = (id) => { for (let o = 0; o < oldLen; o++) if (PE.slotId(tier, o) === id) { const n = order.indexOf(o); return n < 0 ? null : PE.slotId(tier, n); } return id; };
-  const f = slotMap(S.focus); S.focus = f || 'primary';
-  const t = slotMap(S.target); S.target = t || PE.slotId(tier, Math.min(order.length, MAX_TIER - 1));
-}
+/** Role names of a slot and the reorder bookkeeping live in the engine (project.js), so they are tested there (D44, D47). */
+const remapTier = (tier, order, oldLen) => PE.remapTier(S, tier, order, oldLen);
 function useSupporting(cand, lens) {
   const t = targetOf(); if (t.rec && t.rec.locked) return;
+  if (t.rec && t.rec.origin === 'manual') { // an existing brand color keeps its place; the pick becomes its proposal (D47)
+    const dropped = PE.setProposal(S, t.tier, t.i, { hex: cand.hex, origin: `harmony:${lens}`, tier: cand.tier, lens, offset: cand.offset, ...(cand.mappedFrom ? { mappedFrom: cand.mappedFrom } : {}) });
+    commit();
+    say(`${cand.hex} is now the proposal for ${t.label}.${PE.choiceOf(t.rec) === 'proposal' ? ' It is in use.' : ` ${t.rec.hex.toUpperCase()} stays in use until you choose Proposal.`}${dropped > 0 ? ` ${dropped} note${dropped === 1 ? '' : 's'} on the earlier proposal ${dropped === 1 ? 'was' : 'were'} dropped.` : ''}`);
+    return;
+  }
   const list = tierList(t.tier);
   const rec = { hex: cand.hex, origin: `harmony:${lens}`, tier: cand.tier, lens, offset: cand.offset, rationale: t.rec ? t.rec.rationale : '', locked: false,
     ...(t.rec && t.rec.name ? { name: t.rec.name } : {}), ...(t.rec && t.rec.harmonize ? { harmonize: true } : {}) };
@@ -512,12 +497,12 @@ function targetPicker() {
   const opts = [];
   for (const tier of PE.SUPPORT_TIERS) {
     const list = tierList(tier);
-    list.forEach((r, i) => opts.push({ id: PE.slotId(tier, i), label: slotLabel(tier, i), extra: `· ${r.hex.toUpperCase()}${r.locked ? ' · locked' : ''}` }));
+    list.forEach((r, i) => opts.push({ id: PE.slotId(tier, i), label: slotLabel(tier, i), extra: `· ${r.hex.toUpperCase()} · ${r.origin === 'manual' ? 'existing' : 'generated'}${r.locked ? ' · locked' : ''}` }));
     if (list.length < MAX_TIER) opts.push({ id: PE.slotId(tier, list.length), label: slotLabel(tier, list.length), extra: `· ${list.length ? 'new' : 'empty'}` });
   }
   const t = targetOf();
   return radioList('target', 'Send picks to', opts, t.id, (id) => { const m = /^(secondary|tertiary)([23])?$/.exec(id); setTarget(m[1], m[2] ? Number(m[2]) - 1 : 0); commit(); },
-    h('p', { class: 'small muted' }, t.rec ? `A pick replaces ${t.label} (${t.rec.hex.toUpperCase()}).` : `A pick fills ${t.label}.`));
+    h('p', { class: 'small muted' }, !t.rec ? `A pick fills ${t.label}.` : t.rec.origin === 'manual' ? `A pick becomes the proposal for ${t.label}. Your existing ${t.rec.hex.toUpperCase()} stays in use until you choose Proposal.` : `A pick replaces ${t.label} (${t.rec.hex.toUpperCase()}).`));
 }
 function renderSupport() {
   const seed = S.seed.hex;
@@ -531,6 +516,7 @@ function renderSupport() {
       h('p', { class: 'lead' }, 'Each lens proposes colors from a rule, with its evidence on the card; the evidence is weak for classical wheel geometry. Treat the lenses as a starting vocabulary.'),
       h('p', { class: 'small muted' }, `Up to ${MAX_TIER} secondary and ${MAX_TIER} tertiary colors. Secondary 1 and Tertiary 1 set Material's secondary and tertiary roles; the others become extended colors, each with its own color, on-color, container and on-container roles.`)),
     h('div', { class: 'grid cols-2' }, PE.SUPPORT_TIERS.map((tier) => tierColumn(tier))),
+    neutralsBlock(),
     h('div', { class: 'grid cols-2' },
       h('div', { class: 'stack-s' },
       radioList('lens', 'Lens', lensKeys.map((k) => ({ id: k, label: PE.LENSES[k].name, extra: `· ${PE.LENSES[k].tier === 'low confidence' ? 'low confidence' : 'supported but contested'}` })), S.lens in PE.LENSES ? S.lens : 'complementary', (k) => { S.lens = k; commit(); }),
@@ -554,7 +540,7 @@ function harmonyCard(c) {
         h('div', { class: 'small' }, h('b', null, 'Harmony score '), h('span', { class: 'mono' }, c.harmony.score.toFixed(2)), ' ', pill('Advisory · lab-patch model', 'warn')),
         h('div', { class: 'small muted' }, 'Ou & Luo (2006) two-color model against the seed. Fitted on color patches on gray (R² 0.71), not brand contexts, so it is advisory, not a pass or fail.')),
       a11yColumn(acc, h('div', { class: 'stack-s' }, cvdNode, fixLine(acc)))),
-    h('div', { class: 'foot' }, h('button', { type: 'button', class: 'btn outlined small', disabled: locked, title: locked ? `${t.label} is locked` : null, onclick: () => useSupporting(c, c.lens) }, `Use for ${t.label}`)));
+    h('div', { class: 'foot' }, h('button', { type: 'button', class: 'btn outlined small', disabled: locked, title: locked ? `${t.label} is locked` : null, onclick: () => useSupporting(c, c.lens) }, `${t.rec && t.rec.origin === 'manual' ? 'Propose for' : 'Use for'} ${t.label}`)));
 }
 function tierColumn(tier) {
   const list = tierList(tier);
@@ -574,18 +560,57 @@ function emptySlot(tier, i) {
     manualEntry(tier, i),
     i > 0 && h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn text', onclick: () => { supportUi.open[tier] = false; if (t.id === id) setTarget(tier, 0); commit(); } }, 'Cancel')));
 }
+/**
+ * Distance labels for a proposal against the existing color (D47). "Within print tolerance" follows reproduction practice
+ * (ISO 12647-2 allows 3.5 ΔE00 for CMY solids; brand-color studies put acceptability near 3). The 10 boundary is this tool's
+ * own label, not a standard: no standard says when a deliberate change stops reading as the same color.
+ */
+function distanceLabel(d) { return d <= 3 ? 'Within print tolerance' : d <= 10 ? 'Visible adjustment' : 'New color'; }
+const deBetween = (a, b) => Math.round(PE.de00(PE.labD50(a), PE.labD50(b)) * 10) / 10;
+/** Existing color beside its proposal, the distance between them, and the switch that decides which one exports (D47). */
+function compareBlock(tier, i, s) {
+  const p = s.proposal; const label = slotLabel(tier, i); const use = PE.choiceOf(s);
+  const d = deBetween(s.hex, p.hex);
+  const side = (title, hex, sub, on) => h('div', { class: `cmp-side${on ? ' on' : ''}` }, h('div', { class: 'cmp-sw', style: `background:${hex};color:${inkOn(hex)}` }, h('span', { class: 'mono' }, hex.toUpperCase())),
+    h('div', { class: 'small' }, h('b', null, title), on ? ' · in use' : ''), h('div', { class: 'small muted' }, sub));
+  const pSub = p.origin === 'manual' ? 'Typed as an alternative' : `From the ${(PE.LENSES[p.lens] || {}).name || 'lens'} lens${p.offset != null ? ` (${p.offset > 0 ? '+' : ''}${p.offset}°)` : ''}`;
+  return h('div', { class: 'stack-s cmp' }, h('h4', null, `Existing or proposal for ${label}`),
+    h('div', { class: 'cmp-row' }, side('Existing', s.hex, 'The brand\'s color as entered', use === 'existing'),
+      h('div', { class: 'cmp-gap small' }, h('span', { class: 'mono' }, `ΔE00 ${d.toFixed(1)}`), h('span', { class: 'muted' }, distanceLabel(d))),
+      side('Proposal', p.hex, pSub, use === 'proposal')),
+    h('div', { class: 'row' }, h('div', { id: `cmp-${PE.slotId(tier, i)}` }, segmented([{ id: 'existing', label: 'Use existing' }, { id: 'proposal', label: 'Use proposal' }], use, (v) => {
+      if (s.locked) return; if (PE.setChoice(S, tier, i, v)) { commit(); say(`${label} now uses the ${v === 'proposal' ? `proposal ${p.hex.toUpperCase()}` : `existing ${s.hex.toUpperCase()}`}. Palette, checks and exports follow.`); const b = $(`#cmp-${PE.slotId(tier, i)} button[aria-pressed="true"]`); if (b) b.focus(); } }, `Color used for ${label}`, null, s.locked)),
+      h('button', { type: 'button', class: 'btn text small', disabled: s.locked, onclick: () => { const n = PE.clearProposal(S, tier, i); commit(); say(`Proposal removed. ${label} uses ${s.hex.toUpperCase()}.${n > 0 ? ` ${n} note${n === 1 ? '' : 's'} on the proposal ${n === 1 ? 'was' : 'were'} dropped.` : ''}`); } }, 'Remove proposal')),
+    s.locked && h('div', { class: 'small muted' }, 'Locked: unlock this color to switch or change the proposal.'),
+    h('p', { class: 'small muted' }, 'Palette and roles, Checks and every export use the side that is in use. Notes and role overrides stay with the side they were written for.'));
+}
+/** Flag for a gray in an accent slot, with the offer to keep it as a brand neutral (D47). */
+function neutralFlag(tier, i, s) {
+  const nn = PE.nearNeutral(s.hex); if (!nn.near) return null;
+  const list = tierList(tier); const full = (S.neutrals || []).length >= PE.MAX_NEUTRALS; const lockedBelow = list.slice(i + 1).some((x) => x.locked);
+  const why = s.locked ? 'Unlock this color first.' : full ? `The brand neutrals are full (${PE.MAX_NEUTRALS}).` : lockedBelow ? 'A locked color below would move up. Unlock it first.' : null;
+  return notice('warn', h('div', { class: 'stack-s' }, h('span', null, h('b', null, 'This looks like a neutral. '), `Its chroma is ${nn.chroma}. Roles keep only a color's hue and chroma (Material sets the tone of every role), so this color's own lightness, tone ${nn.tone}, is lost and its roles land among the neutral roles. Two grays of different lightness give practically the same roles.`),
+    h('span', { class: 'small' }, 'As a brand neutral it is kept as a swatch at tone ' + nn.tone + ' in every export, and the neutral roles still come from the seed.'),
+    h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn outlined small', disabled: !!why, onclick: () => { const lab = slotLabel(tier, i); if (PE.moveToNeutrals(S, tier, i)) { commit(); say(`${s.hex.toUpperCase()} moved to Brand neutrals as Neutral ${S.neutrals.length}.${list[i] ? ` ${slotLabel(tier, i + 1)} moved up to ${lab}.` : ''}`); } } }, 'Treat as neutral'),
+      why && h('span', { class: 'small muted' }, why))));
+}
 function supportSlot(tier, i, s) {
   const list = tierList(tier); const id = PE.slotId(tier, i); const label = slotLabel(tier, i);
-  const harm = i > 0 ? PE.harmonizeToward(s.hex, S.seed.hex) : null;
+  const c = PE.chosenOf(s); const existing = s.origin === 'manual';
+  const harm = i > 0 ? PE.harmonizeToward(c.hex, S.seed.hex) : null;
   return h('div', { class: 'slot filled' },
     h('div', { class: 'top' }, h('div', { class: 'dot', style: `background:${s.hex}` }), h('div', { class: 'stack-s', style: 'flex:1;min-width:0' }, h('div', { class: 'row' }, h('h3', null, label), h('span', { class: 'mono' }, s.hex.toUpperCase())),
-      h('div', { class: 'row' }, s.origin === 'manual' ? pill('Your own color') : [pill(`From ${(PE.LENSES[s.lens] || {}).name || 'lens'}`), s.tier && tierPill(s.tier)]), roleNote(tier, i))),
+      h('div', { class: 'row' }, existing ? [pill('Existing color'), s.proposal && pill(PE.choiceOf(s) === 'proposal' ? 'Proposal in use' : 'Has a proposal', PE.choiceOf(s) === 'proposal' ? 'warn' : '')] : [pill(`Generated · ${(PE.LENSES[s.lens] || {}).name || 'lens'}`), s.tier && tierPill(s.tier)]), roleNote(tier, i))),
     s.mappedFrom && notice('warn', h('b', null, 'Beyond sRGB. '), `Entered outside sRGB and mapped in by reducing chroma; the original is kept: ${okText(s.mappedFrom)}.`),
+    existing && neutralFlag(tier, i, s),
+    existing && s.proposal && compareBlock(tier, i, s),
+    existing && !s.proposal && h('p', { class: 'small muted' }, `To compare an alternative, choose ${label} under "Send picks to" and use "Propose for ${label}" on a candidate, or type one below.`),
     manualEntry(tier, i, true),
+    existing && proposalEntry(tier, i, s),
     lockAndNote(s, `sup-${id}`, () => commit()),
     harm && h('div', { class: 'stack-s' }, toggleSwitch(s.harmonize ? 'Harmonized toward the primary (roles only)' : 'Harmonize toward the primary (roles only)', !!s.harmonize, (v) => { if (v) s.harmonize = true; else delete s.harmonize; commit(); }, s.locked),
       h('div', { class: 'small muted' }, harm.dE00 < 0.5 ? 'Already close to the primary\'s hue: harmonizing would change almost nothing.' :
-        `${s.harmonize ? 'Roles are built from' : 'Harmonizing would build the roles from'} ${harm.hex.toUpperCase()}: hue ${harm.hueShift > 0 ? '+' : ''}${harm.hueShift}° toward the primary, ΔE00 ${harm.dE00} from your color. The brand token keeps ${s.hex.toUpperCase()}.`)),
+        `${s.harmonize ? 'Roles are built from' : 'Harmonizing would build the roles from'} ${harm.hex.toUpperCase()}: hue ${harm.hueShift > 0 ? '+' : ''}${harm.hueShift}° toward the primary, ΔE00 ${harm.dE00} from the color in use. The brand token keeps ${c.hex.toUpperCase()}.`)),
     h('div', { class: 'row' },
       i > 0 && h('button', { type: 'button', class: 'btn text', disabled: s.locked || list[i - 1].locked, title: s.locked || list[i - 1].locked ? 'A locked color keeps its place' : null,
         onclick: () => { const n = list.length; [list[i - 1], list[i]] = [list[i], list[i - 1]]; const order = [...Array(n).keys()]; [order[i - 1], order[i]] = [order[i], order[i - 1]]; remapTier(tier, order, n); commit(); say(`${label} is now ${slotLabel(tier, i - 1)}${i - 1 === 0 ? ` and sets the ${tier} role` : ''}`); } }, `Move up to ${slotLabel(tier, i - 1)}`),
@@ -597,7 +622,8 @@ function supportSlot(tier, i, s) {
 function manualEntry(tier, i, replace) {
   const id = `manual-${PE.slotId(tier, i)}`;
   const locked = () => { const r = tierList(tier)[i]; return r && r.locked; };
-  const wrap = h('div', { class: 'stack-s' }, field(id, replace ? 'Replace with your own color' : 'Enter your own color', supportUi.errors[id] ? supportUi.errors[id].value : '', { compact: true, mono: true, placeholder: '#D9822B', error: supportUi.errors[id] && supportUi.errors[id].msg, onenter: (v) => set(v) }),
+  const curRec = tierList(tier)[i];
+  const wrap = h('div', { class: 'stack-s' }, field(id, !replace ? 'Enter your own color (counts as existing)' : curRec && curRec.origin === 'manual' ? 'Change the existing color' : 'Replace with your own color (counts as existing)', supportUi.errors[id] ? supportUi.errors[id].value : '', { compact: true, mono: true, placeholder: '#D9822B', error: supportUi.errors[id] && supportUi.errors[id].msg, onenter: (v) => set(v) }),
     h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn outlined small', disabled: locked(), onclick: () => set($(`#${id}`).value) }, 'Set')));
   function set(v) {
     const r = readTypedColor(v); const a = r.a;
@@ -605,11 +631,41 @@ function manualEntry(tier, i, replace) {
     delete supportUi.errors[id];
     if (locked()) return;
     const list = tierList(tier); const cur = list[i];
+    if (cur && cur.origin === 'manual') { // editing the existing color keeps its proposal and choice (D47)
+      cur.hex = a.screen.hex; if (a.screen.mappedFrom) cur.mappedFrom = a.screen.mappedFrom; else delete cur.mappedFrom;
+      commit(); say(`${slotLabel(tier, i)} existing color set to ${a.screen.hex}${cur.proposal ? '; its proposal is kept' : ''}`); return;
+    }
     list[Math.min(i, list.length)] = { hex: a.screen.hex, origin: 'manual', tier: null, lens: null, offset: null, rationale: cur ? cur.rationale : '', locked: false,
       ...(cur && cur.name ? { name: cur.name } : {}), ...(cur && cur.harmonize ? { harmonize: true } : {}), ...(a.screen.mappedFrom ? { mappedFrom: a.screen.mappedFrom } : {}) };
     supportUi.open[tier] = false; commit(); say(`${slotLabel(tier, Math.min(i, list.length - 1))} set to ${a.screen.hex}`);
   }
   return wrap;
+}
+
+/** A typed alternative for an existing color: it becomes the slot's proposal (D47). */
+function proposalEntry(tier, i, s) {
+  const id = `propose-${PE.slotId(tier, i)}`; const label = slotLabel(tier, i);
+  const set = (v) => {
+    const r = readTypedColor(v);
+    if (!r.a) { supportUi.errors[id] = { msg: typedColorMessage(r), value: v }; commit(); const f = $(`#${id}`); if (f) f.focus(); say(typedColorMessage(r)); return; }
+    delete supportUi.errors[id];
+    const n = PE.setProposal(S, tier, i, { hex: r.a.screen.hex, origin: 'manual', ...(r.a.screen.mappedFrom ? { mappedFrom: r.a.screen.mappedFrom } : {}) });
+    if (n < 0) return; commit(); say(`${r.a.screen.hex} is now the proposal for ${label}.${PE.choiceOf(s) === 'proposal' ? ' It is in use.' : ' Choose Use proposal to put it in use.'}`);
+  };
+  return h('div', { class: 'stack-s' }, field(id, s.proposal ? 'Type a different proposal' : 'Type a proposal (an alternative to compare)', supportUi.errors[id] ? supportUi.errors[id].value : '', { compact: true, mono: true, placeholder: '#00739A', error: supportUi.errors[id] && supportUi.errors[id].msg, onenter: set }),
+    h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn outlined small', disabled: s.locked, onclick: () => set($(`#${id}`).value) }, 'Set proposal')));
+}
+/** Brand neutrals: grays kept as swatches, out of the role palettes (D47). */
+function neutralsBlock() {
+  const ns = PE.neutralSlots(S); if (!ns.length) return null;
+  return h('div', { class: 'stack-s' }, h('div', { class: 'row-between' }, h('h3', null, 'Brand neutrals'), h('span', { class: 'small muted' }, `${ns.length} of ${PE.MAX_NEUTRALS}`)),
+    h('p', { class: 'small muted' }, 'Kept at their own lightness in every export. They do not set roles: the neutral roles come from the seed, as in Material 3.'),
+    h('div', { class: 'grid cols-3' }, ns.map((x) => { const nn = PE.nearNeutral(x.rec.hex); const full = tierList(x.rec.fromTier).length >= MAX_TIER;
+      return h('div', { class: 'slot filled' }, h('div', { class: 'top' }, h('div', { class: 'dot', style: `background:${x.rec.hex}` }), h('div', { class: 'stack-s' }, h('div', { class: 'row' }, h('h3', null, x.label), h('span', { class: 'mono' }, x.rec.hex.toUpperCase())),
+        h('div', { class: 'small muted' }, `${x.rec.name ? `${x.rec.name} · ` : ''}tone ${nn.tone}`))),
+        h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn text small', disabled: full, title: full ? `${cap(x.rec.fromTier)} colors are full` : null, onclick: () => { if (PE.restoreNeutral(S, x.index)) { commit(); say(`${x.rec.hex.toUpperCase()} moved back to ${cap(x.rec.fromTier)} ${tierList(x.rec.fromTier).length}.`); } } }, `Move back to ${cap(x.rec.fromTier)} colors`),
+          full && h('span', { class: 'small muted' }, `${cap(x.rec.fromTier)} colors are full.`)));
+    })));
 }
 
 // --- Step 4: palette and roles ----------------------------------------------------------------------------------------
@@ -625,6 +681,8 @@ const GROUPS = [['Primary', ['primary', 'onPrimary', 'primaryContainer', 'onPrim
   ['Surfaces', ['surface', 'surfaceContainerLow', 'surfaceContainer', 'surfaceContainerHigh', 'onSurface', 'surfaceVariant', 'onSurfaceVariant', 'outline', 'outlineVariant', 'background', 'onBackground', 'inverseSurface', 'inverseOnSurface']]];
 /** Groups for the role tiles: the core ones, then one per extended color (D44). */
 function groupsOf(pal) { return [...GROUPS.slice(0, 3), ...pal.extended.map((e) => [`${e.label} (extended)`, e.roles]), ...GROUPS.slice(3)]; }
+/** "Proposal" tag for a role group whose slot uses a proposal (D47); the group's first role is the slot id. */
+function proposalTag(roles) { const x = PE.supportSlots(S).find((y) => y.id === roles[0]); return x && x.choice === 'proposal' ? pill(`Proposal · replaces ${x.stored.hex.toUpperCase()}`, 'warn') : null; }
 /** Background each "on" role sits on, extended roles included. */
 function pairBgOf(pal) { const out = { ...PAIR_BG }; for (const e of pal.extended) { out[e.roles[1]] = e.roles[0]; out[e.roles[3]] = e.roles[2]; } return out; }
 const PAIR_BG = { onPrimary: 'primary', onPrimaryContainer: 'primaryContainer', onSecondary: 'secondary', onSecondaryContainer: 'secondaryContainer', onTertiary: 'tertiary', onTertiaryContainer: 'tertiaryContainer', onError: 'error', onErrorContainer: 'errorContainer', onSurface: 'surface', onSurfaceVariant: 'surfaceVariant', onBackground: 'background', inverseOnSurface: 'inverseSurface' };
@@ -642,7 +700,7 @@ function renderPalette() {
       (Math.abs(gap.toneGap) < 0.6 ? `In ${mode} mode it sits at the primary role's tone, so ${gap.hex.toUpperCase()} is the same color.` : `The ${mode} primary role is ${gap.hex.toUpperCase()}, ${Math.abs(gap.toneGap)} tone steps ${gap.toneGap > 0 ? 'darker' : 'lighter'} than your brand color, to keep text on it readable.`)),
     h('div', { id: 'override-host' }),
     pal.extended.length > 0 && notice('', h('b', null, 'Extended colors. '), `Material 3 has one secondary and one tertiary role palette, so ${pal.extended.map((e) => e.label).join(', ')} ${pal.extended.length === 1 ? 'is an extended color' : 'are extended colors'} (as in Material Theme Builder): each gets its own four roles, built the same way as Secondary 1 and Tertiary 1.`),
-    groupsOf(pal).map(([title, roles]) => h('div', { class: 'stack-s' }, h('h4', null, title), h('div', { class: 'role-grid' }, roles.map((r) => roleTile(r, sc, mode, pal))))),
+    groupsOf(pal).map(([title, roles]) => h('div', { class: 'stack-s' }, h('div', { class: 'row' }, h('h4', null, title), proposalTag(roles)), h('div', { class: 'role-grid' }, roles.map((r) => roleTile(r, sc, mode, pal))))),
     h('div', { class: 'stack-s' }, h('h4', null, 'Tonal palettes (tones 0–100)'), ['primary', 'secondary', 'tertiary', ...pal.extended.map((e) => e.id), 'neutral'].map((n) => h('div', { class: 'stack-s' }, h('div', { class: 'small muted' }, (pal.extended.find((e) => e.id === n) || {}).label || cap(n)),
       h('div', { class: 'ramp', role: 'img', 'aria-label': `${n} tonal palette` }, Object.entries(pal.tones[n]).map(([t, hex]) => h('div', { style: `background:${hex};color:${inkOn(hex)}` }, t)))))),
     h('div', { class: 'stack-s' }, h('h4', null, `Role pairs (${mode})`), pairTable(chk, mode, pal)));
@@ -748,9 +806,10 @@ function printSection(pal) {
     h('p', { class: 'small muted' }, 'WCAG does not apply to print. ΔL* between text and background under the selected profile is a legibility guide; the 50-point marker is a rule of thumb, not a standard.'), body);
 }
 function originSection() {
-  const recs = [['Seed', S.seed, null], ...PE.supportSlots(S).map((x) => [x.label, x.rec, x.index])];
-  const rows = recs.map(([label, v, i]) => [label, h('span', { class: 'mono' }, v.hex.toUpperCase()), v.origin, v.tier ? tierPill(v.tier) : 'Your choice', v.locked ? 'Yes' : 'No', i ? (v.harmonize ? 'Yes (roles only)' : 'No') : '—', v.rationale || '—']);
-  return h('div', { class: 'sect stack' }, h('h3', null, 'Where each color came from'), table(['Role', 'Color', 'Origin', 'Evidence tier', 'Locked', 'Harmonized', 'Rationale'], rows));
+  const choiceText = (x) => (!x ? '—' : x.choice === 'proposal' ? `Proposal (replaces ${x.stored.hex.toUpperCase()})` : x.choice === 'existing' ? (x.stored.proposal ? `Existing (proposal ${x.stored.proposal.hex.toUpperCase()} not used)` : 'Existing') : 'Generated');
+  const recs = [['Seed', S.seed, null, null], ...PE.supportSlots(S).map((x) => [x.label, x.rec, x.index, x]), ...PE.neutralSlots(S).map((x) => [x.label, { ...x.rec, origin: 'manual' }, null, 'neutral'])];
+  const rows = recs.map(([label, v, i, x]) => [label, h('span', { class: 'mono' }, v.hex.toUpperCase()), x === 'neutral' ? 'Brand neutral' : choiceText(x), v.origin, v.tier ? tierPill(v.tier) : 'Your choice', v.locked ? 'Yes' : 'No', i ? (x.stored.harmonize ? 'Yes (roles only)' : 'No') : '—', v.rationale || '—']);
+  return h('div', { class: 'sect stack' }, h('h3', null, 'Where each color came from'), table(['Role', 'Color', 'Choice', 'Origin', 'Evidence tier', 'Locked', 'Harmonized', 'Rationale'], rows));
 }
 function renderChecks() {
   const pal = palette();
@@ -851,6 +910,28 @@ function projectSection() {
     confirm,
     projectResult(m));
 }
+/**
+ * What will export (D47): every supporting slot, the side in use and any proposal left out, plus the brand neutrals.
+ * This replaces a separate "confirm choices" step: the per-slot switch is the decision and this list is the check before saving.
+ */
+function exportSummary() {
+  const slots = PE.supportSlots(S); const ns = PE.neutralSlots(S);
+  if (!slots.length && !ns.length) return null;
+  const sw = (hex) => h('span', { class: 'dot-s', style: `background:${hex}`, 'aria-hidden': 'true' });
+  const rows = slots.map((x) => {
+    const st = x.choice === 'proposal' ? h('span', null, pill('Replaced', 'warn'), ` ${x.stored.hex.toUpperCase()} → ${x.rec.hex.toUpperCase()}`)
+      : x.choice === 'existing' ? h('span', null, pill('Kept', 'pass'), x.stored.proposal ? h('span', { class: 'muted' }, ` Proposal ${x.stored.proposal.hex.toUpperCase()} not used`) : null)
+      : h('span', null, pill('Added'), h('span', { class: 'muted' }, ' Generated by a lens'));
+    return [h('span', { class: 'row', style: 'gap:8px;flex-wrap:nowrap' }, sw(x.rec.hex), h('b', null, x.label)), h('span', { class: 'mono' }, x.rec.hex.toUpperCase()), st];
+  });
+  for (const x of ns) rows.push([h('span', { class: 'row', style: 'gap:8px;flex-wrap:nowrap' }, sw(x.rec.hex), h('b', null, x.label)), h('span', { class: 'mono' }, x.rec.hex.toUpperCase()), h('span', null, pill('Brand neutral'), h('span', { class: 'muted' }, ' Swatch only, no roles'))]);
+  const counts = { kept: slots.filter((x) => x.choice === 'existing').length, replaced: slots.filter((x) => x.choice === 'proposal').length, added: slots.filter((x) => x.choice === 'generated').length, unused: slots.filter((x) => x.choice === 'existing' && x.stored.proposal).length };
+  const parts = [counts.kept && `${counts.kept} kept`, counts.replaced && `${counts.replaced} replaced`, counts.added && `${counts.added} added`, ns.length && `${ns.length} brand neutral${ns.length === 1 ? '' : 's'}`].filter(Boolean);
+  return h('div', { class: 'sect stack-s' }, h('h3', null, 'What will export'),
+    h('p', { class: 'small' }, `Supporting colors: ${parts.join(', ')}.${counts.unused ? ` ${counts.unused} proposal${counts.unused === 1 ? ' is' : 's are'} not used and will not export.` : ''}`),
+    table(['Slot', 'Exports as', 'Decision'], rows),
+    h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn outlined small', onclick: () => setStep('support') }, 'Change in Supporting colors')));
+}
 function renderExport() {
   const pal = palette(); const items = exportStatus(pal);
   const blocked = items.length > 0; const noLut = lutStatus !== 'ready';
@@ -873,6 +954,7 @@ function renderExport() {
     h('div', { class: 'stack-s' }, h('h2', { id: 'panel-title', tabindex: '-1' }, 'Export'),
       h('p', { class: 'lead' }, 'Design tokens are named color values that design and code tools share. The text spec, Adobe swatches and printable sheet come from the same model, so every rationale, lock and accepted failure appears in each.')),
     exportBanner(pal),
+    exportSummary(),
     blocked && h('div', { class: 'stack-s' }, h('ul', null, items.slice(0, 12).map((f) => h('li', null, h('span', { class: 'mono' }, `${f.mode}: ${f.fg} on ${f.bg}${f.kind === 'non-text' ? ' (UI)' : ''}`)))), items.length > 12 && h('div', { class: 'small muted' }, `…and ${items.length - 12} more.`),
       h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn outlined', onclick: () => setStep('palette') }, 'Go to Palette and roles'))),
     !blocked && noLut && (lutStatus === 'failed' ? notice('warn', 'The print lookup tables did not load, so print data cannot be included and exports are unavailable. The project file still works.') : h('p', { class: 'muted' }, 'Loading print data…')),

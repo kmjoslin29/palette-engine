@@ -174,10 +174,36 @@ async function resolveFailures(page) {
   check('Supporting: both tiers are full (3 of 3) and say which colors set the core roles', (t.match(/3 of 3/g) || []).length === 2 && /Sets Material's secondary role palette/.test(t) && /Extended color: its own tertiary3/.test(t));
   check('Supporting: no Beyond-sRGB warning for colors typed as hex', !/Beyond sRGB\./.test(t));
   await page.check('#target-tertiary2');
-  check('Supporting: a candidate goes to the slot chosen under Send picks to', /A pick replaces Tertiary 2 \(#793974\)/.test(await panelText(page)) && (await page.$$('button:has-text("Use for Tertiary 2")')).length > 0);
-  await page.click('article.card >> nth=0 >> button:has-text("Use for Tertiary 2")');
+  check('Supporting: on an existing color the pick is offered as a proposal (D47)', /A pick becomes the proposal for Tertiary 2\. Your existing #793974 stays in use/.test(await panelText(page)) && (await page.$$('button:has-text("Propose for Tertiary 2")')).length > 0 && (await page.$$('button:has-text("Use for Tertiary 2")')).length === 0);
+  await page.click('article.card >> nth=0 >> button:has-text("Propose for Tertiary 2")');
   s = await st(page);
-  check('Supporting: the pick replaces that slot and keeps its name', s.supporting.tertiary[1].origin.startsWith('harmony:') && s.supporting.tertiary[1].name === 'Plum' && s.supporting.tertiary.length === 3);
+  check('Supporting: the pick becomes the proposal; the existing color stays in use and keeps its name', s.supporting.tertiary[1].origin === 'manual' && s.supporting.tertiary[1].hex === '#793974' && s.supporting.tertiary[1].proposal.origin.startsWith('harmony:') && !s.supporting.tertiary[1].use && s.supporting.tertiary[1].name === 'Plum' && s.supporting.tertiary.length === 3);
+  t = await panelText(page);
+  check('Supporting: the slot shows both swatches, the distance with its label, and which side is in use', /Existing or proposal for Tertiary 2/.test(t) && /ΔE00 \d+\.\d/.test(t) && /(Within print tolerance|Visible adjustment|New color)/.test(t) && /Existing · in use/.test(t));
+  const propHex = s.supporting.tertiary[1].proposal.hex;
+  await page.click('#cmp-tertiary2 button:has-text("Use proposal")');
+  s = await st(page);
+  check('Supporting: Use proposal switches the slot, keeps focus on the switch and announces it', s.supporting.tertiary[1].use === 'proposal' && (await page.evaluate(() => document.activeElement.textContent)) === 'Use proposal' && new RegExp(`Tertiary 2 now uses the proposal ${propHex.toUpperCase()}`).test(await page.textContent('#live')));
+  await goto(page, 'palette');
+  check('Palette: a role group built from a proposal is tagged with what it replaces', /Proposal · replaces #793974/.test(await panelText(page)));
+  await goto(page, 'export');
+  t = await panelText(page);
+  check('Export: the summary says what is kept, replaced and added before anything is saved', /What will export/.test(t) && /Supporting colors: 5 kept, 1 replaced\./.test(t) && new RegExp(`#793974 → ${propHex.toUpperCase()}`).test(t));
+  await page.click('#panel button:has-text("Change in Supporting colors")');
+  check('Export: Change in Supporting colors goes back to Step 3', (await st(page)).step === 'support');
+  await page.click('#cmp-tertiary2 button:has-text("Use existing")');
+  await page.click('.slot:has(h3:text-is("Tertiary 2")) button:has-text("Remove proposal")');
+  s = await st(page);
+  check('Supporting: Remove proposal goes back to the existing color', !s.supporting.tertiary[1].proposal && !s.supporting.tertiary[1].use && s.supporting.tertiary[1].hex === '#793974');
+  await page.fill('#propose-tertiary2', '#5a2d6e'); await page.press('#propose-tertiary2', 'Enter');
+  s = await st(page);
+  check('Supporting: a typed proposal is kept beside the existing color', s.supporting.tertiary[1].proposal.hex === '#5a2d6e' && s.supporting.tertiary[1].proposal.origin === 'manual' && s.supporting.tertiary[1].hex === '#793974');
+  await page.fill('#propose-tertiary2', 'cafe'); await page.press('#propose-tertiary2', 'Enter');
+  check('Supporting: a typed proposal is read with the same rule as other fields (D46)', (await st(page)).supporting.tertiary[1].proposal.hex === '#5a2d6e' && /read as a word, not a color/.test(await panelText(page)));
+  await page.click('.slot:has(h3:text-is("Tertiary 2")) [role="switch"]:has-text("Lock")');
+  check('Supporting: a locked slot cannot switch sides or change its proposal (D47)', await page.$eval('.slot:has(h3:text-is("Tertiary 2"))', (el) => [...el.querySelectorAll('#cmp-tertiary2 button, button')].filter((b) => /Use existing|Use proposal|Remove proposal|Set proposal/.test(b.textContent)).every((b) => b.disabled)));
+  await page.click('.slot:has(h3:text-is("Tertiary 2")) [role="switch"]:has-text("Locked")');
+  await page.click('.slot:has(h3:text-is("Tertiary 2")) button:has-text("Remove proposal")');
   const harm = page.locator('.slot:has(h3:text-is("Secondary 2")) [role="switch"]:has-text("Harmonize")');
   await harm.click();
   t = await panelText(page);
@@ -310,7 +336,7 @@ async function resolveFailures(page) {
   const { ctx, page, errors } = await openApp(browser, site.url, { state: v1 });
   await page.waitForSelector('#panel-title');
   const s = await st(page);
-  check('a version 1 state in browser storage is restored, migrated to lists', s.v === 2 && s.seed.hex === v1.seed.hex && s.supporting.secondary.length === 1 && s.supporting.secondary[0].hex === v1.supporting.secondary.hex && /Restored/.test(await page.textContent('#savestate')));
+  check('a version 1 state in browser storage is restored, migrated to lists', s.v === 3 && s.seed.hex === v1.seed.hex && s.supporting.secondary.length === 1 && s.supporting.secondary[0].hex === v1.supporting.secondary.hex && /Restored/.test(await page.textContent('#savestate')));
   check('version 1 restore: zero console errors', errors.length === 0, errors.join(' | '));
   await ctx.close();
 }
@@ -414,6 +440,40 @@ for (const scheme of ['light', 'dark']) for (const width of [375, 1100]) {
 }
 
 // ---- persistence problems degrade, they do not break ------------------------------------------------------------------------------
+// ---- D47: a brand with gray accents (Kwade's screenshot palette): flag, Treat as neutral, export summary, move back ---------
+{
+  const { ctx, page, errors } = await openApp(browser, site.url);
+  await page.click('button:has-text("I have a palette")');
+  await page.fill('#pal-primary', '#E64123');
+  await page.fill('#pal-secondary-0', '#6CC0A6');
+  for (const v of ['#E7D323', '#84BDC6']) { await page.click('button:has-text("Add a secondary color")'); const n = await page.$$eval('input[id^="pal-secondary-"]', (l) => l.length); await page.fill(`#pal-secondary-${n - 1}`, v); }
+  await page.fill('#pal-tertiary-0', 'Fog #B8B8B8');
+  await page.click('button:has-text("Add a tertiary color")'); await page.fill('#pal-tertiary-1', 'Charcoal #333333');
+  await page.click('button:has-text("Use this palette")');
+  await goto(page, 'support');
+  let t = await panelText(page);
+  check('D47: both grays are flagged as neutrals, the colorful accents are not', (await page.$$('.slot:has(h3:text-is("Tertiary 1")) button:has-text("Treat as neutral")')).length === 1 && (await page.$$('.slot:has(h3:text-is("Tertiary 2")) button:has-text("Treat as neutral")')).length === 1 && (await page.$$('.slot:has(h3:text-is("Secondary 1")) button:has-text("Treat as neutral")')).length === 0);
+  check('D47: the flag explains why a gray collapses in the roles, with its tone', /This looks like a neutral\./.test(t) && /tone 75/.test(t) && /tone 21/.test(t));
+  check('D47: every entered color is labelled existing', (await page.$$('.slot.filled .pill:text-is("Existing color")')).length === 5);
+  await page.click('.slot:has(h3:text-is("Tertiary 2")) button:has-text("Treat as neutral")');
+  await page.click('.slot:has(h3:text-is("Tertiary 1")) button:has-text("Treat as neutral")');
+  let s = await st(page);
+  check('D47: Treat as neutral moves each gray to Brand neutrals, names kept, tertiary emptied', s.supporting.tertiary.length === 0 && s.neutrals.map((x) => `${x.hex}:${x.name}`).join() === '#333333:Charcoal,#b8b8b8:Fog' && /Brand neutrals/.test(await panelText(page)));
+  check('D47: the move is announced', /moved to Brand neutrals as Neutral 2/.test(await page.textContent('#live')));
+  await goto(page, 'analyze');
+  check('D47: Analyze lists the brand neutrals with the other colors', (await page.$$('#panel button[aria-label="Details for Neutral 1"]')).length === 1 && (await page.$$('#panel button[aria-label="Details for Neutral 2"]')).length === 1);
+  await goto(page, 'palette');
+  check('D47: neutrals get no role group of their own', !/Neutral 1/.test(await panelText(page)) && (await page.$$('[aria-label="tertiary2 tonal palette"]')).length === 0);
+  await goto(page, 'export');
+  t = await panelText(page);
+  check('D47: the export summary lists the brand neutrals as swatches only', /Supporting colors: 3 kept, 2 brand neutrals\./.test(t) && /Swatch only, no roles/.test(t));
+  await goto(page, 'support');
+  await page.click('.slot:has(h3:text-is("Neutral 2")) button:has-text("Move back to Tertiary colors")');
+  s = await st(page);
+  check('D47: a neutral can be moved back to its tier as an existing color', s.neutrals.length === 1 && s.supporting.tertiary.length === 1 && s.supporting.tertiary[0].hex === '#b8b8b8' && s.supporting.tertiary[0].origin === 'manual');
+  check('D47: no page errors in the neutral flow', errors.length === 0, errors.join(' | '));
+  await ctx.close();
+}
 {
   const { ctx, page, errors } = await openApp(browser, site.url, { init: () => { Object.defineProperty(window, 'localStorage', { get() { throw new Error('blocked'); } }); } });
   check('with browser storage blocked the page says work is not saved', /not saved|unavailable/i.test(await page.textContent('#savestate')), await page.textContent('#savestate'));

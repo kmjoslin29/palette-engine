@@ -41,7 +41,7 @@ const groupEnd = () => block(T_GROUP_END, new Uint8Array(0));
 /** The list of swatches per group, as plain data (also what the tests compare the parsed file to). */
 export function aseContents(model, { includeTones = false } = {}) {
   assertExportable(model);
-  const items = model.colors.map((c) => ({ name: c.name, hex: c.hex, print: c.print, spot: c.spot }));
+  const items = [...model.colors, ...model.neutrals].map((c) => ({ name: c.name, hex: c.hex, print: c.print, spot: c.spot }));
   const toneSets = [['primary', 'Primary'], ['secondary', 'Secondary'], ['tertiary', 'Tertiary'], ...(model.palette.extended || []).map((e) => [e.id, e.label]), ['neutral', 'Neutral'], ['neutralVariant', 'Neutral variant'], ['error', 'Error']];
   if (includeTones) for (const [key, label] of toneSets)
     for (const t of model.tones) { const hex = model.palette.tones[key][t]; items.push({ name: `${label} ${t}`, hex, print: model.printOf(hex), spot: null }); }
@@ -51,7 +51,7 @@ export function aseContents(model, { includeTones = false } = {}) {
   for (const k of ['coated', 'uncoated']) if (model.conditions.printAvailable)
     groups.push({ name: ASE_GROUPS[k], colors: items.map((i) => ({ name: i.name, model: 'CMYK', values: i.print[pid[k]].cmyk.map((v) => v / 100), type: 'global' })) });
   const spot = [], seen = new Set();
-  for (const c of model.colors) for (const b of ['coated', 'uncoated']) for (const m of c.spot[b]) {
+  for (const c of [...model.colors, ...model.neutrals]) for (const b of ['coated', 'uncoated']) for (const m of c.spot[b]) {
     if (m.dE00 > MAX_SPOT_DE || seen.has(m.name)) continue; seen.add(m.name);
     spot.push({ name: m.name, model: 'LAB ', values: [m.lab.l / 100, m.lab.a, m.lab.b], type: 'spot' });
   }

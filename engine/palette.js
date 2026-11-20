@@ -217,6 +217,20 @@ export function buildPalette(seed, supporting = [], opts = {}) {
 /** Every role in a built palette, core first, then each extended color's four roles in slot order. */
 export const rolesOf = (pal) => [...ROLES, ...(pal.extended || []).flatMap((e) => e.roles)];
 
+/**
+ * Near-neutral supporting colors (D47). A supporting color's roles keep only its hue and chroma: Material sets every role's
+ * tone itself, so the color's own lightness is dropped. A gray (chroma near 0) therefore gives roles that barely differ
+ * from the neutral roles, and two grays of different lightness give practically the same roles. Below this chroma the tool
+ * flags the color and offers to keep it as a brand neutral instead. 10 is a design choice, not a standard: Material builds
+ * its neutral and neutral-variant palettes at chroma 4 and 8, so anything under about 10 lands among them.
+ */
+export const NEAR_NEUTRAL_CHROMA = 10;
+/** { near, chroma, tone } for a hex: near is true when HCT chroma is under NEAR_NEUTRAL_CHROMA. */
+export function nearNeutral(hex) {
+  const h = Hct.fromInt(argbFromHex(hex));
+  return { near: h.chroma < NEAR_NEUTRAL_CHROMA, chroma: Math.round(h.chroma * 10) / 10, tone: Math.round(h.tone) };
+}
+
 /** HCT (CAM16 hue, chroma, L* tone) of a color, rounded for display: [hue, chroma, tone]. */
 export function hctOf(hex) {
   const h = Hct.fromInt(argbFromHex(hex));

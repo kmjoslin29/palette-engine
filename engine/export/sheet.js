@@ -164,10 +164,16 @@ export async function buildSpecSheetPdf(model) {
   S.table([{ w: 96 }, { w: 68, k: 'mono' }, { w: 78 }, { w: 78 }, { w: 84 }, { w: 84 }, { w: 40 }], ['Color', 'Hex', 'CMYK, GRACoL coated', 'CMYK, GRACoL uncoated', 'Pantone coated (approx.)', 'Pantone uncoated (approx.)', 'On white'],
     model.colors.map((c) => [{ text: c.name.toLowerCase() === c.slot ? c.name : `${c.name} (${c.slot})`, swatch: c.hex }, c.hex.toUpperCase(), c.print ? cmykText(c.print[c0.profiles[0].id].cmyk) : 'n/a', c.print ? cmykText(c.print[c0.profiles[2].id].cmyk) : 'n/a',
       c.spot.coated[0] ? `${c.spot.coated[0].name}, dE00 ${c.spot.coated[0].dE00.toFixed(1)}` : 'none supplied', c.spot.uncoated[0] ? `${c.spot.uncoated[0].name}, dE00 ${c.spot.uncoated[0].dE00.toFixed(1)}` : 'none supplied', `${c.accessibility.vsWhite.toFixed(2)}:1`]));
+  if (model.neutrals.length) { // brand neutrals (D47): swatches only, never role palettes
+    S.heading('Brand neutrals');
+    S.text('Grays kept at their own lightness. The neutral roles still come from the seed, as in Material 3.', { size: 9, color: MUTED, gap: 4 });
+    S.table([{ w: 120 }, { w: 68, k: 'mono' }, { w: 40 }, { w: 90 }, { w: 90 }, { w: 50 }], ['Neutral', 'Hex', 'Tone', 'CMYK, GRACoL coated', 'CMYK, GRACoL uncoated', 'On white'],
+      model.neutrals.map((c) => [{ text: `${c.name} (${c.slot})`, swatch: c.hex }, c.hex.toUpperCase(), String(c.tone), c.print ? cmykText(c.print[c0.profiles[0].id].cmyk) : 'n/a', c.print ? cmykText(c.print[c0.profiles[2].id].cmyk) : 'n/a', `${c.accessibility.vsWhite.toFixed(2)}:1`]));
+  }
 
   S.heading('Status');
   const flags = [];
-  for (const c of model.colors) if (c.print) for (const p of c0.profiles) if (!c.print[p.id].inGamut) flags.push(`${c.name} is outside the ${p.label} gamut (dE00 ${c.print[p.id].gamutDE00.toFixed(1)}); the press neighbor differs visibly from the screen color.`);
+  for (const c of [...model.colors, ...model.neutrals]) if (c.print) for (const p of c0.profiles) if (!c.print[p.id].inGamut) flags.push(`${c.name} is outside the ${p.label} gamut (dE00 ${c.print[p.id].gamutDE00.toFixed(1)}); the press neighbor differs visibly from the screen color.`);
   for (const c of model.colors) if (c.screen.p3Only) flags.push(`${c.name} was entered beyond sRGB (P3 only) and is mapped into sRGB by reducing chroma.`);
   S.kv([
     ['Accessibility', model.accepted.length ? `${model.accepted.length} WCAG 2.2 failure${model.accepted.length === 1 ? ' is' : 's are'} accepted with a note (listed below).` : 'Every role pair passes WCAG 2.2 AA in light and dark.', model.accepted.length ? WARN : PASS],
@@ -191,7 +197,7 @@ export async function buildSpecSheetPdf(model) {
     S.newPage();
     S.text(c.slot.toUpperCase(), { size: 8.5, k: 'bold', color: MUTED, gap: 0 });
     S.text(c.name, { size: 20, k: 'bold', gap: 1 });
-    S.text(`${c.hex.toUpperCase()}  |  ${c.origin === 'manual' ? "the designer's own color" : c.origin === 'descriptor' ? 'from descriptor words' : `from the ${c.origin.slice(8)} harmony lens`}  |  ${c.locked ? 'locked' : 'not locked'}`, { size: 9.5, color: MUTED, gap: 8 });
+    S.text(`${c.hex.toUpperCase()}  |  ${c.origin === 'manual' ? "the designer's own color" : c.origin === 'descriptor' ? 'from descriptor words' : `from the ${c.origin.slice(8)} harmony lens`}  |  ${c.locked ? 'locked' : 'not locked'}${c.replaces ? `  |  replaces the existing ${c.replaces.hex.toUpperCase()} (dE00 ${c.replaces.dE00.toFixed(1)})` : ''}`, { size: 9.5, color: MUTED, gap: 8 });
     S.ensure(76); const top2 = S.y; const half = (CW - 12) / 2; const sh = 50;
     S.rect(M.l, top2, half, sh, c.hex, { border: RULE }); S.label('Screen (sRGB)', M.l + 8, top2 + 6, { size: 8.5, k: 'bold', color: inkOn(c.hex) }); S.label(c.hex.toUpperCase(), M.l + 8, top2 + sh - 16, { size: 10, k: 'mono', color: inkOn(c.hex) });
     if (c.print) { const nb = c.print[c0.profiles[0].id].printableNeighbor; S.rect(M.l + half + 12, top2, half, sh, nb, { border: RULE }); S.label(`Press neighbor, ${c0.profiles[0].short}`, M.l + half + 20, top2 + 7, { size: 8.5, k: 'bold', color: inkOn(nb), maxWidth: half - 16 }); S.label(`${nb.toUpperCase()}  (an approximation, not a proof)`, M.l + half + 20, top2 + sh - 16, { size: 8, k: 'mono', color: inkOn(nb), maxWidth: half - 16 }); }

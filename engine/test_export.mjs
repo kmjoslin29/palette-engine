@@ -5,7 +5,7 @@ import postcss from 'postcss';
 import MarkdownIt from 'markdown-it';
 import { converter } from 'culori';
 import * as PE from '../dist/engine.mjs';
-import { luts, lex, model, stateA, stateB, stateC, stateD, stateE } from './export_fixtures.mjs';
+import { luts, lex, model, stateA, stateB, stateC, stateD, stateE, stateF } from './export_fixtures.mjs';
 
 let fails = 0;
 const check = (name, ok, detail = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${!ok && detail ? '  ' + String(detail).slice(0, 300) : ''}`); if (!ok) fails++; };
@@ -223,5 +223,26 @@ check('with no lookup tables the exports still build and say print is unavailabl
   check('E: an accepted note on the extended pair lifts the block', model(s3).unresolved.length === 0);
 }
 
+
+// ---- D47: chosen proposals and brand neutrals -------------------------------------------------------------------------
+{
+  const F = stateF(); const mF = model(F); const mE = model(stateE());
+  const s2 = mF.colors.find((c) => c.slot === 'secondary2'), t3 = mF.colors.find((c) => c.slot === 'tertiary3');
+  check('F: a chosen proposal exports in place of the existing color, named as replacing it', s2.hex === '#00739a' && s2.replaces && s2.replaces.hex === '#0083a8' && s2.replaces.dE00 > 0 && s2.name === 'Harbour Teal');
+  check('F: an unchosen proposal changes nothing in that slot', t3.hex === mE.colors.find((c) => c.slot === 'tertiary3').hex && !t3.replaces);
+  check('F: the roles are built from the chosen color', mF.palette.extended.find((e) => e.id === 'secondary2').hex === '#00739a');
+  check('F: neutrals are listed apart, with their tone, and never get a role palette', mF.neutrals.length === 2 && mF.neutrals[0].slot === 'neutral1' && Math.abs(mF.neutrals[0].tone - 75) <= 1 && !('neutral1' in mF.palette.tones) && mF.colors.length === mE.colors.length);
+  const forge = PE.forgeTokens(mF), d = PE.dtcgTokens(mF);
+  check('F: Forge and DTCG carry each neutral as a brand token marked brandNeutral', [forge, d].every((t) => ['neutral1', 'neutral2'].every((k) => t.color.brand[k] && t.color.brand[k].$extensions[PE.NS].brandNeutral && t.color.brand[k].$extensions[PE.NS].brandNeutral.rolesFrom === 'seed')));
+  check('F: the replaced color carries replaces: the existing hex; others carry no replaces key', forge.color.brand.secondary2.$extensions[PE.NS].replaces === '#0083a8' && !('replaces' in forge.color.brand.tertiary3.$extensions[PE.NS]) && !('replaces' in forge.color.brand.primary.$extensions[PE.NS]));
+  const css = PE.cssVariables(mF); const root = postcss.parse(css);
+  const vars = {}; root.walkDecls((dl) => { if (dl.parent.selector === ':root') vars[dl.prop] = dl.value; });
+  check('F: CSS has a brand variable per neutral with its exact hex', vars['--color-brand-neutral1'] === '#b8b8b8' && vars['--color-brand-neutral2'] === '#333333' && vars['--color-brand-secondary2'] === '#00739a');
+  const md = PE.markdownSpec(mF); const html = new MarkdownIt().render(md);
+  check('F: Markdown has a Brand neutrals table and a Replaces line, with names escaped', /### Brand neutrals/.test(md) && /\*\*Replaces:\*\* the brand's existing `#0083A8`/.test(md) && /Light gray for rules &amp; borders\./.test(html));
+  const ase = PE.parseAse(PE.buildAse(mF));
+  check('F: the ASE screen and CMYK groups list the neutrals after the brand colors', ase.slice(0, 3).every((g) => g.colors.length === mF.colors.length + 2) && ase[0].colors.slice(-2).map((c) => c.name).join() === 'Fog,Charcoal');
+  check('E: a project with no proposals or neutrals has no neutrals and no replaces anywhere', mE.neutrals.length === 0 && mE.colors.every((c) => !c.replaces) && !/Brand neutrals/.test(PE.markdownSpec(mE)) && !/neutral1/.test(PE.cssVariables(mE)));
+}
 console.log(fails ? `\n${fails} FAILED` : '\nALL PASS');
 process.exit(fails ? 1 : 0);

@@ -41,7 +41,7 @@ function tree(model, toValue) {
     }
   }
   color.brand = {};
-  for (const c of model.colors) color.brand[c.slot] = { $value: toValue(c.hex), $type: 'color', $description: c.name, $extensions: { [NS]: colorRecord(c, model) } };
+  for (const c of [...model.colors, ...model.neutrals]) color.brand[c.slot] = { $value: toValue(c.hex), $type: 'color', $description: c.name, $extensions: { [NS]: colorRecord(c, model) } };
   const roles = (mode) => Object.fromEntries(rolesOf(pal).map((r) => [r, { $value: toValue(pal.schemes[mode][r]), $type: 'color' }]));
   color.role = roles('light');
   return { color, colorDark: { role: roles('dark') } };

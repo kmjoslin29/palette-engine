@@ -34,7 +34,7 @@
 | `matcher.js` | M8 | Descriptor terms to ranked seed candidates |
 | `de.js` | shared | The only ΔE2000 entry point; keeps Lab in D50 |
 | `analyze.js` | glue | One call: screen record, print per profile, gamut flags |
-| `project.js` | state | The single definition of project state (version 2: up to three colors per supporting tier; version 1 files are migrated on load); strict validation and save/load of project files |
+| `project.js` | state | The single definition of project state (version 3: up to three colors per supporting tier, each existing color with an optional proposal and a choice, plus up to three brand neutrals, D47; version 1 files are migrated on load and version 2 files open unchanged); the choice, proposal and neutral operations (`setChoice`, `setProposal`, `clearProposal`, `moveToNeutrals`, `restoreNeutral`, `remapTier`) so they are tested in the engine; strict validation and save/load of project files |
 | `export/*` | exports | One shared model feeds every exporter (see [05](05-exports.md)) |
 
 ## Rules every module follows
@@ -54,14 +54,15 @@
 | --- | --- |
 | Seed | Color entry, descriptor words and seed candidates, or a whole existing palette (up to seven colors) |
 | Analyze | Every color at a glance when there is more than one; screen values, print per profile with gamut flags, the spot scorer for the chosen color |
-| Supporting colors | Harmony lenses (a radio list), filters, up to three secondary and three tertiary slots, where picks go (a radio list), harmonize per extended color |
-| Palette and roles | Light and dark roles, overrides, role-pair table with fixes and accepted-failure notes |
+| Supporting colors | Harmony lenses (a radio list), filters, up to three secondary and three tertiary slots, where picks go (a radio list), harmonize per extended color; on an existing color, the proposal beside it with an Existing / Proposal segmented switch; the neutral flag and the Brand neutrals group |
+| Palette and roles | Light and dark roles from the colors in use, overrides, role-pair table with fixes and accepted-failure notes; a role group built from a proposal is tagged with the color it replaces |
 | Checks | WCAG summary, color-blind views, APCA, print legibility, color origins |
-| Export | Seven outputs, "download all", project file save and open |
+| Export | "What will export" summary (kept, replaced, added, brand neutrals, proposals not used), seven outputs, "download all", project file save and open |
 
 Interface mechanics follow Material Design 3 (values taken from the Material Web 2.5.0 tokens): 48px touch targets, 40px buttons, 32px chips, 48px tabs with a 3px
 indicator, a 52×32 switch, state layers 8% hover and 10% focus and pressed (12% on chips, switches and tabs), a 3px focus ring with a 2px offset, 38% for disabled.
 Choice controls follow the m3.material.io guidelines, read in the Claude app's browser on 2026-11-17: segmented buttons hold 2 to 5 options and, past five, chips are the suggested control; a single-select chip set is an alternative to segmented buttons, but all chip sets on one page should be either single-select or multi-select; radio buttons are listed vertically, one option always selected, with a 20dp icon, 40dp state layer and 48dp target, recommended for five or fewer options. So the Analyze color switcher (up to seven colors) is a single-select chip set, the only chip set on that step, and on Supporting colors the Lens and Send picks to choices are stacked radio lists, leaving Show only (multi-select) as that step's one chip set. One intentional deviation: Lens has six options and Send picks to can reach six, against the radio guidance of five or fewer; Kwade chose visible radio lists over dropdown menus (2026-11-17) so every lens and its evidence tag stays in view.
+The Existing / Proposal switch is a two-option segmented button (M3: 2 to 5 options, one selected), with focus kept on the chosen segment after the page re-renders.
 Intentional deviations: field labels sit above the field instead of floating in the outline; the tab bar is used as a wizard stepper with a done mark; the visual
 design is Kwade's, not Material's.
 

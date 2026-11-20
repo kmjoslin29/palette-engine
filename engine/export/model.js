@@ -8,7 +8,10 @@ import { parseEntries, score } from '../spot.js';
 import { accessibilityOf, LENSES, TIER_NOTE, WHEEL, ouLuoHarmony } from '../harmony.js';
 import { cvdDistinctPairs } from '../checks.js';
 import { indexLexicon, matchDescriptors } from '../matcher.js';
-import { PRINT_PROFILES, PRINT_REGIONS, acceptKey, supportSlots, supportingForPalette } from '../project.js';
+import { PRINT_PROFILES, PRINT_REGIONS, acceptKey, supportSlots, supportingForPalette, neutralSlots } from '../project.js';
+import { de00 } from '../de.js';
+import { labD50 } from '../color.js';
+import { nearNeutral } from '../palette.js';
 
 export const NS = 'com.kwadejoslin.palette';
 export const GENERATOR = { name: 'Palette Engine', phase: 5 };
@@ -45,6 +48,7 @@ export function shortCite(src) {
 
 function evidenceFor(slot, rec, seedHex, ctx) {
   const srcOf = (ids) => (ids || []).map((id) => ctx.lex && ctx.lex.sources[id] ? { id, cite: ctx.lex.sources[id].cite, url: ctx.lex.sources[id].url } : { id, cite: id, url: null });
+  if (slot.startsWith('neutral')) return [{ claim: 'Brand neutral supplied by the designer. It is kept as a swatch at its own lightness; the neutral roles still come from the seed, as in Material 3.', tier: null, sources: [] }];
   if (rec.origin === 'manual') return [{ claim: 'Color supplied by the designer. No research claim is attached to it.', tier: null, sources: [] }];
   if (rec.origin === 'descriptor') {
     const words = rec.words || '';
@@ -104,12 +108,19 @@ export function buildExportModel(state, luts = {}, ctx = {}) {
   const slots = supportSlots(state);
   const tierCount = (t) => slots.filter((x) => x.tier === t).length;
   const slotRecs = [['primary', state.seed, 'Primary', 'primary'], ...slots.map((x) => [x.id, x.rec, tierCount(x.tier) > 1 ? x.label : SLOTS.find(([k]) => k === x.tier)[1], x.tier])];
-  for (const [slot, rec, label, tier] of slotRecs) {
+  // Brand neutrals (D47): swatches at their own lightness, never role palettes. One neutral is labelled "Neutral".
+  const nSlots = neutralSlots(state);
+  const neutralRecs = nSlots.map((x) => [x.id, { ...x.rec, origin: 'manual', locked: false }, nSlots.length > 1 ? x.label : 'Neutral', 'neutral']);
+  const neutrals = [];
+  for (const [slot, rec, label, tier] of [...slotRecs, ...neutralRecs]) {
     const a = analyze(rec.hex, {});
     const acc = accessibilityOf(rec.hex);
-    const cvd = slot === 'primary' ? [] : cvdDistinctPairs({ seed: state.seed.hex, candidate: rec.hex }).map((f) => ({ type: f.type, dE00: f.dE00 }));
+    const cvd = slot === 'primary' || tier === 'neutral' ? [] : cvdDistinctPairs({ seed: state.seed.hex, candidate: rec.hex }).map((f) => ({ type: f.type, dE00: f.dE00 }));
     const ext = (palette.extended || []).find((e) => e.id === slot);
-    colors.push({
+    (tier === 'neutral' ? neutrals : colors).push({
+      // A color chosen over the brand's existing one names the color it replaces (D47); a brand neutral names its tone.
+      ...(rec.replaces ? { replaces: { hex: rec.replaces.toLowerCase(), dE00: round(de00(labD50(rec.replaces), labD50(rec.hex)), 1) } } : {}),
+      ...(tier === 'neutral' ? { tone: nearNeutral(rec.hex).tone, fromTier: rec.fromTier } : {}),
       id: slot, slot, slotTier: tier, label, role: slot, ...(ext ? { harmonized: ext.harmonized } : {}), name: (rec.name || '').trim() || label, hex: rec.hex.toLowerCase(), origin: rec.origin, locked: !!rec.locked,
       tier: rec.tier || null, rationale: rec.rationale || '',
       screen: { hex: rec.hex.toLowerCase(), srgb: a.screen.srgb, oklch: a.screen.oklch, hct: a.screen.hct, p3Only: !!rec.mappedFrom, mappedFrom: rec.mappedFrom ? { l: round(rec.mappedFrom.l, 2), c: round(rec.mappedFrom.c, 3), h: round(rec.mappedFrom.h) } : null },
@@ -118,12 +129,12 @@ export function buildExportModel(state, luts = {}, ctx = {}) {
       print: printOf(rec.hex),
       spot: spotFor(a.labD50),
       accessibility: { vsWhite: ratio2(acc.vsWhite), vsBlack: ratio2(acc.vsBlack), textOnWhite: acc.textOnWhite, textOnBlack: acc.textOnBlack, uiOnWhite: acc.uiOnWhite, uiOnBlack: acc.uiOnBlack, apca: acc.apca, cvdVsSeed: cvd },
-      harmonyScore: slot === 'primary' ? null : round(ouLuoHarmony(state.seed.hex, rec.hex).score, 2),
+      harmonyScore: slot === 'primary' || tier === 'neutral' ? null : round(ouLuoHarmony(state.seed.hex, rec.hex).score, 2),
       evidence: evidenceFor(slot, rec, state.seed.hex, ctx),
     });
   }
   const uniq = new Set();
-  for (const c of colors) {
+  for (const c of [...colors, ...neutrals]) {
     let n = c.name;
     if (uniq.has(n.toLowerCase())) n = `${c.name} (${c.slot})`;
     for (let i = 2; uniq.has(n.toLowerCase()); i++) n = `${c.name} (${c.slot}) ${i}`;
@@ -150,7 +161,7 @@ export function buildExportModel(state, luts = {}, ctx = {}) {
       gamut: 'Out of print gamut when the round-trip ΔE00 is above 2.0 (convention)',
     },
     spotDataset, spotSkipped: parsed.errors,
-    colors, palette, printOf, tones: TONES,
+    colors, neutrals, palette, printOf, tones: TONES,
     failures, unresolved: failures.filter((f) => !f.note), accepted: failures.filter((f) => f.note), acceptedStale, overrides,
     state,
   };
@@ -161,6 +172,7 @@ export function colorRecord(c, model) {
   const print = c.print ? { intent: model.conditions.intent, ...Object.fromEntries(model.conditions.profiles.map((p) => [p.id, { cmyk: c.print[p.id].cmyk, tac: c.print[p.id].tac, tacLimit: c.print[p.id].tacLimit, gamutDE00: c.print[p.id].gamutDE00, inGamut: c.print[p.id].inGamut, printableNeighbor: c.print[p.id].printableNeighbor }])) } : null;
   return {
     id: c.id, role: c.role, name: c.name, origin: c.origin, locked: c.locked, rationale: c.rationale, tier: c.tier,
+    ...(c.replaces ? { replaces: c.replaces.hex } : {}), ...(c.slotTier === 'neutral' ? { brandNeutral: { tone: c.tone, rolesFrom: 'seed' } } : {}),
     screen: { hex: c.hex, srgb: c.screen.srgb, oklch: c.screen.oklch, hct: c.screen.hct, p3Only: c.screen.p3Only, mappedFrom: c.screen.mappedFrom },
     labD50: [c.labD50.l, c.labD50.a, c.labD50.b],
     print,

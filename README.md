@@ -20,10 +20,12 @@ phases. [`docs/02-how-it-was-made.md`](docs/02-how-it-was-made.md) says what tha
 2. **Analyze.** Screen values (sRGB, OKLCH, HCT, Lab D50); CMYK and total ink for six print conditions, grouped by region (North America: GRACoL 2013 coated, SWOP 2013, GRACoL 2013 uncoated; Europe: PSO Coated v3, PSO Uncoated v3, a FOGRA39 file);
    a print-gamut flag with the nearest printable color; a scorer that ranks spot colors the designer pastes in.
 3. **Supporting colors.** Harmony lenses (analogous, complementary, split, triadic, square, empirical) with the evidence tier on each card.
+   A color you entered is the brand's existing color: a lens pick or a typed alternative becomes its proposal, shown side by side with the distance between them,
+   and a switch decides which one the palette and exports use. Grays are flagged and can be kept as brand neutrals (swatches only; the neutral roles come from the seed).
 4. **Palette and roles.** Material 3 tonal palettes and 29 light/dark roles, built with HCT. Every text and UI pair is checked against WCAG 2.2;
    each failure carries a nearest passing fix. Colors can be locked, overridden, and given a rationale note.
 5. **Checks.** WCAG 2.2 (the pass/fail gate), color-blind views (Machado 2009), APCA (advisory, web only), print legibility, color origins.
-6. **Export.** Design tokens (JSON and W3C standard), website colors (CSS), a text specification (Markdown), Adobe swatches (`.ase`), a printable
+6. **Export.** A summary of what will export (kept, replaced, added, brand neutrals) first, then design tokens (JSON and W3C standard), website colors (CSS), a text specification (Markdown), Adobe swatches (`.ase`), a printable
    brand color sheet (PDF), and a project file to save and reopen the work.
 
 Two rules run through everything:

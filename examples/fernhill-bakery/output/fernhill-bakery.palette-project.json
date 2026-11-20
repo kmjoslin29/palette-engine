@@ -1,10 +1,10 @@
 {
   "format": "palette-engine-project",
-  "version": 2,
+  "version": 3,
   "app": "Palette Engine",
   "savedAt": "2026-09-28T12:00:00.000Z",
   "state": {
-    "v": 2,
+    "v": 3,
     "step": "export",
     "name": "Fernhill Bakery",
     "path": "known",
@@ -50,6 +50,7 @@
         }
       ]
     },
+    "neutrals": [],
     "paletteInput": {
       "primary": "",
       "secondary": [

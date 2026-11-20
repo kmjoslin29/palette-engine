@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import * as PE from '../dist/engine.mjs';
-import { luts, lex, model, stateA, stateB, stateC, stateD } from './export_fixtures.mjs';
+import { luts, lex, model, stateA, stateB, stateC, stateD, stateF } from './export_fixtures.mjs';
 
 let fails = 0;
 const check = (name, ok, detail = '') => { console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${!ok && detail ? '  ' + String(detail).slice(0, 300) : ''}`); if (!ok) fails++; };
@@ -99,6 +99,12 @@ function pairLabel(f) { return PE.pairLabel(f); }
   fs.writeFileSync(dir + 'control.pdf', await doc.save());
   const bad = outside(words(dir + 'control.pdf'));
   check('control: a word drawn past the right margin is detected by the measuring code', bad.length >= 1 && bad.some((x) => /escaped|margin/.test(x)), bad.join());
+}
+{ // D47: brand neutrals table and the replaces line
+  const mF = model(stateF()); const r = await make('F', mF); const t = squash(r.text);
+  check('F: the sheet has a Brand neutrals table with each neutral, its hex and tone', t.includes(squash('Brand neutrals')) && t.includes('Fog(neutral1)') && t.includes('#B8B8B8') && t.includes('#333333'));
+  check('F: the replaced color\'s page says what it replaces', t.includes(squash('replaces the existing #0083A8')));
+  const pages = words(r.file); check('F: nothing on the sheet runs outside the margins or into the footer', outside(pages).length === 0 && straddle(pages).length === 0, [...outside(pages), ...straddle(pages)].slice(0, 6).join(' '));
 }
 check('control: text missing from a PDF is detected', !squash('nothing here').includes(squash(stateA().seed.rationale)));
 console.log(fails ? `\n${fails} FAILED` : '\nALL PASS');

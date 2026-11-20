@@ -1,5 +1,3 @@
-> Repo copy as of pe-update57 (2026-10-14; delivered as pe-update57.zip; pe-update52 to 56 are committed, CI is green and the page is live). The repo is authoritative; this copy goes stale until refreshed after the next update. docs/07-decisions.md in the Project has D1 to D43: D1 to D41 match the repo file Kwade attached on 2026-10-13, and D42 and D43 (pe-update46 and 47) are committed.
-
 # Open items: a working reference
 
 A plain-language guide to every open item in [`TO-CONFIRM.md`](../TO-CONFIRM.md): what it is, why it matters, what you need, the steps, and how to

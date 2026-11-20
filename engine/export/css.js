@@ -24,6 +24,10 @@ export function cssVariables(model) {
   out.push('/* Roles: ' + model.conditions.roleModel + '. Dark roles apply under prefers-color-scheme: dark unless data-theme="light" is set, or whenever data-theme="dark" is set. */');
   out.push('', ':root {', '  color-scheme: light;', '', '  /* Brand colors (your own hex, kept exactly) */');
   for (const c of model.colors) out.push(line('  ', brandVar(c.slot), c.hex).replace(/\/\*/, `/* ${safeComment(c.name)}: `));
+  if (model.neutrals.length) {
+    out.push('', '  /* Brand neutrals (your own hex, kept exactly; the neutral roles below still come from the seed) */');
+    for (const c of model.neutrals) out.push(line('  ', brandVar(c.slot), c.hex).replace(/\/\*/, `/* ${safeComment(c.name)}, tone ${c.tone}: `));
+  }
   out.push('');
   for (const [key, name] of Object.entries(paletteKeysOf(pal))) {
     out.push(`  /* Tonal palette: ${name} */`);

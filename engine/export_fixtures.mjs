@@ -53,4 +53,13 @@ export function stateE() {
   s.supporting.tertiary.push(rec({ hex: '#7a4fa0', origin: 'harmony:triadic', tier: 'low confidence', lens: 'triadic', offset: 120, name: 'Harbour Teal' }), rec({ hex: '#c2185b', origin: 'manual', lens: null, offset: null, locked: true }));
   return s;
 }
+/** F (D47): E with Secondary 2 replaced by a chosen proposal, an unchosen proposal on Tertiary 3, and two brand neutrals. */
+export function stateF() {
+  const s = stateE();
+  s.name = 'Brand refresh review';
+  s.supporting.secondary[1].proposal = { hex: '#00739a', origin: 'manual', tier: null, lens: null, offset: null }; s.supporting.secondary[1].use = 'proposal';
+  s.supporting.tertiary[2].proposal = { hex: '#3f7ab8', origin: 'harmony:triadic', tier: 'low confidence', lens: 'triadic', offset: 240 };
+  s.neutrals = [{ hex: '#b8b8b8', rationale: 'Light gray for rules & borders.', fromTier: 'tertiary', name: 'Fog' }, { hex: '#333333', rationale: '', fromTier: 'tertiary', name: 'Charcoal' }];
+  return s;
+}
 export const model = (s) => PE.buildExportModel(s, luts, { lex, date: DATE });

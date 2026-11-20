@@ -27,7 +27,9 @@ function colorSection(model, c) {
   L.push(`### ${label}: ${mdEscape(c.name)} ${code(c.hex.toUpperCase())}`, '');
   L.push(`- **Origin:** ${c.origin === 'manual' ? "the designer's own color" : c.origin === 'descriptor' ? 'from descriptor words' : `from the ${mdEscape(c.origin.slice(8))} harmony lens`}`);
   L.push(`- **Evidence tier:** ${tierText(c.tier)}`);
-  L.push(`- **Locked:** ${c.locked ? 'yes (kept when other choices change)' : 'no'}`, '');
+  L.push(`- **Locked:** ${c.locked ? 'yes (kept when other choices change)' : 'no'}`);
+  if (c.replaces) L.push(`- **Replaces:** the brand's existing ${code(c.replaces.hex.toUpperCase())} (ΔE00 ${c.replaces.dE00.toFixed(1)} between them)`);
+  L.push('');
   L.push('**Rationale**', '', c.rationale.trim() ? quote(c.rationale) : '_No rationale was written for this color._', '');
   L.push('**Screen**', '', table(['Value', 'Setting'], [
     ['Hex', code(c.hex.toUpperCase())], ['sRGB', c.screen.srgb.join(', ')], ['OKLCH', code(oklchText(c.screen.oklch))],
@@ -84,6 +86,13 @@ export function markdownSpec(model) {
       c.spot.coated[0] ? `${cell(c.spot.coated[0].name)}, ΔE00 ${c.spot.coated[0].dE00.toFixed(1)}` : 'none supplied', c.spot.uncoated[0] ? `${cell(c.spot.uncoated[0].name)}, ΔE00 ${c.spot.uncoated[0].dE00.toFixed(1)}` : 'none supplied',
       `${c.accessibility.vsWhite.toFixed(2)}:1`, cell(tierText(c.tier))])), '');
   L.push(model.accepted.length ? `**Accessibility status:** ${model.accepted.length} WCAG 2.2 failure${model.accepted.length === 1 ? ' is' : 's are'} accepted with a note (see "Accessibility decisions").` : '**Accessibility status:** every role pair passes WCAG 2.2 AA.', '');
+
+  if (model.neutrals.length) {
+    L.push('### Brand neutrals', '', 'Grays kept as brand swatches at their own lightness. They are not role palettes: the neutral roles come from the seed, as in Material 3. A gray used as a supporting color would lose its lightness, because Material sets role tones itself.', '');
+    L.push(table(['Neutral', 'Name', 'Hex', 'Tone', 'CMYK, GRACoL coated', 'CMYK, GRACoL uncoated', 'On white'], model.neutrals.map((c) => [c.slot, cell(c.name), code(c.hex.toUpperCase()), String(c.tone),
+      c.print ? cmykText(c.print[c0.profiles[0].id].cmyk) : 'n/a', c.print ? cmykText(c.print[c0.profiles[2].id].cmyk) : 'n/a', `${c.accessibility.vsWhite.toFixed(2)}:1`])), '');
+    for (const c of model.neutrals) if (c.rationale.trim()) L.push(`**${mdEscape(c.name)}**`, '', quote(c.rationale), '');
+  }
 
   L.push('## Colors', '');
   for (const c of model.colors) L.push(colorSection(model, c));

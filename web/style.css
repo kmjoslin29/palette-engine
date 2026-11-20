@@ -229,3 +229,14 @@ fieldset.radios legend { padding: 0 0 4px; font-size: 12px; letter-spacing: 0.06
 .radio input:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 .radio:has(input:focus-visible)::before { opacity: .10; }
 .radio .rl { line-height: 20px; }
+
+/* Existing or proposal (D47): two swatches with the distance between them; the side in use carries a heavier border. */
+.grid.cols-3 { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.cmp { border-top: 1px solid var(--line); padding-top: 12px; }
+.cmp-row { display: flex; gap: 12px; align-items: stretch; flex-wrap: wrap; }
+.cmp-side { flex: 1 1 140px; min-width: 0; display: flex; flex-direction: column; gap: 4px; padding: 8px; border: 1px solid var(--line); border-radius: 10px; }
+.cmp-side.on { border: 2px solid var(--ink); padding: 7px; }
+.cmp-sw { height: 56px; border-radius: 6px; border: 1px solid var(--line); display: flex; align-items: flex-end; padding: 6px 8px; }
+.cmp-gap { flex: 0 1 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 2px; }
+@media (max-width: 560px) { .cmp-row { flex-direction: column; } .cmp-gap { flex: none; flex-direction: row; gap: 8px; } .cmp-side { flex: none; } }
+.seg button[disabled] { opacity: .38; cursor: not-allowed; } .seg button[disabled]::before { display: none; }
