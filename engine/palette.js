@@ -244,3 +244,29 @@ export function referenceScheme(seed, isDark = false) {
   for (const r of ROLES) out[r] = hexFromArgb(md[r]().getArgb(s));
   return out;
 }
+
+/**
+ * The light and dark key role (secondary, tertiary or the extended color) that `hex` would give in `slot`, built the same
+ * way buildPalette builds it (D49: the nearest-fix search checks roles without building a whole palette per candidate).
+ * Only the slot's own palette matters for its key role, so the other supporting colors are not needed.
+ */
+const basePalCache = new Map();
+export function keyRoleOf(hex, slot, seed, { harmonize = false, spec = '2021', contrast = 0 } = {}) {
+  const seedHct = Hct.fromInt(argbFromHex(seed));
+  const key = `${seed}|${spec}|${contrast}`;
+  if (!basePalCache.has(key)) { if (basePalCache.size > 20) basePalCache.clear(); basePalCache.set(key, palettes(seedHct, [], 'seed')); }
+  const pal = basePalCache.get(key);
+  const tier = slot.startsWith('secondary') ? 'secondary' : 'tertiary';
+  const source = slot !== tier && harmonize ? harmonizeToward(hex, seed).hex : hex.toLowerCase();
+  const hct = Hct.fromInt(argbFromHex(source));
+  const p = { ...pal, [tier]: TonalPalette.fromHueAndChroma(hct.hue, hct.chroma) };
+  const out = {};
+  for (const isDark of [false, true]) {
+    const s = new DynamicScheme({ sourceColorHct: seedHct, variant: Variant.TONAL_SPOT, contrastLevel: contrast, isDark, specVersion: spec,
+      primaryPalette: p.primary, secondaryPalette: p.secondary, tertiaryPalette: p.tertiary, neutralPalette: p.neutral, neutralVariantPalette: p.neutralVariant });
+    out[isDark ? 'dark' : 'light'] = hexFromArgb(md[tier]().getArgb(s));
+  }
+  return out;
+}
+/** The sRGB hex Material's HCT solver gives for hue, chroma and tone (chroma is reduced if the color is out of gamut). */
+export const hexFromHct = (h, c, t) => hexFromArgb(Hct.from(((h % 360) + 360) % 360, Math.max(0, c), Math.min(100, Math.max(0, t))).toInt());

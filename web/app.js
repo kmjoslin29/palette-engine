@@ -468,7 +468,7 @@ function renderSpot(a, against) {
 // Each tier holds up to MAX_TIER colors (D44). Secondary 1 and Tertiary 1 set Material's secondary and tertiary role
 // palettes; Secondary 2–3 and Tertiary 2–3 are extended colors with roles of their own. A pick from a lens goes to the
 // slot chosen under "Send picks to".
-const supportUi = { open: { secondary: false, tertiary: false }, errors: {} };
+const supportUi = { open: { secondary: false, tertiary: false }, errors: {}, fix: {}, fixBusy: '' };
 const tierList = (tier) => S.supporting[tier];
 const slotLabel = (tier, i) => `${cap(tier)} ${i + 1}`;
 function targetOf() {
@@ -567,7 +567,7 @@ function compareBlock(tier, i, s) {
   const d = deBetween(s.hex, p.hex);
   const side = (title, hex, sub, on) => h('div', { class: `cmp-side${on ? ' on' : ''}` }, h('div', { class: 'cmp-sw', style: `background:${hex};color:${inkOn(hex)}` }, h('span', { class: 'mono' }, hex.toUpperCase())),
     h('div', { class: 'small' }, h('b', null, title), on ? ' · in use' : ''), h('div', { class: 'small muted' }, sub));
-  const pSub = p.origin === 'manual' ? 'Typed as an alternative' : `From the ${(PE.LENSES[p.lens] || {}).name || 'lens'} lens${p.offset != null ? ` (${p.offset > 0 ? '+' : ''}${p.offset}°)` : ''}`;
+  const pSub = p.origin === 'manual' ? 'Typed as an alternative' : p.origin === 'fix' ? 'Nearest fix for color-blind views' : `From the ${(PE.LENSES[p.lens] || {}).name || 'lens'} lens${p.offset != null ? ` (${p.offset > 0 ? '+' : ''}${p.offset}°)` : ''}`;
   return h('div', { class: 'stack-s cmp' }, h('h4', null, `Existing or proposal for ${label}`),
     h('div', { class: 'cmp-row' }, side('Existing', s.hex, 'The brand\'s color as entered', use === 'existing'),
       h('div', { class: 'cmp-gap small' }, h('span', { class: 'mono' }, `ΔE00 ${d.toFixed(1)}`), h('span', { class: 'muted' }, distanceLabel(d))),
@@ -600,6 +600,7 @@ function supportSlot(tier, i, s) {
     existing && s.proposal && compareBlock(tier, i, s),
     existing && !s.proposal && h('p', { class: 'small muted' }, `To compare an alternative, choose ${label} under "Send picks to" and use "Propose for ${label}" on a candidate, or type one below.`),
     manualEntry(tier, i, true),
+    existing && fixRow(tier, i, s),
     existing && proposalEntry(tier, i, s),
     lockAndNote(s, `sup-${id}`, () => commit()),
     harm && h('div', { class: 'stack-s' }, toggleSwitch(s.harmonize ? 'Harmonized toward the primary (roles only)' : 'Harmonize toward the primary (roles only)', !!s.harmonize, (v) => { if (v) s.harmonize = true; else delete s.harmonize; commit(); }, s.locked),
@@ -636,6 +637,62 @@ function manualEntry(tier, i, replace) {
   return wrap;
 }
 
+/** Names a pair the fix reports: another brand color, or another key role in light or dark. */
+function pairText(p, mode) {
+  const who = p.other === 'primary' ? 'Primary' : p.other === 'error' ? 'Error' : (() => { const m = p.other.match(/^(secondary|tertiary)(\d?)$/); return m ? `${cap(m[1])} ${m[2] || 1}` : p.other; })();
+  return `${who}${mode ? ` role (${mode})` : ''}, ${({ protan: 'protanopia', deutan: 'deuteranopia', tritan: 'tritanopia' })[p.type]} ΔE00 ${p.dE00.toFixed(1)}`;
+}
+const pairList = (r) => [...r.brand.map((p) => pairText(p)), ...r.roles.light.map((p) => pairText(p, 'light')), ...r.roles.dark.map((p) => pairText(p, 'dark'))];
+/**
+ * Suggest a fix (D49): the closest color, hue within 15°, that keeps this color and its key role at least ΔE00 10 from the
+ * others under color-blind simulation. The result is shown first; "Make it the proposal" puts it beside the existing color.
+ */
+function fixRow(tier, i, s) {
+  if (PE.nearNeutral(s.hex).near) return null; // the neutral flag answers grays
+  const id = PE.slotId(tier, i); const label = slotLabel(tier, i); const res = supportUi.fix[id]; const busy = supportUi.fixBusy === id;
+  // what the search depended on: this slot's existing color and harmonize, the seed, and the other colors in use
+  const sig = () => JSON.stringify([S.seed.hex, s.hex, !!s.harmonize, PE.supportSlots(S).filter((x) => x.id !== id).map((x) => [x.id, x.rec.hex, !!x.stored.harmonize])]);
+  const run = () => {
+    if (supportUi.fixBusy) return; supportUi.fixBusy = id; render(); say(`Searching for a fix for ${label}…`);
+    setTimeout(() => {
+      let r; try { r = PE.nearestFix(S, tier, i); } catch (e) { r = { status: 'error', message: String(e && e.message || e) }; }
+      r.forKey = sig(); supportUi.fix[id] = r; supportUi.fixBusy = ''; commit();
+      const msg = r.status === 'fixed' ? `Fix found for ${label}: ${r.hex.toUpperCase()}, ΔE00 ${r.dE00.toFixed(1)} from the existing color. It clears every pair.`
+        : r.status === 'partial' ? `No color within 15° of hue clears every pair for ${label}. Best found: ${r.hex.toUpperCase()}.`
+          : r.status === 'none' ? `No color within 15° of hue does better than ${s.hex.toUpperCase()}.`
+            : r.status === 'clear' ? `Nothing to fix: ${label} already stays clear under color-blind views.` : `The search failed: ${r.message || r.reason}`;
+      say(msg); const b = $(`#fix-${id}`); if (b) b.focus();
+    }, 30);
+  };
+  const stale = res && res.forKey !== sig();
+  const n = (x) => x.brand.length + x.roles.light.length + x.roles.dark.length;
+  let body = null;
+  if (res && !stale) {
+    if (res.status === 'fixed' || res.status === 'partial') {
+      const already = s.proposal && s.proposal.hex === res.hex;
+      body = h('div', { class: 'stack-s' },
+        h('div', { class: 'row', style: 'gap:8px' }, h('span', { class: 'dot-s', style: `background:${res.hex}`, 'aria-hidden': 'true' }),
+          h('b', null, res.status === 'fixed' ? `Fix found: ${res.hex.toUpperCase()}` : `Best found: ${res.hex.toUpperCase()}`),
+          h('span', { class: 'small muted' }, `ΔE00 ${res.dE00.toFixed(1)} from the existing color (${distanceLabel(res.dE00).toLowerCase()}), hue ${res.hueShift > 0 ? '+' : ''}${res.hueShift}°`)),
+        h('p', { class: 'small' }, res.status === 'fixed' ? `It keeps this color and its key role at least ΔE00 10 from the others under all three color-blind views (${n(res.before)} pair${n(res.before) === 1 ? '' : 's'} under the line before).`
+          : `No color within 15° of hue clears every pair: moving one color cannot separate everything here. This one clears the most, ${n(res.before)} pair${n(res.before) === 1 ? '' : 's'} under the line before, ${n(res.after)} after. Still close: ${pairList(res.after).slice(0, 4).join('; ')}${n(res.after) > 4 ? '; …' : ''}.`),
+        h('div', { class: 'row' }, already ? h('span', { class: 'small muted' }, 'This is the proposal now.')
+          : h('button', { type: 'button', class: 'btn outlined small', disabled: s.locked, onclick: () => {
+            const d = PE.setProposal(S, tier, i, { hex: res.hex, origin: 'fix' }); if (d < 0) return; commit();
+            say(`${res.hex.toUpperCase()} is now the proposal for ${label}. Choose Use proposal to put it in use.${d > 0 ? ` ${d} note${d === 1 ? '' : 's'} on the earlier proposal ${d === 1 ? 'was' : 'were'} dropped.` : ''}`);
+          } }, s.proposal ? 'Make it the proposal (replaces the current one)' : 'Make it the proposal')));
+    } else if (res.status === 'none') {
+      body = h('p', { class: 'small' }, `No color within 15° of hue does better than ${s.hex.toUpperCase()}. Still close: ${pairList(res.before).slice(0, 4).join('; ')}. A bigger change of hue is a design decision: try the lenses.`);
+    } else if (res.status === 'clear') {
+      body = h('p', { class: 'small pass-text' }, 'Nothing to fix: this color and its key role stay at least ΔE00 10 from the others under all three color-blind views.');
+    } else body = notice('warn', `The search did not finish: ${res.message || res.reason}`);
+  }
+  return h('div', { class: 'stack-s fix-row' },
+    h('div', { class: 'row' }, h('button', { type: 'button', class: 'btn outlined small', id: `fix-${id}`, disabled: s.locked || !!supportUi.fixBusy, onclick: run }, busy ? 'Searching…' : 'Suggest a fix for color-blind views'),
+      h('span', { class: 'small muted' }, busy ? 'This takes about a second.' : 'Closest color, hue within 15°, that stays clear of the others.')),
+    stale && h('p', { class: 'small muted' }, 'This color or the others in use changed since the last search. Search again.'),
+    body);
+}
 /** A typed alternative for an existing color: it becomes the slot's proposal (D47). */
 function proposalEntry(tier, i, s) {
   const id = `propose-${PE.slotId(tier, i)}`; const label = slotLabel(tier, i);

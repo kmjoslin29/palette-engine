@@ -257,7 +257,7 @@ export function validateState(raw) {
         else if (!isObj(r.proposal)) err(`${path}.proposal`, 'must be a color record');
         else {
           const p = r.proposal;
-          if (!(p.origin === 'manual' || (typeof p.origin === 'string' && p.origin.startsWith('harmony:') && LENSES[p.origin.slice(8)]))) err(`${path}.proposal.origin`, 'must be manual or harmony:<lens>');
+          if (!(p.origin === 'manual' || p.origin === 'fix' || (typeof p.origin === 'string' && p.origin.startsWith('harmony:') && LENSES[p.origin.slice(8)]))) err(`${path}.proposal.origin`, 'must be manual, fix or harmony:<lens>');
           out.proposal = { hex: hex(`${path}.proposal.hex`, p.hex), origin: p.origin, tier: p.tier == null ? null : oneOf(`${path}.proposal.tier`, p.tier, TIERS, null),
             lens: p.lens == null ? null : oneOf(`${path}.proposal.lens`, p.lens, Object.keys(LENSES), null), offset: p.offset == null ? null : num(`${path}.proposal.offset`, p.offset, 360) };
           if (p.mappedFrom !== undefined) out.proposal.mappedFrom = oklchObj(`${path}.proposal.mappedFrom`, p.mappedFrom);

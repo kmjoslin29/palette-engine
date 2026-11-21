@@ -50,6 +50,7 @@ function evidenceFor(slot, rec, seedHex, ctx) {
   const srcOf = (ids) => (ids || []).map((id) => ctx.lex && ctx.lex.sources[id] ? { id, cite: ctx.lex.sources[id].cite, url: ctx.lex.sources[id].url } : { id, cite: id, url: null });
   if (slot.startsWith('neutral')) return [{ claim: 'Brand neutral supplied by the designer. It is kept as a swatch at its own lightness; the neutral roles still come from the seed, as in Material 3.', tier: null, sources: [] }];
   if (rec.origin === 'manual') return [{ claim: 'Color supplied by the designer. No research claim is attached to it.', tier: null, sources: [] }];
+  if (rec.origin === 'fix') return [{ claim: 'Nearest fix suggested by the tool (D49): the closest color, with hue held within 15°, that keeps this color and its key role at least dE00 10 from the others under color-blind simulation (Machado et al. 2009, full severity), or as many as it could. Kept only because the designer chose it.', tier: null, sources: [] }];
   if (rec.origin === 'descriptor') {
     const words = rec.words || '';
     if (ctx.lex && words) {

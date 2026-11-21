@@ -36,6 +36,7 @@
 | `analyze.js` | glue | One call: screen record, print per profile, gamut flags |
 | `project.js` | state | The single definition of project state (version 3: up to three colors per supporting tier, each existing color with an optional proposal and a choice, plus up to three brand neutrals, D47; version 1 files are migrated on load and version 2 files open unchanged); the choice, proposal and neutral operations (`setChoice`, `setProposal`, `clearProposal`, `moveToNeutrals`, `restoreNeutral`, `remapTier`) so they are tested in the engine; strict validation and save/load of project files |
 | `review.js` | review | The brand as entered against its proposals (D48): `reviewModel` (both palettes built without overrides; per-slot stats, closest color under each color-blind type, role previews, totals, strips, plain sentences), `distanceLabel`, `deBetween`. Read by the Checks step and `export/review-pdf.js` |
+| `fix.js` | fix | `nearestFix(state, tier, i)` (D49): the closest color, hue within 15°, that keeps the color and its key role ΔE00 10 or more from the others under color-blind simulation; statuses fixed, partial, none, clear, neutral. Uses `keyRoleOf` and `hexFromHct` from `palette.js` |
 | `export/*` | exports | One shared model feeds every exporter (see [05](05-exports.md)) |
 
 ## Rules every module follows
@@ -55,7 +56,7 @@
 | --- | --- |
 | Seed | Color entry, descriptor words and seed candidates, or a whole existing palette (up to seven colors) |
 | Analyze | Every color at a glance when there is more than one; screen values, print per profile with gamut flags, the spot scorer for the chosen color |
-| Supporting colors | Harmony lenses (a radio list), filters, up to three secondary and three tertiary slots, where picks go (a radio list), harmonize per extended color; on an existing color, the proposal beside it with an Existing / Proposal segmented switch; the neutral flag and the Brand neutrals group |
+| Supporting colors | Harmony lenses (a radio list), filters, up to three secondary and three tertiary slots, where picks go (a radio list), harmonize per extended color; on an existing color, the proposal beside it with an Existing / Proposal segmented switch, and Suggest a fix for color-blind views (D49); the neutral flag and the Brand neutrals group |
 | Palette and roles | Light and dark roles from the colors in use, overrides, role-pair table with fixes and accepted-failure notes; a role group built from a proposal is tagged with the color it replaces |
 | Checks | When any slot has a proposal, first "Brand as entered against the proposals" (D48); then WCAG summary, color-blind views, APCA, print legibility, color origins |
 | Export | "What will export" summary (kept, replaced, added, brand neutrals, proposals not used), the Palette review (PDF) under "Before you choose" when a proposal exists (D48), seven outputs, "download all", project file save and open |

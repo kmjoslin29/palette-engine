@@ -81,7 +81,7 @@ export function reviewModel(state, { printOf = null } = {}) {
     const prop = s.stored.proposal || null; const generated = s.choice === 'generated';
     const row = { id: s.id, label: s.label, name: s.stored.name || '', tier: s.tier, generated, choice: s.choice, locked: !!s.stored.locked,
       existing: colorStats(s.stored.hex, s.id, 'existing'), proposal: prop ? colorStats(prop.hex, s.id, 'proposed') : null,
-      proposalSource: prop ? (prop.origin === 'manual' ? 'typed as an alternative' : `from the ${prop.lens} lens`) : null };
+      proposalSource: prop ? (prop.origin === 'manual' ? 'typed as an alternative' : prop.origin === 'fix' ? 'the nearest fix for color-blind views' : `from the ${prop.lens} lens`) : null };
     if (prop) { row.dE00 = deBetween(s.stored.hex, prop.hex); row.distance = distanceLabel(row.dE00); }
     row.sentences = sentencesFor(row, labelOf);
     return row;

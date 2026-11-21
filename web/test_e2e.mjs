@@ -477,6 +477,17 @@ for (const scheme of ['light', 'dark']) for (const width of [375, 1100]) {
   check('D48: with no proposals there is no palette review to save', (await page.$$('#exp-review')).length === 0);
   check('D47: the export summary lists the brand neutrals as swatches only', /Supporting colors: 3 kept, 2 brand neutrals\./.test(t) && /Swatch only, no roles/.test(t));
   await goto(page, 'support');
+  // D49: Suggest a fix on Secondary 1 (grays now neutrals): a partial result with the pairs still close, then made the proposal
+  check('D49: grays (now neutrals) have no fix button; existing accents do', (await page.$$('#fix-secondary')).length === 1);
+  await page.click('#fix-secondary');
+  await page.waitForSelector('#panel :text("Best found:"), #panel :text("Fix found:")', { timeout: 15000 });
+  let ft = await panelText(page);
+  check('D49: the result names the color, its distance and what is still close', /(Best|Fix) found: #[0-9A-F]{6}/.test(ft) && /ΔE00 \d+\.\d from the existing color/.test(ft) && (/Fix found/.test(ft) || /Still close: .*(protanopia|deuteranopia|tritanopia)/.test(ft)));
+  check('D49: focus returns to the button and the result is announced', (await page.evaluate(() => document.activeElement.id)) === 'fix-secondary' && /(Best found|Fix found)/.test(await page.textContent('#live')));
+  check('D49: nothing changes until it is made the proposal', !(await st(page)).supporting.secondary[0].proposal);
+  await page.click('.slot:has(h3:text-is("Secondary 1")) button:has-text("Make it the proposal")');
+  let fs = await st(page);
+  check('D49: Make it the proposal sets a proposal with origin fix, existing still in use', fs.supporting.secondary[0].proposal.origin === 'fix' && !fs.supporting.secondary[0].use && /Nearest fix for color-blind views/.test(await panelText(page)));
   await page.click('.slot:has(h3:text-is("Neutral 2")) button:has-text("Move back to Tertiary colors")');
   s = await st(page);
   check('D47: a neutral can be moved back to its tier as an existing color', s.neutrals.length === 1 && s.supporting.tertiary.length === 1 && s.supporting.tertiary[0].hex === '#b8b8b8' && s.supporting.tertiary[0].origin === 'manual');

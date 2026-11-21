@@ -25,7 +25,7 @@ function colorSection(model, c) {
   const L = [];
   const label = c.slot[0].toUpperCase() + c.slot.slice(1);
   L.push(`### ${label}: ${mdEscape(c.name)} ${code(c.hex.toUpperCase())}`, '');
-  L.push(`- **Origin:** ${c.origin === 'manual' ? "the designer's own color" : c.origin === 'descriptor' ? 'from descriptor words' : `from the ${mdEscape(c.origin.slice(8))} harmony lens`}`);
+  L.push(`- **Origin:** ${c.origin === 'manual' ? "the designer's own color" : c.origin === 'descriptor' ? 'from descriptor words' : c.origin === 'fix' ? 'the nearest fix for color-blind views (D49)' : `from the ${mdEscape(c.origin.slice(8))} harmony lens`}`);
   L.push(`- **Evidence tier:** ${tierText(c.tier)}`);
   L.push(`- **Locked:** ${c.locked ? 'yes (kept when other choices change)' : 'no'}`);
   if (c.replaces) L.push(`- **Replaces:** the brand's existing ${code(c.replaces.hex.toUpperCase())} (ΔE00 ${c.replaces.dE00.toFixed(1)} between them)`);

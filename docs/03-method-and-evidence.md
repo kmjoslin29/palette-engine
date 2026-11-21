@@ -226,3 +226,14 @@ When a brand arrives with its own secondary and tertiary colors, the tool keeps 
 - **Low confidence: when a change stops being the same color.** No standard covers a deliberate redesign. The tool labels 3 to 10 ΔE00 "Visible adjustment" and over 10 "New color"; the boundary at 10 and the wording are this tool's. A 2025 study of printed samples found observers more sensitive to hue differences than CIEDE2000 predicts (Huang et al., "Acceptable Color Differences for Printed Color Samples", Color Research & Application 50:508–518), which is why the planned nearest-fix suggestion (pe-update66) limits hue shift to 15°, the same limit Material's harmonize uses, rather than capping the total distance.
 
 The tool does not pick for the designer: every proposal starts unused, and the Export step lists exactly what will export before anything is saved.
+
+## Nearest fix for color-blind views (D49, 2026-11-20)
+
+The fix searches for the closest color to an existing one (CIEDE2000) that keeps it, and the key role built from it, at least ΔE00 10 from the others under the three color-blind simulations. What it rests on, by evidence tier:
+
+- **Well-established: what can and cannot move a role.** A supporting color's key role is built from its hue and chroma at a tone Material fixes (40 in light, 80 in dark in the 2021 spec), so changing a color's lightness separates the brand colors but never their roles; only hue and chroma do. Protanopia and deuteranopia lose the red-green difference and keep blue-yellow; tritanopia is the reverse. So a teal and a red-orange can stay close as roles under protanopia whatever their lightness.
+- **Supported but contested: lightness as the main cue that survives color blindness.** Brand colors are separated mostly by lightness in the search results, which fits the general finding that luminance contrast survives all three dichromacies; protan observers see reds darker, so the cue is weaker there.
+- **Low confidence: the 15° hue limit.** It is Material's harmonize limit, used as a guard so the color still reads as the same hue family; hue is the dimension observers are most sensitive to in print comparisons (Huang et al. 2025), but no study sets a recognition limit.
+- **Design choices:** one color moves at a time; brand-color pairs are ranked before role pairs when nothing clears everything; chroma stays at or above the near-neutral line (D47).
+
+In a seeded survey of 40 random three-color palettes, a full fix existed for 4, a partial one for 26, nothing better for 7, and 3 needed nothing. A partial result is the usual answer, and the tool says what is still close rather than calling it fixed.
