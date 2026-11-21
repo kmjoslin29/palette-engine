@@ -118,7 +118,9 @@ Start a new session for this. Read `TO-CONFIRM.md` first.
 
 ## Starting a new session
 
-**State on 2026-11-20 (pe-update67):** pe-update66 is committed as be817b1. pe-update67 adds the nearest fix for color-blind views (D49, `engine/fix.js`: `nearestFix`; `keyRoleOf` and `hexFromHct` in `palette.js`): a button on each existing color shows the closest color within 15° of hue that clears the color-blind pairs (or the best partial), and Make it the proposal sets it with origin `fix`. Next: C49 (NVDA), C51 (thresholds on real palettes) and the UI/UX pass (C38).
+**State on 2026-11-20 (pe-update69):** pe-update67 is committed as 9904120 and pe-update68 (README screenshots retaken in IBM Plex, three new images) as 5d0db1a; Kwade tried the fix on the live page. pe-update69 closes C51: he checked the D47 and D49 thresholds visually and kept them, and a fix outside print gamut is acceptable to him. Next: C49 (NVDA) and the UI/UX pass (C38).
+
+**Earlier, pe-update67:** pe-update66 is committed as be817b1. pe-update67 adds the nearest fix for color-blind views (D49, `engine/fix.js`: `nearestFix`; `keyRoleOf` and `hexFromHct` in `palette.js`): a button on each existing color shows the closest color within 15° of hue that clears the color-blind pairs (or the best partial), and Make it the proposal sets it with origin `fix`. Next: C49 (NVDA), C51 (thresholds on real palettes) and the UI/UX pass (C38).
 
 **Earlier, pe-update66:** pe-update65 is committed as f61c163. pe-update66 adds the palette review (D48): `engine/review.js` compares the brand as entered with its proposals (both sides built without overrides), read by a block at the top of Checks and by the Palette review PDF (`engine/export/review-pdf.js`, never gated, not in Download all, offered only with a proposal). Next: pe-update67, the nearest-fix suggestion (hue within 15°, lightness and chroma free, the brand-color and role color-blind targets both checked); Opus for the math.
 
@@ -142,7 +144,7 @@ Start a new session for this. Read `TO-CONFIRM.md` first.
 | A screen-reader session | C18, C20 (re-test), then C19 (step navigation), then C21 (reading load). |
 | Equipment Kwade does not have | C6 (Pantone guide), C7 and C8 (Adobe). |
 | Kwade's judgment, deferred on purpose | C10 (seed quality on the live page), C15 (the near-synonym chip, not yet seen by him), C13 (stays open). |
-| Kwade, to do next | Apply and push pe-update67, let CI run, try Suggest a fix on the live page (on a palette with a color-blind problem). NVDA session for C49 with C18 to C21 (now including the D47 to D49 controls). C51 after real brand palettes. The UI/UX pass (C38) is still waiting for his scope. |
+| Kwade, to do next | NVDA session for C49 with C18 to C21 (now including the D47 to D49 controls). The UI/UX pass (C38) is still waiting for his scope. |
 
 **Decisions that need Kwade before anything changes:** the matcher tie-break and the color-word bands (D34, D35) are not changed without asking. Brand data comes from published sources only. No researcher or contact email addresses go in the repo.
 

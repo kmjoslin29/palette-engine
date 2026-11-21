@@ -197,3 +197,7 @@ pe-update66 was committed as be817b1 and Kwade tried the palette review on the l
 ## 2026-11-20: README screenshots retaken (pe-update68, docs only)
 
 After pe-update67 (9904120), Kwade asked whether the README screenshots needed updating. A pixel comparison was not conclusive on its own, because the committed set turned out to have been rendered with a fallback font, not the IBM Plex named in `docs/images/README.md`. All seven step images were retaken in Plex from the page at pe-update67, which brings in the Step 3 labels (existing and generated colors, Suggest a fix, Type a proposal), the Export summary and the Analyze overview's Details buttons. Three images were added for D47 to D49: the existing-or-proposal card after a suggested fix on the sample's Fern Green (close to Kiln Terracotta under deuteranopia, ΔE00 3.4; the fix, #6C8C00, is ΔE00 9.9 away and clears that pair, though it falls outside GRACoL coated gamut), and pages 2 and 3 of the palette review PDF. The brand color sheet images are unchanged.
+
+## 2026-11-20: Thresholds kept (pe-update69, docs only)
+
+Kwade committed pe-update68 as 5d0db1a. He had tried the D47 and D49 thresholds on the live page (chroma 10 for a gray, ΔE00 10 for "New color", the fix's 15° hue limit) and found they work visually, so C51 is closed with the values unchanged. He is also fine with a suggested fix landing outside print gamut, since the palette review flags it and names the nearest printable color. Still open from these updates: C49, his NVDA session on the new controls.
